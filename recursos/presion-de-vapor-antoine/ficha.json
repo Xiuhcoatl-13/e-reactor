@@ -1,0 +1,24 @@
+{
+  "titulo": "Presión de vapor con la ecuación de Antoine",
+  "descripcion": "Calcula la presión de saturación a partir de la temperatura (y la temperatura a partir de la presión) para 4 977 compuestos, con curva P–T y conversión de unidades.",
+  "materia": "termodinamica",
+  "tema": "Propiedades de sustancias puras",
+  "archivo": "/modulos/antoine.html",
+  "tipo": "calculadora",
+  "sigla": "Pv",
+  "nivel": "basico",
+  "etiquetas": [
+    "Antoine",
+    "presión de vapor",
+    "saturación",
+    "punto de ebullición"
+  ],
+  "objetivos": [
+    "Usar la ecuación de Antoine en sus dos sentidos: T → P y P → T.",
+    "Reconocer el rango de validez de los coeficientes.",
+    "Interpretar la curva de presión de vapor de un compuesto."
+  ],
+  "destacado": true,
+  "publicado": false,
+  "fecha": "2026-10-21"
+}

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Convección de calor — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{
+  --bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);
+  --muted:var(--paper-muted);--accent:var(--paper-accent);--ok:var(--paper-accent-2);--warn:#92400e;
+  --err:#b42318;--line:var(--paper-line);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,Roboto,'Segoe UI',sans-serif;font-size:16px}
+.module-shell{max-width:760px}
+.module-tabs{margin-bottom:16px}
+.module-tabs button{min-width:0;padding:0 4px;overflow-wrap:anywhere}
+.card{background:var(--paper-surface);border:1px solid var(--paper-line);border-radius:16px;
+  padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+label{display:block;color:var(--paper-muted);font-size:12px;font-weight:800;margin:10px 0 6px}
+input,select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--paper-line);
+  background:#fffdf8;color:var(--paper-ink);font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.seg{display:flex;gap:3px;padding:3px;background:var(--paper-surface-2);border:1px solid var(--paper-line);
+  border-radius:14px;margin-bottom:12px}
+.seg button{flex:1;min-height:38px;border:0;border-radius:11px;background:transparent;color:var(--paper-muted);
+  font-size:12px;font-weight:800}
+.seg button.on{background:var(--paper-surface);color:var(--paper-ink);box-shadow:0 1px 4px rgba(31,41,51,.08)}
+.btn-calc{width:100%;padding:13px;background:#10263f;color:#f8fafc;border:0;border-radius:12px;
+  font-size:16px;font-weight:800;cursor:pointer;margin-top:12px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.res-card{background:var(--paper-surface-2);border:1px solid var(--paper-line);border-radius:12px;padding:12px;text-align:center}
+.res-card.full{grid-column:1/-1;text-align:left}
+.res-card .val{font-size:20px;font-weight:850;color:#10263f;margin-bottom:3px}
+.res-card .lbl{font-size:11px;color:var(--paper-muted);text-transform:uppercase;letter-spacing:.5px}
+.res-card .interp{font-size:13px;color:var(--paper-muted);line-height:1.55;margin-top:6px}
+.warn-box{border-radius:10px;padding:11px 13px;margin:10px 0;font-size:13px;line-height:1.6}
+.warn-box.info{background:var(--paper-soft-blue);border:1px solid #cbdaf7;color:#1d4ed8}
+.warn-box.ok{background:var(--paper-soft-green);border:1px solid #b7dbc9;color:#0f5132}
+.warn-box.warn{background:var(--paper-soft-amber);border:1px solid #f3d391;color:#92400e}
+.warn-box.err{background:#fff0ed;border:1px solid #f0b9b0;color:#9f2a1d}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;border-radius:999px;
+  background:var(--paper-surface-2);border:1px solid var(--paper-line);color:#475467;font-size:10px;font-weight:800}
+.tag.hot{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#1d4ed8}
+.equation-box{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.7}
+.learn h3,.corr h3{font-size:13px;color:#10263f;margin:14px 0 6px}
+.learn p,.learn li,.corr p,.corr li{font-size:13px;color:var(--paper-muted);line-height:1.58}
+.learn ul,.corr ul{padding-left:18px;margin:8px 0}
+.slider-row{margin:12px 0}.slider-lbl{display:flex;justify-content:space-between;color:var(--paper-muted);font-size:13px}
+.slider-lbl span:last-child{color:#10263f;font-weight:800}input[type=range]{accent-color:#10263f}
+.trend-bar{height:16px;border-radius:999px;background:var(--paper-surface-2);border:1px solid var(--paper-line);overflow:hidden;margin:8px 0}
+.trend-fill{height:100%;background:#2563eb;width:20%;transition:.15s}
+.technical-table{margin-top:8px}
+.technical-table th,.technical-table td{border-bottom:1px solid var(--paper-line);padding:8px 6px;text-align:left;font-size:12px;vertical-align:top}
+.technical-table th{color:#10263f}.technical-table td{color:var(--paper-muted)}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row,.res-grid{display:grid;grid-template-columns:1fr}
+  .module-tabs button{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar">
+      <a class="back-link" href="../index.html">‹ Inicio</a>
+      <span class="module-kicker">Fenómenos de transporte</span>
+    </div>
+    <h1 class="module-heading">Convección de calor</h1>
+    <p class="module-subtitle">De correlaciones Nu a h, q'', Q y área requerida.</p>
+  </div>
+
+  <div class="module-tabs" id="tabs">
+    <button class="on" onclick="showTab('calc',0)">Calculadora</button>
+    <button onclick="showTab('learn',1)">Aprendizaje</button>
+    <button onclick="showTab('explore',2)">Exploración</button>
+    <button onclick="showTab('corr',3)">Correlaciones</button>
+  </div>
+
+  <div id="tab-calc">
+    <div class="card">
+      <div class="seg" id="caseSeg">
+        <button class="on" onclick="setCase('tube',0)">Tubo interno</button>
+        <button onclick="setCase('plate',1)">Placa forzada</button>
+        <button onclick="setCase('natural',2)">Placa natural</button>
+      </div>
+      <div class="warn-box info" id="caseHelp">Flujo interno en tubo circular. Calcula Re, Pr, Nu, h y transferencia por área.</div>
+      <div class="tag-row" id="caseTags"></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div><label id="lenLabel">Diámetro D (m)</label><input id="Lchar" type="number" value="0.05" min="0" inputmode="decimal"></div>
+        <div id="velBox"><label>Velocidad V (m/s)</label><input id="V" type="number" value="1.5" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="row">
+        <div><label>ρ fluido (kg/m³)</label><input id="rho" type="number" value="998" min="0" inputmode="decimal"></div>
+        <div><label>μ dinámica (Pa·s)</label><input id="mu" type="number" value="0.001" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="row">
+        <div><label>Cp (J/kg·K)</label><input id="Cp" type="number" value="4182" min="0" inputmode="decimal"></div>
+        <div><label>k fluido (W/m·K)</label><input id="k" type="number" value="0.598" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="row" id="natProps" style="display:none">
+        <div><label>β expansión (1/K)</label><input id="beta" type="number" value="0.00343" min="0" inputmode="decimal"></div>
+        <div><label>ν cinemática (m²/s)</label><input id="nu" type="number" value="0.000001" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="row">
+        <div><label id="hotLabel">T pared Ts (°C)</label><input id="Ts" type="number" value="80" inputmode="decimal"></div>
+        <div><label id="coldLabel">T fluido/bulk T∞ (°C)</label><input id="Tinf" type="number" value="25" inputmode="decimal"></div>
+      </div>
+      <div class="row">
+        <div><label>Área A disponible (m², opcional)</label><input id="area" type="number" placeholder="ej. 1.2" min="0" inputmode="decimal"></div>
+        <div><label>Q objetivo (W, opcional)</label><input id="qtarget" type="number" placeholder="ej. 5000" min="0" inputmode="decimal"></div>
+      </div>
+      <button class="btn-calc" onclick="calculate()">Calcular convección</button>
+    </div>
+
+    <div id="calcOut"></div>
+  </div>
+
+  <div id="tab-learn" style="display:none">
+    <div class="card learn">
+      <h3>Qué es la convección</h3>
+      <p>La convección combina conducción cerca de la superficie y movimiento del fluido. Por eso h no es una propiedad tabulada del fluido: depende de velocidad, geometría, régimen, propiedades y condición térmica.</p>
+      <h3>Forzada vs. natural</h3>
+      <ul>
+        <li><strong>Forzada:</strong> una bomba, ventilador o corriente impuesta fija la velocidad. Re es el primer filtro.</li>
+        <li><strong>Natural:</strong> el movimiento aparece por flotación térmica. Ra = Gr·Pr gobierna la intensidad.</li>
+      </ul>
+      <h3>Interna vs. externa</h3>
+      <p>En flujo interno la longitud característica suele ser el diámetro hidráulico. En flujo externo sobre placa, la longitud característica suele ser la distancia desde el borde de ataque o la longitud total L.</p>
+      <h3>Nusselt y diseño</h3>
+      <p>Nu conecta la correlación con el coeficiente práctico: h = Nu·k/Lc. Después se usa q'' = h(Ts − T∞), Q = q''A y, si Q es objetivo, A = Q/q''.</p>
+      <h3>Errores comunes</h3>
+      <ul>
+        <li>Usar k del sólido en Nu; para convección se usa k del fluido.</li>
+        <li>Mezclar diámetro, radio y longitud de placa como si fueran el mismo Lc.</li>
+        <li>Aplicar una correlación turbulenta en régimen laminar o de transición.</li>
+        <li>Olvidar que las propiedades se evalúan a temperatura de película o bulk según la correlación.</li>
+      </ul>
+      <div class="warn-box info">Conexión: este módulo usa los números y familias de correlaciones introducidos en Números adimensionales v2.0.</div>
+    </div>
+  </div>
+
+  <div id="tab-explore" style="display:none">
+    <div class="card">
+      <h2 style="margin:0 0 8px;font-size:16px">Exploración rápida</h2>
+      <div class="slider-row">
+        <div class="slider-lbl"><span>Velocidad en tubo (m/s)</span><span id="exVv">1.5</span></div>
+        <input id="exV" type="range" min="0.1" max="5" step="0.1" value="1.5" oninput="updateExplore()">
+      </div>
+      <div class="trend-bar"><div class="trend-fill" id="barTube"></div></div>
+      <div id="exTube" class="warn-box info"></div>
+      <div class="slider-row">
+        <div class="slider-lbl"><span>ΔT en placa vertical (K)</span><span id="exDTv">40</span></div>
+        <input id="exDT" type="range" min="1" max="120" step="1" value="40" oninput="updateExplore()">
+      </div>
+      <div class="trend-bar"><div class="trend-fill" id="barNat"></div></div>
+      <div id="exNat" class="warn-box ok"></div>
+    </div>
+  </div>
+
+  <div id="tab-corr" style="display:none">
+    <div class="card corr">
+      <h3>Tubo circular interno</h3>
+      <table class="technical-table">
+        <tr><th>Régimen</th><td>Laminar: Re &lt; 2300. Turbulento: Re &gt; 10000. Transición: evitar diseño directo.</td></tr>
+        <tr><th>Correlaciones</th><td>Nu = 3.66 para laminar plenamente desarrollado con pared a T constante. Nu = 0.023 Re^0.8 Pr^0.4 para Dittus-Boelter en turbulento.</td></tr>
+        <tr><th>Uso</th><td>Estima h interno con Lc = D. Requiere propiedades del fluido.</td></tr>
+      </table>
+      <h3>Placa plana forzada</h3>
+      <table class="technical-table">
+        <tr><th>Régimen</th><td>Promedio sobre L. Laminar típico si Re_L &lt; 5×10⁵.</td></tr>
+        <tr><th>Correlaciones</th><td>Nu_L = 0.664 Re_L^1/2 Pr^1/3. Para flujo mixto/turbulento: Nu_L = (0.037 Re_L^0.8 − 871) Pr^1/3.</td></tr>
+        <tr><th>Uso</th><td>Flujo externo sobre placa lisa con gradiente de presión bajo.</td></tr>
+      </table>
+      <h3>Placa vertical natural</h3>
+      <table class="technical-table">
+        <tr><th>Números</th><td>Gr = gβΔTL³/ν², Pr = ν/α, Ra = GrPr.</td></tr>
+        <tr><th>Correlación</th><td>Churchill-Chu: Nu_L = [0.825 + 0.387 Ra^(1/6)/(1+(0.492/Pr)^(9/16))^(8/27)]².</td></tr>
+        <tr><th>Uso</th><td>Convección natural sobre placa vertical; útil como correlación educativa amplia.</td></tr>
+      </table>
+      <div class="warn-box warn">Estas correlaciones son representativas para aprendizaje. En diseño real confirma rugosidad, entrada, propiedades a temperatura adecuada y límites del texto de referencia.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+let curCase='tube';
+const g=id=>document.getElementById(id);
+const fmt=(v,d=3)=>!isFinite(v)?'—':(Math.abs(v)>=1000||Math.abs(v)<0.001&&v!==0?v.toExponential(3):v.toFixed(d));
+function showTab(name,idx){
+  ['calc','learn','explore','corr'].forEach(n=>g('tab-'+n).style.display=n===name?'':'none');
+  g('tabs').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===idx));
+  if(name==='explore') updateExplore();
+}
+function setCase(name,idx){
+  curCase=name;
+  g('caseSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===idx));
+  g('velBox').style.display=name==='natural'?'none':'';
+  g('natProps').style.display=name==='natural'?'':'none';
+  g('lenLabel').textContent=name==='tube'?'Diámetro D (m)':'Longitud característica L (m)';
+  g('caseHelp').textContent={
+    tube:'Flujo interno en tubo circular. Usa D como longitud característica y selecciona la correlación por Re.',
+    plate:'Flujo externo forzado sobre placa plana. Re_L define capa límite laminar o mixta/turbulenta.',
+    natural:'Placa vertical en convección natural. Ra reemplaza a Re porque el movimiento lo genera la flotación.'
+  }[name];
+  const tags={
+    tube:['interno','forzada','Re','Pr','Nu'],
+    plate:['externo','forzada','Re_L','Pr','Nu_L'],
+    natural:['natural','Gr','Ra','Pr','Nu_L']
+  }[name];
+  g('caseTags').innerHTML=tags.map((t,i)=>`<span class="tag ${i<2?'hot':''}">${t}</span>`).join('');
+}
+function warn(msg,cls='warn'){return `<div class="warn-box ${cls}">${msg}</div>`}
+function card(lbl,val,sub='',full=false){return `<div class="res-card ${full?'full':''}"><div class="val">${val}</div><div class="lbl">${lbl}</div>${sub?`<div class="interp">${sub}</div>`:''}</div>`}
+function readInputs(){
+  return {
+    L:+g('Lchar').value,V:+g('V').value,rho:+g('rho').value,mu:+g('mu').value,Cp:+g('Cp').value,k:+g('k').value,
+    beta:+g('beta').value,nu:+g('nu').value,Ts:+g('Ts').value,Tinf:+g('Tinf').value,A:+g('area').value,Qt:+g('qtarget').value
+  };
+}
+function calcCore(caseName,x){
+  const dT=x.Ts-x.Tinf;
+  const Pr=caseName==='natural' ? x.nu/(x.k/(x.rho*x.Cp)) : x.mu*x.Cp/x.k;
+  let Re=NaN,Gr=NaN,Ra=NaN,Nu=NaN,corr='',regime='',warnings=[];
+  if(!(x.L>0&&x.k>0)) return {error:'Ingresa Lc y k mayores que cero.'};
+  if(caseName!=='natural'&&!(x.V>0&&x.rho>0&&x.mu>0&&x.Cp>0)) return {error:'Ingresa V, ρ, μ y Cp válidos.'};
+  if(caseName==='tube'){
+    Re=x.rho*x.V*x.L/x.mu;
+    if(Re<2300){Nu=3.66;corr='Nu = 3.66';regime='Laminar desarrollado';}
+    else if(Re>=10000){Nu=0.023*Math.pow(Re,0.8)*Math.pow(Pr,0.4);corr='Dittus-Boelter';regime='Turbulento';}
+    else{Nu=NaN;corr='Transición';regime='Transición';warnings.push('Re entre 2300 y 10000: evita usar una sola correlación sin revisión.');}
+  }
+  if(caseName==='plate'){
+    Re=x.rho*x.V*x.L/x.mu;
+    if(Re<5e5){Nu=0.664*Math.sqrt(Re)*Math.pow(Pr,1/3);corr='Placa plana laminar';regime='Laminar';}
+    else{Nu=(0.037*Math.pow(Re,0.8)-871)*Math.pow(Pr,1/3);corr='Placa plana mixta';regime='Turbulento mixto';}
+  }
+  if(caseName==='natural'){
+    const alpha=x.k/(x.rho*x.Cp);
+    if(!(x.rho>0&&x.Cp>0&&x.beta>0&&x.nu>0)) return {error:'Ingresa ρ, Cp, β y ν válidos para convección natural.'};
+    Gr=9.80665*x.beta*Math.abs(dT)*Math.pow(x.L,3)/(x.nu*x.nu);
+    Ra=Gr*Pr;
+    const den=Math.pow(1+Math.pow(0.492/Pr,9/16),8/27);
+    Nu=Math.pow(0.825+0.387*Math.pow(Ra,1/6)/den,2);
+    corr='Churchill-Chu placa vertical';regime=Ra<1e9?'Natural laminar':'Natural alto Ra';
+    if(Ra<1e4) warnings.push('Ra bajo: la conducción puede dominar y la convección natural será débil.');
+  }
+  const h=Nu*x.k/x.L;
+  const qpp=h*dT;
+  const Q=x.A>0?qpp*x.A:NaN;
+  const Areq=x.Qt>0&&qpp!==0?x.Qt/qpp:NaN;
+  return {Re,Pr,Gr,Ra,Nu,h,qpp,Q,Areq,corr,regime,warnings,dT};
+}
+function calculate(){
+  const x=readInputs();
+  const r=calcCore(curCase,x);
+  if(r.error){g('calcOut').innerHTML=warn(r.error,'err');return;}
+  let html='<div class="card"><div class="res-grid">';
+  html+=card('Caso',curCase==='tube'?'Tubo interno':curCase==='plate'?'Placa forzada':'Placa natural',r.regime,true);
+  if(isFinite(r.Re)) html+=card('Re',fmt(r.Re,1),'régimen de flujo');
+  html+=card('Pr',fmt(r.Pr,3),'difusión de momento / térmica');
+  if(isFinite(r.Gr)) html+=card('Gr',fmt(r.Gr,2),'flotación / viscosidad');
+  if(isFinite(r.Ra)) html+=card('Ra',fmt(r.Ra,2),'Gr·Pr');
+  html+=card('Nu',fmt(r.Nu,3),r.corr);
+  html+=card('h',`${fmt(r.h,3)} W/(m²·K)`,'h = Nu·k/Lc');
+  html+=card("q''",`${fmt(r.qpp,3)} W/m²`,'q" = h(Ts−T∞)');
+  if(isFinite(r.Q)) html+=card('Q',`${fmt(r.Q,3)} W`,'Q = q"·A');
+  if(isFinite(r.Areq)) html+=card('A requerida',`${fmt(r.Areq,3)} m²`,'A = Q objetivo/q"',true);
+  html+='</div>';
+  r.warnings.forEach(w=>html+=warn(w,'warn'));
+  html+=warn('Supone propiedades constantes, superficie isoterma y correlación dentro de rango educativo. Verifica condiciones de frontera en diseño formal.','info');
+  html+='</div>';
+  g('calcOut').innerHTML=html;
+}
+function updateExplore(){
+  const V=+g('exV').value, DT=+g('exDT').value;
+  g('exVv').textContent=V.toFixed(1);g('exDTv').textContent=DT.toFixed(0);
+  const tube=calcCore('tube',{L:0.05,V,rho:998,mu:0.001,Cp:4182,k:0.598,Ts:60,Tinf:25,A:0,Qt:0});
+  const nat=calcCore('natural',{L:0.5,rho:1.2,Cp:1007,k:0.026,beta:1/300,nu:1.6e-5,Ts:25+DT,Tinf:25,A:0,Qt:0});
+  g('exTube').innerHTML=`Tubo con agua: Re=${fmt(tube.Re,0)}, Nu=${fmt(tube.Nu)}, h=${fmt(tube.h)} W/(m²·K). Aumentar V eleva Re y normalmente h.`;
+  g('exNat').innerHTML=`Placa vertical en aire: Ra=${fmt(nat.Ra)}, Nu=${fmt(nat.Nu)}, h=${fmt(nat.h)} W/(m²·K). Mayor ΔT intensifica la flotación.`;
+  g('barTube').style.width=Math.min(100,Math.max(4,tube.h/120*100))+'%';
+  g('barNat').style.width=Math.min(100,Math.max(4,nat.h/12*100))+'%';
+}
+setCase('tube',0);
+calculate();
+</script>
+</body>
+</html>

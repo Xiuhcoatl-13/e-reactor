@@ -1,0 +1,19 @@
+{
+  "titulo": "Reacciones en serie A → B → C en un reactor por lotes",
+  "descripcion": "Script de MATLAB que resuelve con ode45 el sistema A → B → C, encuentra el máximo del intermedio B y lo compara con la solución analítica. También corre en GNU Octave.",
+  "materia": "reactores",
+  "tema": "Reacciones múltiples, selectividad y rendimiento",
+  "tambien_en": [{"materia": "numericos", "tema": "MATLAB para ingeniería"}],
+  "archivo": "reacciones_serie.m",
+  "tipo": "matlab",
+  "sigla": ".m",
+  "nivel": "intermedio",
+  "etiquetas": ["reacciones en serie", "ode45", "MATLAB", "Octave", "reactor batch", "intermedio"],
+  "objetivos": [
+    "Plantear el sistema de EDO de reacciones consecutivas de primer orden.",
+    "Resolverlo con ode45 y verificar el balance de materia.",
+    "Calcular el tiempo óptimo para maximizar el producto intermedio."
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

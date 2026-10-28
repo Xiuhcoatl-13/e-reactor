@@ -1,0 +1,23 @@
+{
+  "titulo": "Conversión al equilibrio",
+  "descripcion": "Calcula el grado de avance de equilibrio, la composición y la conversión de una reacción en mezcla ideal a partir de K y la alimentación, y explora cómo cambian al variar K.",
+  "materia": "termodinamica",
+  "tema": "Equilibrio químico",
+  "tambien_en": [
+    {
+      "materia": "reactores",
+      "tema": "Reactores ideales"
+    }
+  ],
+  "archivo": "/modulos/equilibrium_conversion.html",
+  "tipo": "simulacion",
+  "sigla": "Xeq",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "equilibrio químico",
+    "conversión de equilibrio",
+    "gas ideal"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

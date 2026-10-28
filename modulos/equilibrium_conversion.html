@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Conversión al equilibrio — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{--bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);--muted:var(--paper-muted);--accent:var(--paper-accent);--line:var(--paper-line);--green:var(--paper-accent-2);--red:#b42318;--yellow:#92400e;--orange:#b45309}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,Segoe UI,sans-serif;font-size:16px}
+.wrap{max-width:620px;margin:0 auto;padding:16px 14px 44px}.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;font-weight:600}
+h1{font-size:20px;margin:0;line-height:1.2}.sub{color:var(--muted);font-size:13px;margin:2px 0 16px}
+.tabs{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0 14px}.tabs button{flex:1;padding:10px 4px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:700}.tabs button.on{background:var(--accent);color:#04121f}.tab-panel{display:none}.tab-panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}input,select{width:100%;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:14px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:70px 1fr 86px 32px;gap:6px;align-items:end;margin-bottom:8px}.row button{height:38px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:18px}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin:4px 4px 4px 0;font-size:12px;color:var(--txt)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px}.metric .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.metric .val{font-size:19px;font-weight:800;margin-top:4px;color:#bfe3ff}.metric .badval{color:var(--red)}
+.status{border-radius:11px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:10px}.ok{background:#10291b;border:1px solid #1f6b3a;color:#b8f7cc}.warn{background:#2a230f;border:1px solid #735a13;color:#ffe29c}.bad{background:#2a1616;border:1px solid #7d2a2a;color:#ffb4b4}
+.table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}.table th{color:var(--muted);font-size:11px;text-align:left;border-bottom:1px solid var(--line);padding:6px}.table td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7)}.table td.num{text-align:right;font-family:monospace}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:#bfe3ff}p,li{font-size:13px;color:var(--muted);line-height:1.6}ul{padding-left:18px;margin:8px 0}.mini{font-size:12px;color:var(--muted);line-height:1.6}
+.eq{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:#bfe3ff;font-weight:700;margin:8px 0;font-size:14px}
+.preset-grid{display:grid;grid-template-columns:1fr;gap:8px}.preset{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);text-align:left;padding:10px;font-size:12px}.preset b{display:block;color:#bfe3ff;margin-bottom:2px}
+.chart{height:220px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:10px;padding:8px}.kv{width:100%;border-collapse:collapse;font-size:13px}.kv td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7);vertical-align:top}.kv td:first-child{color:var(--muted);width:42%}
+.foot{color:var(--muted);font-size:11px;text-align:center;margin-top:18px;line-height:1.6}
+
+/* Paper design-system migration */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:760px}
+.module-hero{margin-bottom:14px}
+.module-tabs{margin-bottom:16px}
+.module-panel{display:none}
+.module-panel.on{display:block}
+.paper-card{margin-bottom:12px}
+label{color:var(--paper-muted);font-weight:700}
+input,select{background:#fffdf8;color:var(--paper-ink);border-color:var(--paper-line)}
+input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.row button{border-color:var(--paper-line);color:var(--paper-muted);background:var(--paper-surface)}
+.row button:active,.pill:active,.preset:active{background:#e7e0d4}
+.pill,.preset,.metric{background:var(--paper-surface-2);border-color:var(--paper-line);color:var(--paper-ink)}
+.preset,.metric{box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.preset b,.metric .val{color:#10263f}
+.metric .badval{color:#b42318}
+.status{border-radius:12px}
+.ok{background:#e7f5ef;border-color:#b7dbc9;color:#0f5132}
+.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.bad{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.table th,.table td,.kv td{border-color:var(--paper-line)}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table th{color:var(--paper-muted)}
+h3{color:#10263f}
+.mini,p,li{color:var(--paper-muted)}
+.eq{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#10263f}
+.chart{background:#fffdf8;border-color:var(--paper-line)}
+.foot{color:var(--paper-muted)}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row{grid-template-columns:1fr 1fr 1fr 32px}
+  .grid,.grid3{grid-template-columns:1fr}
+  .table th,.table td{padding-left:3px;padding-right:3px}
+  .table td.num{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar">
+      <a class="back-link" href="../index.html">← Inicio</a>
+      <span class="module-kicker">Equilibrio químico</span>
+    </div>
+    <h1 class="module-heading">Conversión al equilibrio</h1>
+    <p class="module-subtitle">Calcula ξeq, composición y conversión para una reacción ideal usando estequiometría y K.</p>
+  </div>
+
+  <div class="module-tabs" id="tabs">
+    <button class="on" data-tab="calc">Calculadora</button><button data-tab="learn">Aprendizaje</button><button data-tab="explore">Exploración</button><button data-tab="data">Datos</button>
+  </div>
+
+  <div id="tab-calc" class="module-panel on">
+    <div class="paper-card">
+      <h2>Calculadora</h2>
+      <div class="mini">Modelo v1: una reacción, mezcla ideal, K basado en fracciones molares. ν negativo para reactantes y positivo para productos.</div>
+      <div id="speciesRows"></div>
+      <button class="pill" id="addSpecies" type="button">+ Agregar especie</button>
+      <label>Constante de equilibrio K</label><input id="kInput" type="number" value="4" step="any" min="0">
+      <label>Reactante para conversión</label><select id="conversionSpecies"></select>
+      <div id="statusBox"></div>
+    </div>
+    <div class="paper-card">
+      <h2>Resultado de equilibrio</h2>
+      <div class="grid" id="metricGrid"></div>
+      <div class="table-scroll"><table class="table" id="resultTable"></table></div>
+    </div>
+  </div>
+
+  <div id="tab-learn" class="module-panel">
+    <div class="paper-card">
+      <h2>Aprendizaje</h2>
+      <p>La conversión al equilibrio es la conversión máxima que permite la termodinámica para una alimentación y temperatura dadas. No necesariamente es conversión completa.</p>
+      <div class="eq">nᵢ = nᵢ,0 + νᵢ ξ &nbsp; y &nbsp; K = Π yᵢ^νᵢ</div>
+      <h3>Cómo entra ξ</h3>
+      <p>La estequiometría convierte un solo avance ξ en todas las cantidades finales. El equilibrio se encuentra cuando la composición producida por ξ satisface Q(ξ)=K.</p>
+      <h3>Interpretación de K</h3>
+      <p>K grande favorece productos; K pequeña favorece reactantes. La alimentación también importa: exceso de un reactante puede aumentar la conversión del otro.</p>
+      <h3>Errores comunes</h3>
+      <ul>
+        <li>Confundir reacción favorable con conversión completa.</li>
+        <li>Usar raíces matemáticas que producen moles negativos.</li>
+        <li>Olvidar que K cambia con temperatura.</li>
+        <li>Aplicar un modelo ideal cuando la mezcla requiere fugacidades o actividades.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-explore" class="module-panel">
+    <div class="paper-card">
+      <h2>Exploración</h2>
+      <p>Elige un preset o usa tu reacción. Cambia K y observa cómo cambian ξeq y conversión.</p>
+      <div class="preset-grid" id="presetGrid"></div>
+      <div class="grid3">
+        <label>log10 K min<input id="logMin" type="number" value="-3" step="0.5"></label>
+        <label>log10 K max<input id="logMax" type="number" value="3" step="0.5"></label>
+        <label>Puntos<input id="steps" type="number" value="9" min="4" max="13" step="1"></label>
+      </div>
+      <div id="exploreSummary"></div>
+      <div class="chart" id="chart"></div>
+      <div class="table-scroll"><table class="table" id="exploreTable"></table></div>
+    </div>
+  </div>
+
+  <div id="tab-data" class="module-panel">
+    <div class="paper-card">
+      <h2>Datos / Supuestos / Fuentes</h2>
+      <table class="kv" id="dataTable"></table>
+      <div class="mini" style="margin-top:10px">Supuestos: una reacción independiente, mezcla ideal en fracciones molares, sistema cerrado, sin cinética, sin transporte y sin no idealidad. K se ingresa directamente.</div>
+    </div>
+  </div>
+  <div class="foot">Módulo offline · Conecta ξ, K y conversión de equilibrio</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let species=[], nextId=1;
+const presets=[
+  {title:"A ⇌ B",desc:"Isomerización simple; solución suave.",K:4,sp:[["A",-1,1],["B",1,0]]},
+  {title:"A + B ⇌ C",desc:"Asociación ideal; conversión limitada por K y alimentación.",K:2,sp:[["A",-1,1],["B",-1,1],["C",1,0]]},
+  {title:"N2 + 3H2 ⇌ 2NH3",desc:"Síntesis con cambio de moles totales.",K:0.05,sp:[["N2",-1,1],["H2",-3,3],["NH3",2,0]]},
+  {title:"CO + H2O ⇌ CO2 + H2",desc:"Water-gas shift ideal con Δν=0.",K:1.5,sp:[["CO",-1,1],["H2O",-1,1],["CO2",1,0],["H2",1,0]]}
+];
+function fmt(v,d=4){return isFinite(v)?v.toLocaleString("es-MX",{maximumFractionDigits:d,minimumFractionDigits:d}):"N/D"}
+function fmtK(v){if(!isFinite(v))return"∞"; if(v!==0&&(Math.abs(v)<1e-3||Math.abs(v)>=1e5))return v.toExponential(3); return v.toLocaleString("es-MX",{maximumFractionDigits:4})}
+function addSpecies(name="Nueva",nu=-1,n0=1){species.push({id:nextId++,name,nu,n0});renderRows();updateAll()}
+function loadPreset(p){species=[];nextId=1;p.sp.forEach(s=>species.push({id:nextId++,name:s[0],nu:s[1],n0:s[2]}));$("kInput").value=p.K;renderRows();updateAll()}
+function renderRows(){
+  $("speciesRows").innerHTML=species.map(s=>`<div class="row">
+    <label>νᵢ<input type="number" step="0.1" value="${s.nu}" data-id="${s.id}" data-field="nu"></label>
+    <label>Especie<input value="${s.name}" data-id="${s.id}" data-field="name"></label>
+    <label>nᵢ,0<input type="number" step="0.01" min="0" value="${s.n0}" data-id="${s.id}" data-field="n0"></label>
+    <button type="button" data-remove="${s.id}">×</button></div>`).join("");
+  $("speciesRows").querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{const s=species.find(x=>x.id==e.target.dataset.id);if(!s)return;const f=e.target.dataset.field;s[f]=f==="name"?e.target.value:(parseFloat(e.target.value)||0);updateAll()}));
+  $("speciesRows").querySelectorAll("button").forEach(b=>b.addEventListener("click",e=>{species=species.filter(s=>s.id!=e.target.dataset.remove);renderRows();updateAll()}));
+}
+function bounds(){
+  let lo=-Infinity, hi=Infinity;
+  species.forEach(s=>{if(s.nu>0)lo=Math.max(lo,-s.n0/s.nu); if(s.nu<0)hi=Math.min(hi,s.n0/(-s.nu));});
+  if(!isFinite(lo))lo=0;if(!isFinite(hi))hi=0;
+  return {lo,hi};
+}
+function comp(xi){
+  const rows=species.map(s=>({...s,n:s.n0+s.nu*xi}));
+  const nt=rows.reduce((a,r)=>a+r.n,0);
+  rows.forEach(r=>r.y=nt>0?r.n/nt:NaN);
+  return {rows,nt};
+}
+function lnQ(xi){
+  const c=comp(xi);
+  if(c.nt<=0)return NaN;
+  let s=0;
+  for(const r of c.rows){
+    if(r.nu===0)continue;
+    if(r.y<=0)return r.nu>0?-Infinity:Infinity;
+    s+=r.nu*Math.log(r.y);
+  }
+  return s;
+}
+function solve(K){
+  const {lo,hi}=bounds(), eps=Math.max(1e-10,(hi-lo)*1e-9);
+  if(!(K>0)||hi<lo)return {root:null,roots:[],lo,hi,msg:"K debe ser positivo y el rango físico debe existir."};
+  const target=Math.log(K), n=500, roots=[];
+  let x0=lo+eps, f0=lnQ(x0)-target;
+  for(let i=1;i<=n;i++){
+    const x1=lo+eps+(hi-lo-2*eps)*i/n, f1=lnQ(x1)-target;
+    if(!isFinite(f0)){x0=x1;f0=f1;continue;}
+    if(f0===0||f0*f1<0){
+      let a=x0,b=x1,fa=f0;
+      for(let j=0;j<70;j++){const m=(a+b)/2,fm=lnQ(m)-target;if(Math.abs(fm)<1e-10){a=b=m;break;} if(fa*fm<=0){b=m}else{a=m;fa=fm}}
+      const r=(a+b)/2;if(!roots.some(x=>Math.abs(x-r)<1e-6))roots.push(r);
+    }
+    x0=x1;f0=f1;
+  }
+  if(!roots.length)return {root:null,roots,lo,hi,msg:"No se encontró raíz física interior. Revisa K, alimentación o estequiometría."};
+  return {root:roots[0],roots,lo,hi,msg:roots.length>1?"Se detectaron varias raíces matemáticas; se reporta la primera físicamente válida.":"Raíz física encontrada."};
+}
+function reactionText(){
+  const side=s=>species.filter(x=>s*x.nu>0).map(x=>`${Math.abs(x.nu)!==1?fmt(Math.abs(x.nu),2)+" ":""}${x.name||"?"}`).join(" + ");
+  return `${side(-1)||"Reactantes"} ⇌ ${side(1)||"Productos"}`;
+}
+function updateOptions(){
+  const prev=$("conversionSpecies").value, r=species.filter(s=>s.nu<0);
+  $("conversionSpecies").innerHTML=r.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+  if(r.some(s=>String(s.id)===prev))$("conversionSpecies").value=prev;
+}
+function updateAll(){
+  updateOptions();
+  const K=parseFloat($("kInput").value), sol=solve(K), convSp=species.find(s=>s.id===$("conversionSpecies").value)||species.find(s=>s.nu<0);
+  const c=sol.root!==null?comp(sol.root):null;
+  const X=sol.root!==null&&convSp&&convSp.n0>0 ? -convSp.nu*sol.root/convSp.n0 : null;
+  $("statusBox").innerHTML=sol.root!==null?`<div class="status ok">${sol.msg} Rango físico: ${fmt(sol.lo,4)} ≤ ξ ≤ ${fmt(sol.hi,4)}.</div>`:`<div class="status bad">${sol.msg}</div>`;
+  $("metricGrid").innerHTML=[
+    ["Reacción",reactionText(),""],
+    ["K usado",fmtK(K),"adimensional"],
+    ["ξeq",sol.root!==null?fmt(sol.root,5):"N/D","mol rxn"],
+    ["Conversión",X!==null?fmt(100*X,2)+" %":"N/D",convSp?convSp.name:""]
+  ].map(m=>`<div class="metric"><div class="lbl">${m[0]}</div><div class="val">${m[1]}</div><div class="mini">${m[2]}</div></div>`).join("");
+  $("resultTable").innerHTML=c?`<thead><tr><th>Especie</th><th class="num">νᵢ</th><th class="num">n0</th><th class="num">neq</th><th class="num">y_eq</th></tr></thead><tbody>${c.rows.map(r=>`<tr><td>${r.name}</td><td class="num">${fmt(r.nu,2)}</td><td class="num">${fmt(r.n0,3)}</td><td class="num">${fmt(r.n,4)}</td><td class="num">${fmt(r.y,4)}</td></tr>`).join("")}</tbody>`:"";
+  updateExplore(); updateData(sol,c,convSp,X,K);
+}
+function exploreRows(){
+  let a=parseFloat($("logMin").value),b=parseFloat($("logMax").value),n=parseInt($("steps").value,10);
+  if(!isFinite(a))a=-3;if(!isFinite(b))b=3;if(b<a)[a,b]=[b,a];n=Math.min(13,Math.max(4,isFinite(n)?n:9));
+  const convSp=species.find(s=>s.id===$("conversionSpecies").value)||species.find(s=>s.nu<0);
+  return Array.from({length:n},(_,i)=>{const logK=a+(b-a)*i/(n-1),K=Math.pow(10,logK),sol=solve(K),X=sol.root!==null&&convSp&&convSp.n0>0?-convSp.nu*sol.root/convSp.n0:null;return{logK,K,xi:sol.root,X};});
+}
+function updateExplore(){
+  const rows=exploreRows();
+  const valid=rows.filter(r=>r.X!==null);
+  $("exploreSummary").innerHTML=valid.length?`<div class="status ok">Al aumentar K, la conversión de equilibrio de ${$("conversionSpecies").selectedOptions[0]?.textContent||"reactante"} cambia de ${fmt(100*valid[0].X,1)} % a ${fmt(100*valid[valid.length-1].X,1)} %.</div>`:"<div class='status warn'>No hay soluciones físicas en el rango de K.</div>";
+  drawChart(rows);
+  $("exploreTable").innerHTML=`<thead><tr><th>log10 K</th><th class="num">K</th><th class="num">ξeq</th><th class="num">Xeq</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${fmt(r.logK,2)}</td><td class="num">${fmtK(r.K)}</td><td class="num">${r.xi!==null?fmt(r.xi,4):"N/D"}</td><td class="num">${r.X!==null?fmt(100*r.X,2)+" %":"N/D"}</td></tr>`).join("")}</tbody>`;
+}
+function drawChart(rows){
+  const valid=rows.filter(r=>r.X!==null); if(valid.length<2){$("chart").innerHTML="";return;}
+  const W=320,H=180,ml=44,mr=12,mt=12,mb=30,gw=W-ml-mr,gh=H-mt-mb,x0=valid[0].logK,x1=valid[valid.length-1].logK;
+  const px=x=>ml+(x-x0)/(x1-x0||1)*gw, py=y=>mt+gh-y*gh;
+  const path=valid.map((r,i)=>`${i?"L":"M"}${px(r.logK).toFixed(1)},${py(r.X).toFixed(1)}`).join("");
+  $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%;display:block"><line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+gh}" stroke="#d8d0c3"/><line x1="${ml}" y1="${mt+gh}" x2="${W-mr}" y2="${mt+gh}" stroke="#d8d0c3"/><path d="${path}" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>${valid.map(r=>`<circle cx="${px(r.logK).toFixed(1)}" cy="${py(r.X).toFixed(1)}" r="3" fill="#1d4ed8"/>`).join("")}<text x="${ml}" y="${H-8}" fill="#667085" font-size="9">logK ${fmt(x0,1)}</text><text x="${W-mr}" y="${H-8}" fill="#667085" font-size="9" text-anchor="end">logK ${fmt(x1,1)}</text><text x="${ml-6}" y="${mt+4}" fill="#667085" font-size="9" text-anchor="end">100%</text><text x="${ml-6}" y="${mt+gh}" fill="#667085" font-size="9" text-anchor="end">0%</text></svg>`;
+}
+function updateData(sol,c,convSp,X,K){
+  $("dataTable").innerHTML=[
+    ["Reacción",reactionText()],
+    ["Modelo","K = Π yᵢ^νᵢ, con nᵢ = nᵢ,0 + νᵢξ"],
+    ["K usado",fmtK(K)],
+    ["Rango físico de ξ",`${fmt(sol.lo,4)} ≤ ξ ≤ ${fmt(sol.hi,4)}`],
+    ["ξeq",sol.root!==null?fmt(sol.root,5):"N/D"],
+    ["Reactante de conversión",convSp?`${convSp.name}, Xeq=${X!==null?fmt(100*X,2)+" %":"N/D"}`:"No seleccionado"],
+    ["Especies",species.map(s=>`${s.name}: ν=${s.nu}, n0=${s.n0}`).join("<br>")]
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;[...$("tabs").children].forEach(x=>x.classList.toggle("on",x===b));["calc","learn","explore","data"].forEach(t=>$("tab-"+t).classList.toggle("on",t===b.dataset.tab));updateAll();});
+$("addSpecies").addEventListener("click",()=>addSpecies("Nueva",0,0));$("kInput").addEventListener("input",updateAll);$("conversionSpecies").addEventListener("change",updateAll);["logMin","logMax","steps"].forEach(id=>$(id).addEventListener("input",updateExplore));
+$("presetGrid").innerHTML=presets.map((p,i)=>`<button class="preset" type="button" data-i="${i}"><b>${p.title}</b><span class="mini">${p.desc}</span></button>`).join("");
+$("presetGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b)loadPreset(presets[+b.dataset.i]);});
+loadPreset(presets[0]);
+</script>
+</body>
+</html>

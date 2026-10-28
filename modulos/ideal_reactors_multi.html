@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Reactores ideales con múltiples reacciones — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{--bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);--muted:var(--paper-muted);--accent:var(--paper-accent);--line:var(--paper-line);--green:var(--paper-accent-2);--red:#b42318;--yellow:#92400e}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,Segoe UI,sans-serif;font-size:16px}
+.wrap{max-width:670px;margin:0 auto;padding:16px 14px 44px}.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}.back{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;font-weight:600}
+h1{font-size:20px;margin:0;line-height:1.2}.sub{color:var(--muted);font-size:13px;margin:2px 0 16px}.tabs{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0 14px}.tabs button{flex:1;padding:10px 4px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:700}.tabs button.on{background:var(--accent);color:#04121f}.tab-panel{display:none}.tab-panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
+input,select{width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 58px 58px 76px;gap:5px;align-items:end;margin-bottom:7px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px}.metric .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.metric .val{font-size:18px;font-weight:800;margin-top:4px;color:#bfe3ff}
+.status{border-radius:11px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:10px}.ok{background:#10291b;border:1px solid #1f6b3a;color:#b8f7cc}.warn{background:#2a230f;border:1px solid #735a13;color:#ffe29c}.bad{background:#2a1616;border:1px solid #7d2a2a;color:#ffb4b4}
+.table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}.table th{color:var(--muted);font-size:11px;text-align:left;border-bottom:1px solid var(--line);padding:6px}.table td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7)}.table td.num{text-align:right;font-family:monospace}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:#bfe3ff}p,li{font-size:13px;color:var(--muted);line-height:1.6}ul{padding-left:18px;margin:8px 0}.mini{font-size:12px;color:var(--muted);line-height:1.6}.eq{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:#bfe3ff;font-weight:700;margin:8px 0;font-size:14px}
+.preset-grid{display:grid;grid-template-columns:1fr;gap:8px}.preset{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);text-align:left;padding:10px;font-size:12px}.preset b{display:block;color:#bfe3ff;margin-bottom:2px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:6px}.check{display:flex;gap:7px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:8px;font-size:12px;color:var(--txt)}.check input{width:auto}
+.chart{height:230px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:10px;padding:8px}.kv{width:100%;border-collapse:collapse;font-size:13px}.kv td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7);vertical-align:top}.kv td:first-child{color:var(--muted);width:42%}.foot{color:var(--muted);font-size:11px;text-align:center;margin-top:18px;line-height:1.6}
+
+/* Paper design-system migration */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:780px}
+.module-hero{margin-bottom:14px}
+.module-tabs{margin-bottom:16px}
+.module-panel{display:none}
+.module-panel.on{display:block}
+.paper-card{margin-bottom:12px}
+label{color:var(--paper-muted);font-weight:700}
+input,select{background:#fffdf8;color:var(--paper-ink);border-color:var(--paper-line)}
+input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.metric,.preset,.check{background:var(--paper-surface-2);border-color:var(--paper-line);color:var(--paper-ink)}
+.metric,.preset,.check{box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.preset b,.metric .val{color:#10263f}
+.preset:active{background:#e7e0d4}
+.status{border-radius:12px}
+.ok{background:#e7f5ef;border-color:#b7dbc9;color:#0f5132}
+.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.bad{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.table th,.table td,.kv td{border-color:var(--paper-line)}
+.table th{color:var(--paper-muted)}
+h3{color:#10263f}
+.mini,p,li{color:var(--paper-muted)}
+.eq{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#10263f}
+.chart{background:#fffdf8;border-color:var(--paper-line)}
+.foot{color:var(--paper-muted)}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row,.grid,.grid3,.checks{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar">
+      <a class="back-link" href="../index.html">← Inicio</a>
+      <span class="module-kicker">Reactores químicos</span>
+    </div>
+    <h1 class="module-heading">Reactores ideales con múltiples reacciones</h1>
+    <p class="module-subtitle">Compara Batch, CSTR y PFR para redes de reacción simples con conversión, rendimiento y selectividad.</p>
+  </div>
+
+  <div class="module-tabs" id="tabs"><button class="on" data-tab="calc">Calculadora</button><button data-tab="learn">Aprendizaje</button><button data-tab="explore">Exploración</button><button data-tab="data">Datos</button></div>
+
+  <div id="tab-calc" class="module-panel on">
+    <div class="paper-card">
+      <h2>Calculadora</h2>
+      <div class="mini">Modelo v1: dos reacciones, volumen/densidad constantes y leyes de potencia generadas desde los reactantes estequiométricos.</div>
+      <div class="grid3">
+        <label>Reactor<select id="reactor"><option value="batch">Batch</option><option value="cstr">CSTR</option><option value="pfr">PFR</option></select></label>
+        <label>t o τ<input id="tau" type="number" value="1.2" step="any" min="0"></label>
+        <label>Pasos<input id="steps" type="number" value="240" step="1" min="20"></label>
+      </div>
+      <div class="grid"><label>k1<input id="k1" type="number" value="1.2" step="any"></label><label>k2<input id="k2" type="number" value="0.45" step="any"></label></div>
+      <div id="speciesRows"></div>
+      <div class="grid">
+        <label>Reactante base<select id="keySpecies"></select></label>
+        <label>Producto deseado<select id="desiredSpecies"></select></label>
+      </div>
+      <label>Productos no deseados</label><div class="checks" id="undesiredChecks"></div>
+      <div id="statusBox"></div>
+    </div>
+    <div class="paper-card">
+      <h2>Resultados</h2>
+      <div class="grid" id="metricGrid"></div>
+      <table class="table" id="amountTable"></table>
+    </div>
+  </div>
+
+  <div id="tab-learn" class="module-panel">
+    <div class="paper-card">
+      <h2>Aprendizaje</h2>
+      <p>Un reactor ideal simplifica el transporte para enfocarse en la reacción. En sistemas con múltiples reacciones, el tipo de reactor puede cambiar la concentración local y por lo tanto la selectividad.</p>
+      <div class="eq">rⱼ = kⱼ Π Cᵢ^αᵢⱼ</div>
+      <h3>Batch, CSTR y PFR</h3>
+      <ul>
+        <li>Batch: la composición cambia con el tiempo dentro del recipiente.</li>
+        <li>CSTR: mezcla perfecta; la velocidad se evalúa a la composición de salida.</li>
+        <li>PFR: no hay mezcla axial; la composición evoluciona con la posición o tiempo espacial.</li>
+      </ul>
+      <h3>Por qué importa el reactor</h3>
+      <p>Las reacciones paralelas, consecutivas y competitivas responden distinto a la concentración. Un CSTR opera con concentraciones de salida en todo el volumen; un PFR conserva concentraciones altas al inicio; Batch y PFR suelen compartir la misma forma matemática si la densidad es constante.</p>
+      <h3>Errores comunes</h3>
+      <ul>
+        <li>Comparar conversión sin revisar selectividad ni rendimiento.</li>
+        <li>Usar la misma velocidad en CSTR y PFR sin cambiar la composición donde se evalúa.</li>
+        <li>Confundir limitación cinética con equilibrio termodinámico.</li>
+        <li>Ignorar concentraciones negativas generadas por pasos numéricos o datos imposibles.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-explore" class="module-panel">
+    <div class="paper-card">
+      <h2>Exploración</h2>
+      <p>Compara Batch, CSTR y PFR para el mismo sistema. Cambia el intervalo de tiempo espacial y observa conversión, rendimiento y selectividad.</p>
+      <div class="preset-grid" id="presetGrid"></div>
+      <div class="grid3"><label>τ bajo<input id="tauLow" type="number" value="0.1" step="any"></label><label>τ alto<input id="tauHigh" type="number" value="4" step="any"></label><label>puntos<input id="points" type="number" value="7" step="1" min="3"></label></div>
+      <div id="exploreSummary"></div>
+      <div class="chart" id="chart"></div>
+      <table class="table" id="exploreTable"></table>
+    </div>
+  </div>
+
+  <div id="tab-data" class="module-panel">
+    <div class="paper-card">
+      <h2>Datos / Supuestos / Fuentes</h2>
+      <table class="kv" id="dataTable"></table>
+      <div class="mini" style="margin-top:10px">Supuestos: reactor ideal, fase homogénea, densidad/volumen constantes, cinética irreversible de potencia, dos reacciones, sin calor de reacción, sin caída de presión, sin equilibrio impuesto y sin limitaciones de transporte.</div>
+    </div>
+  </div>
+  <div class="foot">Módulo offline · Base para reactores no isotérmicos, optimización y redes de reactores</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let species=[], selectedUndesired=[];
+const presets=[
+  {title:"A → B y A → C",desc:"Reacciones paralelas; B deseado, C subproducto.",k:[1.2,.45],tau:1.2,key:"A",desired:"B",undesired:["C"],sp:[["A",-1,-1,1],["B",1,0,0],["C",0,1,0]]},
+  {title:"A → B → C",desc:"B deseado en red consecutiva; demasiado tiempo forma C.",k:[1.4,.7],tau:1,key:"A",desired:"B",undesired:["C"],sp:[["A",-1,0,1],["B",1,-1,0],["C",0,1,0]]},
+  {title:"A + B → D; A → U",desc:"Producto D compite con degradación de A.",k:[.9,.35],tau:1.5,key:"A",desired:"D",undesired:["U"],sp:[["A",-1,-1,1],["B",-1,0,1.4],["D",1,0,0],["U",0,1,0]]},
+  {title:"Oxidación parcial",desc:"Producto parcial deseado frente a oxidación profunda.",k:[.7,.18],tau:1.8,key:"R",desired:"P",undesired:["CO2"],sp:[["R",-1,-1,1],["O2",-0.5,-2,1.1],["P",1,0,0],["CO2",0,1,0]]}
+];
+function fmt(v,d=4){return isFinite(v)?v.toLocaleString("es-MX",{maximumFractionDigits:d,minimumFractionDigits:d}):"N/D"}
+function pct(v){return isFinite(v)?(100*v).toLocaleString("es-MX",{maximumFractionDigits:1,minimumFractionDigits:1})+" %":"N/D"}
+function loadPreset(p){species=p.sp.map(s=>({name:s[0],v1:s[1],v2:s[2],c0:s[3]}));$("k1").value=p.k[0];$("k2").value=p.k[1];$("tau").value=p.tau;$("tauHigh").value=Math.max(3*p.tau,2);selectedUndesired=[...p.undesired];renderRows();renderSelectors(p.key,p.desired);updateAll()}
+function renderRows(){
+  $("speciesRows").innerHTML=species.map((s,i)=>`<div class="row"><label>Especie<input value="${s.name}" data-i="${i}" data-f="name"></label><label>ν1<input type="number" step="0.1" value="${s.v1}" data-i="${i}" data-f="v1"></label><label>ν2<input type="number" step="0.1" value="${s.v2}" data-i="${i}" data-f="v2"></label><label>C0<input type="number" step="0.01" min="0" value="${s.c0}" data-i="${i}" data-f="c0"></label></div>`).join("");
+  $("speciesRows").querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{const s=species[+e.target.dataset.i],f=e.target.dataset.f;s[f]=f==="name"?e.target.value:(parseFloat(e.target.value)||0);renderSelectors();updateAll()}));
+}
+function options(selected){return species.map(s=>`<option value="${s.name}" ${s.name===selected?"selected":""}>${s.name}</option>`).join("")}
+function renderSelectors(key=$("keySpecies").value,desired=$("desiredSpecies").value){
+  const keyValue=species.some(s=>s.name===key)?key:species[0]?.name, desiredValue=species.some(s=>s.name===desired)?desired:species[1]?.name;
+  $("keySpecies").innerHTML=options(keyValue);$("keySpecies").value=keyValue||"";$("desiredSpecies").innerHTML=options(desiredValue);$("desiredSpecies").value=desiredValue||"";
+  $("undesiredChecks").innerHTML=species.map(s=>`<label class="check"><input type="checkbox" value="${s.name}" ${selectedUndesired.includes(s.name)?"checked":""}>${s.name}</label>`).join("");
+  $("undesiredChecks").querySelectorAll("input").forEach(c=>c.addEventListener("change",()=>{selectedUndesired=[...$("undesiredChecks").querySelectorAll("input:checked")].map(x=>x.value);updateAll()}));
+}
+function rate(C,j){const k=parseFloat($(j===1?"k1":"k2").value);if(!(k>=0))return NaN;let r=k;species.forEach((s,i)=>{const nu=j===1?s.v1:s.v2;if(nu<0)r*=Math.pow(Math.max(C[i],0),Math.abs(nu));});return r}
+function deriv(C){const r1=rate(C,1),r2=rate(C,2);return species.map(s=>s.v1*r1+s.v2*r2)}
+function euler(tau,steps){let C=species.map(s=>s.c0),dt=tau/Math.max(20,steps);for(let n=0;n<steps;n++){const d=deriv(C);C=C.map((c,i)=>Math.max(0,c+dt*d[i]));}return C}
+function solveCstr(tau){let C=species.map(s=>s.c0),relaxed=true;for(let it=0;it<500;it++){const d=deriv(C), next=species.map((s,i)=>Math.max(0,s.c0+tau*d[i]));let err=0;C=C.map((c,i)=>{const v=.55*c+.45*next[i];err=Math.max(err,Math.abs(v-c));return v});if(err<1e-8)return{C,ok:true,msg:"CSTR resuelto por iteración amortiguada."}}return{C,ok:false,msg:"La iteración CSTR no convergió; revisa τ o constantes cinéticas."}}
+function solve(reactor=$("reactor").value,tau=parseFloat($("tau").value)){const steps=Math.max(20,parseInt($("steps").value)||240);if(!(tau>=0))return{ok:false,msg:"t o τ debe ser no negativo.",C:species.map(s=>s.c0)};if(reactor==="cstr")return solveCstr(tau);return{C:euler(tau,steps),ok:true,msg:reactor==="batch"?"Batch integrado en tiempo.":"PFR integrado en tiempo espacial."}}
+function byName(rows,n){return rows.find(r=>r.name===n)}
+function metrics(C){const rows=species.map((s,i)=>({...s,c:C[i],delta:C[i]-s.c0})),key=$("keySpecies").value,desired=$("desiredSpecies").value,keyRow=byName(rows,key);const consumed=keyRow?keyRow.c0-keyRow.c:NaN,conv=keyRow&&keyRow.c0>0?consumed/keyRow.c0:NaN,formed=n=>Math.max(0,(byName(rows,n)?.delta)||0),dForm=formed(desired),uForm=selectedUndesired.reduce((a,n)=>a+formed(n),0),sel=uForm>0?dForm/uForm:dForm>0?Infinity:NaN,yFeed=keyRow&&keyRow.c0>0?dForm/keyRow.c0:NaN,yCons=consumed>0?dForm/consumed:NaN;return{rows,key,desired,conv,dForm,uForm,sel,yFeed,yCons,bad:rows.some(r=>r.c<-.000001)}}
+function updateAll(){const sol=solve(),m=metrics(sol.C);const warn=[];if(!sol.ok)warn.push(sol.msg);if(m.bad)warn.push("Hay concentraciones negativas.");if(!(m.dForm>0))warn.push("El producto deseado no se forma con estas condiciones.");if(m.uForm===0)warn.push("No se formaron subproductos seleccionados; S D/U es infinita o no aplicable.");$("statusBox").innerHTML=`<div class="status ${!sol.ok||m.bad?"bad":warn.length?"warn":"ok"}">${warn.length?warn.join(" "):sol.msg}</div>`;
+  $("metricGrid").innerHTML=[["Conversión "+m.key,pct(m.conv),"reactante base"],["Selectividad D/U",isFinite(m.sel)?fmt(m.sel,3):"∞","deseado / no deseado"],["Rendimiento a feed",pct(m.yFeed),"producto deseado / feed"],["Rendimiento a consumido",pct(m.yCons),"producto deseado / consumido"],["Producto deseado",fmt(m.dForm,4),"concentración formada"],["Reactor",$("reactor").value.toUpperCase(),`t o τ = ${fmt(parseFloat($("tau").value),3)}`]].map(x=>`<div class="metric"><div class="lbl">${x[0]}</div><div class="val">${x[1]}</div><div class="mini">${x[2]}</div></div>`).join("");
+  $("amountTable").innerHTML=`<thead><tr><th>Especie</th><th class="num">C0</th><th class="num">Csalida/final</th><th class="num">ΔC</th></tr></thead><tbody>${m.rows.map(r=>`<tr><td>${r.name}</td><td class="num">${fmt(r.c0,3)}</td><td class="num">${fmt(r.c,4)}</td><td class="num">${fmt(r.delta,4)}</td></tr>`).join("")}</tbody>`;updateExplore();updateData(sol,m)}
+function explore(){const lo=parseFloat($("tauLow").value)||0,hi=parseFloat($("tauHigh").value)||1,n=Math.max(3,Math.min(12,parseInt($("points").value)||7)),oldTau=$("tau").value,oldReactor=$("reactor").value,rows=[];for(let i=0;i<n;i++){const tau=lo+(hi-lo)*i/(n-1),rec={tau};["batch","cstr","pfr"].forEach(rt=>{$("reactor").value=rt;$("tau").value=tau;const s=solve(rt,tau),m=metrics(s.C);rec[rt]={ok:s.ok,conv:m.conv,y:m.yFeed,sel:m.sel};});rows.push(rec)}$("tau").value=oldTau;$("reactor").value=oldReactor;return rows}
+function updateExplore(){const rows=explore();const last=rows[rows.length-1];$("exploreSummary").innerHTML=`<div class="status ok">A τ alto: Batch Y=${pct(last.batch.y)}, CSTR Y=${pct(last.cstr.y)}, PFR Y=${pct(last.pfr.y)}. Las diferencias vienen de dónde se evalúan las velocidades.</div>`;drawChart(rows);$("exploreTable").innerHTML=`<thead><tr><th>τ</th><th class="num">Y Batch</th><th class="num">Y CSTR</th><th class="num">Y PFR</th><th class="num">X PFR</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${fmt(r.tau,3)}</td><td class="num">${pct(r.batch.y)}</td><td class="num">${pct(r.cstr.y)}</td><td class="num">${pct(r.pfr.y)}</td><td class="num">${pct(r.pfr.conv)}</td></tr>`).join("")}</tbody>`}
+function drawChart(rows){const valid=rows.filter(r=>isFinite(r.batch.y)&&isFinite(r.cstr.y)&&isFinite(r.pfr.y));if(valid.length<2){$("chart").innerHTML="";return;}const W=320,H=180,ml=42,mr=12,mt=12,mb=30,gw=W-ml-mr,gh=H-mt-mb,x0=valid[0].tau,x1=valid[valid.length-1].tau,vals=valid.flatMap(r=>[r.batch.y,r.cstr.y,r.pfr.y]),y0=0,y1=Math.max(.05,...vals),py=y=>mt+gh-(y-y0)/(y1-y0||1)*gh,px=x=>ml+(x-x0)/(x1-x0||1)*gw,path=k=>valid.map((r,i)=>`${i?"L":"M"}${px(r.tau).toFixed(1)},${py(r[k].y).toFixed(1)}`).join("");$("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%;display:block"><line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+gh}" stroke="#d8d0c3"/><line x1="${ml}" y1="${mt+gh}" x2="${W-mr}" y2="${mt+gh}" stroke="#d8d0c3"/><path d="${path("batch")}" fill="none" stroke="#1d4ed8" stroke-width="2.5"/><path d="${path("cstr")}" fill="none" stroke="#b45309" stroke-width="2.5"/><path d="${path("pfr")}" fill="none" stroke="#0f766e" stroke-width="2.5"/><text x="${W-10}" y="18" fill="#1d4ed8" font-size="10" text-anchor="end">Batch</text><text x="${W-10}" y="32" fill="#b45309" font-size="10" text-anchor="end">CSTR</text><text x="${W-10}" y="46" fill="#0f766e" font-size="10" text-anchor="end">PFR</text><text x="${ml}" y="${H-8}" fill="#667085" font-size="9">τ bajo</text><text x="${W-mr}" y="${H-8}" fill="#667085" font-size="9" text-anchor="end">τ alto</text></svg>`}
+function rxnText(j){const side=s=>species.filter(x=>s*(j===1?x.v1:x.v2)>0).map(x=>`${Math.abs(j===1?x.v1:x.v2)!==1?fmt(Math.abs(j===1?x.v1:x.v2),2)+" ":""}${x.name}`).join(" + ");return `${side(-1)||"Reactantes"} → ${side(1)||"Productos"}`}
+function rateText(j){return `r${j}=k${j}`+species.filter(s=>(j===1?s.v1:s.v2)<0).map(s=>`·${s.name}^${fmt(Math.abs(j===1?s.v1:s.v2),2)}`).join("")}
+function updateData(sol,m){$("dataTable").innerHTML=[["Reacción 1",rxnText(1)],["Reacción 2",rxnText(2)],["Velocidades",`${rateText(1)}<br>${rateText(2)}`],["Parámetros",`k1=${fmt(parseFloat($("k1").value),4)}, k2=${fmt(parseFloat($("k2").value),4)}, t/τ=${fmt(parseFloat($("tau").value),4)}`],["Reactante/producto",`${m.key} → ${m.desired}`],["Subproductos",selectedUndesired.join(", ")||"Ninguno"],["Matriz estequiométrica",species.map(s=>`${s.name}: [${s.v1}, ${s.v2}], C0=${s.c0}`).join("<br>")],["Estado numérico",sol.msg]].map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("")}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;[...$("tabs").children].forEach(x=>x.classList.toggle("on",x===b));["calc","learn","explore","data"].forEach(t=>$("tab-"+t).classList.toggle("on",t===b.dataset.tab));updateAll()});
+["reactor","tau","steps","k1","k2","keySpecies","desiredSpecies","tauLow","tauHigh","points"].forEach(id=>$(id).addEventListener("input",updateAll));["reactor","keySpecies","desiredSpecies"].forEach(id=>$(id).addEventListener("change",updateAll));
+$("presetGrid").innerHTML=presets.map((p,i)=>`<button class="preset" type="button" data-i="${i}"><b>${p.title}</b><span class="mini">${p.desc}</span></button>`).join("");
+$("presetGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b)loadPreset(presets[+b.dataset.i])});
+loadPreset(presets[0]);
+</script>
+</body>
+</html>

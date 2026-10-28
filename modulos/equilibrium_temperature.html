@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Efecto de la temperatura sobre K — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{--bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);--muted:var(--paper-muted);--accent:var(--paper-accent);--line:var(--paper-line);--green:var(--paper-accent-2);--red:#b42318;--yellow:#92400e;--orange:#b45309}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,Segoe UI,sans-serif;font-size:16px}
+.wrap{max-width:600px;margin:0 auto;padding:16px 14px 44px}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;font-weight:600}
+h1{font-size:20px;margin:0;line-height:1.2}.sub{color:var(--muted);font-size:13px;margin:2px 0 16px}
+.tabs{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0 14px}
+.tabs button{flex:1;padding:10px 4px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:700}
+.tabs button.on{background:var(--accent);color:#04121f}.tab-panel{display:none}.tab-panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
+input,select{width:100%;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:14px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px}.metric .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.metric .val{font-size:19px;font-weight:800;margin-top:4px;color:#bfe3ff}.metric .neg{color:var(--orange)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin:4px 4px 4px 0;font-size:12px;color:var(--txt)}
+.status{border-radius:11px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:10px}.ok{background:#10291b;border:1px solid #1f6b3a;color:#b8f7cc}.warn{background:#2a230f;border:1px solid #735a13;color:#ffe29c}.bad{background:#2a1616;border:1px solid #7d2a2a;color:#ffb4b4}
+.table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}.table th{color:var(--muted);font-size:11px;text-align:left;border-bottom:1px solid var(--line);padding:6px}.table td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7)}.table td.num{text-align:right;font-family:monospace}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:#bfe3ff}p,li{font-size:13px;color:var(--muted);line-height:1.6}ul{padding-left:18px;margin:8px 0}.mini{font-size:12px;color:var(--muted);line-height:1.6}
+.eq{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:#bfe3ff;font-weight:700;margin:8px 0;font-size:14px}
+.preset-grid{display:grid;grid-template-columns:1fr;gap:8px}.preset{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);text-align:left;padding:10px;font-size:12px}.preset b{display:block;color:#bfe3ff;margin-bottom:2px}
+.chart{height:220px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:10px;padding:8px}
+.kv{width:100%;border-collapse:collapse;font-size:13px}.kv td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7);vertical-align:top}.kv td:first-child{color:var(--muted);width:42%}
+.foot{color:var(--muted);font-size:11px;text-align:center;margin-top:18px;line-height:1.6}
+
+/* Paper design-system migration */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:760px}
+.module-hero{margin-bottom:14px}
+.module-tabs{margin-bottom:16px}
+.module-panel{display:none}
+.module-panel.on{display:block}
+.paper-card{margin-bottom:12px}
+label{color:var(--paper-muted);font-weight:700}
+input,select{background:#fffdf8;color:var(--paper-ink);border-color:var(--paper-line)}
+input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.metric,.pill,.preset{background:var(--paper-surface-2);border-color:var(--paper-line);color:var(--paper-ink)}
+.metric,.preset{box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.metric .val,.preset b{color:#10263f}
+.metric .neg{color:#b45309}
+.pill:active,.preset:active{background:#e7e0d4}
+.status{border-radius:12px}
+.ok{background:#e7f5ef;border-color:#b7dbc9;color:#0f5132}
+.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.bad{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.table th,.table td,.kv td{border-color:var(--paper-line)}
+.table th{color:var(--paper-muted)}
+h3{color:#10263f}
+.mini,p,li{color:var(--paper-muted)}
+.eq{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#10263f}
+.chart{background:#fffdf8;border-color:var(--paper-line)}
+.foot{color:var(--paper-muted)}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .grid,.grid3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar">
+      <a class="back-link" href="../index.html">← Inicio</a>
+      <span class="module-kicker">Equilibrio químico</span>
+    </div>
+    <h1 class="module-heading">Efecto de la temperatura sobre K</h1>
+    <p class="module-subtitle">Aplica van’t Hoff para explorar cómo la temperatura modifica la constante de equilibrio en reacciones endo y exotérmicas.</p>
+  </div>
+
+  <div class="module-tabs" id="tabs">
+    <button class="on" data-tab="calc">Calculadora</button>
+    <button data-tab="learn">Aprendizaje</button>
+    <button data-tab="explore">Exploración</button>
+    <button data-tab="data">Datos</button>
+  </div>
+
+  <div id="tab-calc" class="module-panel on">
+    <div class="paper-card">
+      <h2>Calculadora</h2>
+      <label>Reacción o caso</label><input id="reaction" value="N2 + 3H2 ⇌ 2NH3">
+      <div class="grid">
+        <label>Kref<input id="kRef" type="number" value="6.0e5" step="any"></label>
+        <label>Tref (K)<input id="tRef" type="number" value="298.15" step="0.1"></label>
+        <label>ΔH°rxn (kJ/mol-rxn)<input id="dH" type="number" value="-92.4" step="0.1"></label>
+        <label>T nueva (K)<input id="tNew" type="number" value="700" step="1"></label>
+      </div>
+      <button class="pill" id="calcBtn" type="button">Calcular K(T)</button>
+      <button class="pill" id="loadAmmonia" type="button">Cargar amoníaco</button>
+      <div id="calcStatus"></div>
+    </div>
+    <div class="paper-card">
+      <h2>Resultado</h2>
+      <div class="grid" id="resultGrid"></div>
+    </div>
+  </div>
+
+  <div id="tab-learn" class="module-panel">
+    <div class="paper-card">
+      <h2>Aprendizaje</h2>
+      <p>La constante de equilibrio K depende de la temperatura porque el equilibrio refleja un balance entre energía y composición. Cambiar T cambia la tendencia termodinámica de la reacción.</p>
+      <div class="eq">ln(K₂/K₁) = -ΔH°/R · (1/T₂ - 1/T₁)</div>
+      <h3>Exotérmica vs endotérmica</h3>
+      <p>Si ΔH° &lt; 0, la reacción libera calor: al subir T, K suele disminuir. Si ΔH° &gt; 0, la reacción absorbe calor: al subir T, K suele aumentar.</p>
+      <h3>Interpretación de ingeniería</h3>
+      <p>K grande indica productos favorecidos en equilibrio. K pequeña indica reactantes favorecidos. Esto no dice qué tan rápido ocurre la reacción: equilibrio no es cinética.</p>
+      <h3>Limitaciones</h3>
+      <ul>
+        <li>Se asume ΔH° aproximadamente constante en el rango de T.</li>
+        <li>Para rangos amplios se requieren Cp(T), ΔG°(T) o modelos más completos.</li>
+        <li>K debe ser adimensional; aquí se usa una forma práctica educativa.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-explore" class="module-panel">
+    <div class="paper-card">
+      <h2>Exploración</h2>
+      <p>Elige un caso, define un rango de temperatura y observa si K aumenta o disminuye.</p>
+      <div class="preset-grid" id="presetGrid"></div>
+      <div class="grid3">
+        <label>T min (K)<input id="tMin" type="number" value="300" step="10"></label>
+        <label>T max (K)<input id="tMax" type="number" value="1200" step="10"></label>
+        <label>Puntos<input id="steps" type="number" value="7" min="4" max="11" step="1"></label>
+      </div>
+      <label>Vista de gráfica</label><select id="plotMode"><option value="ln">ln K vs T</option><option value="k">K vs T</option></select>
+      <div id="exploreSummary"></div>
+      <div class="chart" id="chart"></div>
+      <table class="table" id="trendTable"></table>
+    </div>
+  </div>
+
+  <div id="tab-data" class="module-panel">
+    <div class="paper-card">
+      <h2>Datos / Fuentes</h2>
+      <table class="kv" id="dataTable"></table>
+      <div class="mini" style="margin-top:10px">Modelo educativo offline basado en van’t Hoff integrado con ΔH° constante. Los presets son valores representativos para exploración conceptual, no reemplazan datos de diseño detallado.</div>
+    </div>
+  </div>
+  <div class="foot">Módulo offline · Puente entre ΔG°, K, ξ y equilibrio químico</div>
+</div>
+
+<script>
+const R=8.314462618e-3; // kJ/mol/K
+const $=id=>document.getElementById(id);
+const presets=[
+  {title:"Síntesis de amoníaco",desc:"Exotérmica: K disminuye al subir T.",rxn:"N2 + 3H2 ⇌ 2NH3",K:6.0e5,T:298.15,H:-92.4,src:"Valor representativo educativo"},
+  {title:"Formación de agua",desc:"Muy exotérmica: productos fuertemente favorecidos a baja T.",rxn:"2H2 + O2 ⇌ 2H2O(g)",K:1.0e40,T:298.15,H:-483.6,src:"Estimación conceptual desde ΔH°rxn"},
+  {title:"Reformado seco de metano",desc:"Endotérmica: K aumenta al subir T.",rxn:"CH4 + CO2 ⇌ 2CO + 2H2",K:1.0e-4,T:1000,H:247.0,src:"Caso representativo para exploración"},
+  {title:"Reformado con vapor",desc:"Endotérmica industrial: altas T favorecen productos.",rxn:"CH4 + H2O ⇌ CO + 3H2",K:1.0e-3,T:900,H:206.0,src:"Caso representativo para exploración"}
+];
+let currentSource="Usuario";
+function fmtK(v){
+  if(!isFinite(v)) return v>0?"∞":"N/D";
+  const a=Math.abs(v);
+  if(a!==0&&(a<1e-3||a>=1e5)) return v.toExponential(3);
+  return v.toLocaleString("es-MX",{maximumFractionDigits:4});
+}
+function fmt(v,d=2){return isFinite(v)?v.toLocaleString("es-MX",{maximumFractionDigits:d,minimumFractionDigits:d}):"N/D"}
+function values(){
+  return {rxn:$("reaction").value.trim(),K:parseFloat($("kRef").value),T1:parseFloat($("tRef").value),H:parseFloat($("dH").value),T2:parseFloat($("tNew").value)};
+}
+function calcAt(T2){
+  const v=values();
+  if(v.K<=0||v.T1<=0||T2<=0||!isFinite(v.K)||!isFinite(v.T1)||!isFinite(v.H)) return null;
+  const lnK=Math.log(v.K) - (v.H/R)*(1/T2 - 1/v.T1);
+  return {T:T2,lnK,K:Math.exp(Math.max(-745,Math.min(709,lnK)))};
+}
+function classify(H){return H<0?"exotérmica":H>0?"endotérmica":"aprox. térmicamente neutra"}
+function updateAll(){
+  const v=values(), r=calcAt(v.T2);
+  let status="";
+  if(!r) status='<div class="status bad">Revisa entradas: Kref y temperaturas deben ser positivas.</div>';
+  else if(r.K>1e20||r.K<1e-20) status='<div class="status warn">K es extremadamente grande o pequeña; usa ln K para interpretar mejor.</div>';
+  else status='<div class="status ok">Cálculo válido con van’t Hoff integrado y ΔH° constante.</div>';
+  $("calcStatus").innerHTML=status;
+  const trend=v.H<0?"al subir T, K disminuye":"al subir T, K aumenta";
+  $("resultGrid").innerHTML=[
+    ["K(T)",r?fmtK(r.K):"N/D","adimensional"],
+    ["ln K",r?fmt(r.lnK,3):"N/D",""],
+    ["Tipo",classify(v.H),`ΔH° = ${fmt(v.H,1)} kJ/mol-rxn`],
+    ["Tendencia",trend,"según signo de ΔH°"]
+  ].map(m=>`<div class="metric"><div class="lbl">${m[0]}</div><div class="val ${m[1].includes("-")?"neg":""}">${m[1]}</div><div class="mini">${m[2]}</div></div>`).join("");
+  updateExplore(); updateData();
+}
+function loadPreset(p){
+  $("reaction").value=p.rxn;$("kRef").value=p.K;$("tRef").value=p.T;$("dH").value=p.H;currentSource=p.src;updateAll();
+}
+function trendRows(){
+  let a=parseFloat($("tMin").value),b=parseFloat($("tMax").value),n=parseInt($("steps").value,10);
+  if(!isFinite(a))a=300;if(!isFinite(b))b=1200;if(b<a)[a,b]=[b,a];n=Math.min(11,Math.max(4,isFinite(n)?n:7));
+  return Array.from({length:n},(_,i)=>calcAt(a+(b-a)*i/(n-1))).filter(Boolean);
+}
+function updateExplore(){
+  const rows=trendRows();
+  if(!rows.length){$("chart").innerHTML="";$("trendTable").innerHTML="";return;}
+  const first=rows[0],last=rows[rows.length-1],v=values();
+  const dir=last.lnK>first.lnK?"aumenta":"disminuye";
+  $("exploreSummary").innerHTML=`<div class="status ok">${classify(v.H)}: en este rango K ${dir} con T. ${last.lnK>0?"A la temperatura alta, productos tienden a estar favorecidos.":"A la temperatura alta, reactantes pueden estar favorecidos si K<1."}</div>`;
+  drawChart(rows);
+  $("trendTable").innerHTML=`<thead><tr><th>T (K)</th><th class="num">K(T)</th><th class="num">ln K</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${fmt(r.T,1)}</td><td class="num">${fmtK(r.K)}</td><td class="num">${fmt(r.lnK,3)}</td></tr>`).join("")}</tbody>`;
+}
+function drawChart(rows){
+  const mode=$("plotMode").value;
+  const vals=rows.map(r=>mode==="ln"?r.lnK:r.K);
+  const W=320,H=180,ml=48,mr=12,mt=12,mb=30,gw=W-ml-mr,gh=H-mt-mb;
+  const x0=rows[0].T,x1=rows[rows.length-1].T,yMin=Math.min(...vals),yMax=Math.max(...vals),pad=(yMax-yMin)*0.12||1;
+  const y0=yMin-pad,y1=yMax+pad,px=T=>ml+(T-x0)/(x1-x0||1)*gw,py=y=>mt+gh-(y-y0)/(y1-y0||1)*gh;
+  const path=rows.map((r,i)=>`${i?"L":"M"}${px(r.T).toFixed(1)},${py(mode==="ln"?r.lnK:r.K).toFixed(1)}`).join(" ");
+  $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%;display:block">
+    <line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+gh}" stroke="#d8d0c3"/><line x1="${ml}" y1="${mt+gh}" x2="${W-mr}" y2="${mt+gh}" stroke="#d8d0c3"/>
+    <path d="${path}" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>${rows.map(r=>`<circle cx="${px(r.T).toFixed(1)}" cy="${py(mode==="ln"?r.lnK:r.K).toFixed(1)}" r="3" fill="#1d4ed8"/>`).join("")}
+    <text x="${ml}" y="${H-8}" fill="#667085" font-size="9">${fmt(x0,0)} K</text><text x="${W-mr}" y="${H-8}" fill="#667085" font-size="9" text-anchor="end">${fmt(x1,0)} K</text>
+    <text x="${ml-6}" y="${mt+4}" fill="#667085" font-size="9" text-anchor="end">${mode==="ln"?fmt(y1,1):fmtK(y1)}</text>
+    <text x="${ml-6}" y="${mt+gh}" fill="#667085" font-size="9" text-anchor="end">${mode==="ln"?fmt(y0,1):fmtK(y0)}</text>
+  </svg>`;
+}
+function updateData(){
+  const v=values();
+  $("dataTable").innerHTML=[
+    ["Reacción",v.rxn||"No definida"],
+    ["Kref",fmtK(v.K)],
+    ["Tref",`${fmt(v.T1,2)} K`],
+    ["ΔH°rxn",`${fmt(v.H,2)} kJ/mol-rxn (${classify(v.H)})`],
+    ["Fuente",currentSource],
+    ["Modelo","ln(K2/K1) = -ΔH°/R · (1/T2 - 1/T1)"],
+    ["Supuesto principal","ΔH° constante en el rango de temperatura."]
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;[...$("tabs").children].forEach(x=>x.classList.toggle("on",x===b));["calc","learn","explore","data"].forEach(t=>$("tab-"+t).classList.toggle("on",t===b.dataset.tab));updateAll();});
+["reaction","kRef","tRef","dH","tNew","tMin","tMax","steps","plotMode"].forEach(id=>$(id).addEventListener("input",()=>{currentSource=currentSource==="Usuario"?currentSource:"Preset modificado";updateAll();}));
+$("calcBtn").addEventListener("click",updateAll);
+$("loadAmmonia").addEventListener("click",()=>loadPreset(presets[0]));
+$("presetGrid").innerHTML=presets.map((p,i)=>`<button class="preset" type="button" data-i="${i}"><b>${p.title}</b><span class="mini">${p.desc}</span></button>`).join("");
+$("presetGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b)loadPreset(presets[+b.dataset.i]);});
+loadPreset(presets[0]);
+</script>
+</body>
+</html>

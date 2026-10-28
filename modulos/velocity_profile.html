@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Simulador de perfiles de velocidad en flujo laminar — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{
+  --bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);
+  --muted:var(--paper-muted);--accent:var(--paper-accent);--ok:var(--paper-accent-2);--warn:#92400e;
+  --err:#b42318;--line:var(--paper-line);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,Roboto,'Segoe UI',sans-serif;font-size:16px}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 48px}
+
+/* topbar */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;font-weight:600}
+h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 16px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+input[type=number],select{width:100%;padding:11px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card2);color:var(--txt);
+  font-size:16px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.row{display:flex;gap:10px}
+.row>div{flex:1;min-width:0}
+
+/* segmented control */
+.seg{display:flex;background:var(--card2);border:1px solid var(--line);
+  border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:10px 4px;border:0;background:transparent;
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.seg button.on{background:var(--accent);color:#04121f}
+
+/* tab bar */
+.tabs{display:flex;background:var(--card2);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;margin-bottom:12px}
+.tabs button{flex:1;padding:12px 4px;border:0;background:transparent;
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.tabs button.on{background:var(--accent);color:#04121f}
+
+/* calc button */
+.btn-calc{width:100%;padding:14px;background:var(--accent);color:#04121f;
+  border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;
+  margin:12px 0;transition:.15s}
+.btn-calc:active{opacity:.85}
+
+/* result grid */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.res-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:14px;text-align:center}
+.res-card .val{font-size:20px;font-weight:700;color:#bfe3ff;margin-bottom:4px}
+.res-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.res-card .unit{font-size:12px;color:var(--muted);margin-top:3px}
+.res-card.full{grid-column:1/-1}
+.res-card.ok .val{color:var(--ok)}
+.res-card.warn .val{color:var(--warn)}
+
+/* warning boxes */
+.warn-box{border-radius:10px;padding:12px 14px;margin:8px 0;font-size:13px;line-height:1.6}
+.warn-box.warn{background:#1f1800;border:1px solid #4a3800;color:var(--warn)}
+.warn-box.err{background:#1f0808;border:1px solid #4a1010;color:var(--err)}
+.warn-box.info{background:#001833;border:1px solid #003366;color:#5db8ff}
+
+/* canvas */
+canvas{width:100%;border-radius:10px;display:block;margin-top:8px}
+
+/* q unit selector */
+.qunit{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:10px}
+.qunit button{flex:1;padding:7px;border:0;background:var(--card2);color:var(--muted);
+  font-size:12px;cursor:pointer;font-weight:600}
+.qunit button.on{background:var(--accent);color:#04121f}
+
+/* fluid note */
+.fluid-note{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+/* learning */
+.learn-sec{margin-bottom:18px}
+.learn-sec h3{font-size:13px;color:var(--accent);margin:0 0 8px;
+  text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.learn-sec p{font-size:14px;color:var(--txt);line-height:1.65;margin:0 0 8px}
+.learn-sec ul{margin:4px 0 8px;padding-left:18px}
+.learn-sec li{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:3px}
+.eq-box{font-family:monospace;font-size:13px;color:#bfe3ff;
+  background:var(--card2);border:1px solid var(--line);border-radius:8px;
+  padding:10px 12px;margin:8px 0;line-height:1.9}
+.bc-box{background:#001a10;border:1px solid #004422;border-radius:8px;
+  padding:10px 12px;margin:8px 0;font-size:13px;color:#80e0a0;
+  font-family:monospace;line-height:1.9}
+.err-box{background:#1a0808;border:1px solid #3a1515;border-radius:8px;
+  padding:10px 12px;margin:8px 0;font-size:13px;color:#ff9090;line-height:1.8}
+
+/* ── Math rendering — 100% offline, sin CDN ─────────────── */
+/* Contenedor de bloque de ecuación (display-mode)          */
+.math-block{background:#0d1e2e;border:1px solid #1e3a52;
+  border-left:3px solid var(--accent);border-radius:8px;
+  padding:14px 16px;margin:10px 0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Fila de ecuación */
+.meq{display:flex;align-items:center;flex-wrap:nowrap;white-space:nowrap;
+  gap:2px;margin:8px 0;font-size:15px;color:#c8e4ff;
+  font-family:Georgia,'Times New Roman',serif}
+.meq:first-child{margin-top:0}.meq:last-child{margin-bottom:0}
+/* Fracción: columna con línea divisoria */
+.mfrac{display:inline-flex;flex-direction:column;align-items:center;
+  vertical-align:middle;line-height:1.15;margin:0 1px}
+.mfrac .num{border-bottom:1.5px solid #aacde8;padding:1px 5px;
+  font-size:.8em;text-align:center;white-space:nowrap}
+.mfrac .den{padding:2px 5px;font-size:.8em;text-align:center;white-space:nowrap}
+/* Variable (itálica), letras griegas, operadores, notas al lado */
+.mv{font-style:italic}
+.mg{color:#a0ccf0}
+.mo{color:#6a8a9a;margin:0 4px}
+.mnote{color:var(--muted);font-size:12px;margin-left:10px;
+  font-family:system-ui,sans-serif;font-style:normal;white-space:normal}
+/* Bloque de condiciones de frontera */
+.bc-block{background:#001a10;border:1px solid #004422;border-radius:8px;
+  padding:12px 16px;margin:8px 0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bc-row{display:flex;align-items:center;flex-wrap:nowrap;white-space:nowrap;
+  gap:3px;margin:6px 0;font-size:14px;color:#80e0a0;
+  font-family:Georgia,'Times New Roman',serif}
+.bc-row:first-child{margin-top:0}.bc-row:last-child{margin-bottom:0}
+.bc-note{font-family:system-ui,sans-serif;font-size:13px;color:#60b080;white-space:normal}
+/* Compatibilidad: eq-box y bc-box originales ahora con scroll horizontal */
+.eq-box{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bc-box{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* exploration */
+.slider-row{margin:12px 0}
+.slider-row .slabel{display:flex;justify-content:space-between;
+  font-size:13px;color:var(--muted);margin-bottom:6px}
+.slider-row .sval{color:var(--txt);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:4px}
+.explore-insight{background:#0a1f10;border:1px solid #1a4a20;
+  border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;
+  color:#80e0a0;line-height:1.7}
+
+/* Phase 2 Paper shell migration.
+   Preserve existing IDs/classes because calculator and canvas logic bind to them. */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:760px}
+.topbar{
+  background:linear-gradient(135deg,#fffdf8 0%,#f5efe4 62%,#e8f0ff 100%);
+  border:1px solid var(--paper-line);
+  border-radius:20px 20px 0 0;
+  border-bottom:0;
+  padding:16px 16px 6px;
+  margin:0;
+  box-shadow:var(--shadow-soft);
+}
+.sub{
+  background:linear-gradient(135deg,#fffdf8 0%,#f5efe4 62%,#e8f0ff 100%);
+  border:1px solid var(--paper-line);
+  border-top:0;
+  border-radius:0 0 20px 20px;
+  padding:0 16px 16px;
+  margin:0 0 14px;
+  box-shadow:var(--shadow-soft);
+}
+.back{
+  flex-shrink:0;
+  background:rgba(255,253,248,.78);
+  color:var(--paper-accent);
+  border-color:var(--paper-line);
+}
+h1{
+  color:var(--paper-ink);
+  font-size:22px;
+  line-height:1.18;
+  letter-spacing:-.25px;
+}
+.card{
+  background:var(--paper-surface);
+  border-color:var(--paper-line);
+  box-shadow:0 1px 0 rgba(31,41,51,.03);
+}
+label,.sub,.fluid-note,.mnote,.res-card .lbl,.res-card .unit,
+.learn-sec li,.slider-row .slabel{
+  color:var(--paper-muted);
+}
+.learn-sec p{color:var(--paper-ink)}
+input[type=number],select{
+  background:#fffdf8;
+  color:var(--paper-ink);
+  border-color:var(--paper-line);
+}
+input:focus,select:focus{
+  border-color:var(--paper-accent);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+.seg,.tabs,.qunit{
+  background:var(--paper-surface-2);
+  border-color:var(--paper-line);
+}
+.seg button,.tabs button,.qunit button{color:var(--paper-muted)}
+.seg button.on,.tabs button.on,.qunit button.on{
+  background:var(--paper-surface);
+  color:var(--paper-ink);
+  box-shadow:0 1px 4px rgba(31,41,51,.08);
+}
+.tabs{
+  padding:3px;
+  gap:3px;
+  border-radius:14px;
+  margin-top:12px;
+  overflow:visible;
+}
+.tabs button{
+  min-height:38px;
+  border-radius:11px;
+  padding:10px 4px;
+}
+.btn-calc{
+  background:#10263f;
+  color:#f8fafc;
+}
+.res-card{
+  background:var(--paper-surface-2);
+  border-color:var(--paper-line);
+}
+.res-card .val,.slider-row .sval,.learn-sec h3{
+  color:#10263f;
+}
+.res-card.ok .val{color:#0f766e}
+.res-card.warn .val{color:#b45309}
+.warn-box.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.warn-box.err,.err-box{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.warn-box.info{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#1d4ed8}
+.explore-insight,.bc-box,.bc-block{
+  background:#e7f5ef;
+  border-color:#b7dbc9;
+  color:#0f5132;
+}
+.bc-row,.bc-note{color:#0f5132}
+.math-block,.eq-box{
+  background:var(--paper-soft-blue);
+  border-color:#cbdaf7;
+  color:#10263f;
+}
+.meq{color:#10263f}
+.mfrac .num{border-color:#8fa9d6}
+.mg{color:#1d4ed8}
+.mo{color:#667085}
+canvas{
+  background:#fffdf8;
+  border:1px solid var(--paper-line);
+}
+input[type=range]{accent-color:#10263f}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row{display:grid;grid-template-columns:1fr}
+  h1{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap module-shell">
+
+<div class="topbar">
+  <a class="back" href="../index.html">← Inicio</a>
+  <h1>🌊 Simulador de perfiles de velocidad en flujo laminar</h1>
+</div>
+<div class="sub">Fenómenos de Transporte I · Flujo laminar en geometrías clásicas</div>
+
+<!-- Case selector -->
+<div class="card" style="padding:10px 14px">
+  <label style="margin:0 0 8px">Geometría</label>
+  <div class="seg" id="caseBar">
+    <button class="on" data-c="pipe">Tubo circular</button>
+    <button data-c="film">Película desc.</button>
+    <button data-c="couette">Couette plano</button>
+  </div>
+</div>
+
+<!-- Tab bar -->
+<div class="tabs" id="tabBar">
+  <button class="on" data-t="calc">🧮 Calculadora</button>
+  <button data-t="learn">📖 Aprendizaje</button>
+  <button data-t="explore">🔬 Exploración</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB: CALCULADORA
+══════════════════════════════════════════════════════════ -->
+<div id="tab-calc">
+
+  <!-- Fluid quick-fill -->
+  <div class="card">
+    <label>Fluido predefinido (opcional)</label>
+    <select id="fluidSel">
+      <option value="">— Ingresar manualmente —</option>
+      <option value="agua">Agua (25 °C)</option>
+      <option value="aire">Aire (25 °C)</option>
+      <option value="glicerina">Glicerina (20 °C)</option>
+      <option value="etanol">Etanol (20 °C)</option>
+      <option value="aceite">Aceite ligero (25 °C)</option>
+    </select>
+    <div class="fluid-note">⚠ Propiedades aproximadas a temperatura ambiente. Para cálculos formales, verifica los datos en tablas especializadas.</div>
+  </div>
+
+  <!-- ─── TUBO CIRCULAR ─── -->
+  <div id="inputs-pipe" class="card">
+    <label style="margin-top:0">Dimensiones del tubo</label>
+    <div class="seg" id="rdSel" style="margin-bottom:8px">
+      <button class="on" data-rd="R">Radio R</button>
+      <button data-rd="D">Diámetro D</button>
+    </div>
+    <div class="row">
+      <div>
+        <input type="number" id="p_rd" inputmode="decimal" placeholder="5" min="0">
+      </div>
+      <div>
+        <select id="p_rdU">
+          <option value="m">m</option>
+          <option value="cm">cm</option>
+          <option value="mm" selected>mm</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Longitud L</label>
+        <input type="number" id="p_L" inputmode="decimal" placeholder="1.0" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="p_LU">
+          <option value="m" selected>m</option>
+          <option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Caída de presión ΔP</label>
+        <input type="number" id="p_dP" inputmode="decimal" placeholder="10">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="p_dPU">
+          <option value="Pa" selected>Pa</option>
+          <option value="kPa">kPa</option>
+          <option value="bar">bar</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Viscosidad dinámica μ</label>
+        <input type="number" id="p_mu" inputmode="decimal" placeholder="1.002" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="p_muU">
+          <option value="Pas">Pa·s</option>
+          <option value="cP" selected>cP</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Densidad ρ</label>
+        <input type="number" id="p_rho" inputmode="decimal" placeholder="998.2" min="0">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <select disabled><option>kg/m³</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PELÍCULA DESCENDENTE ─── -->
+  <div id="inputs-film" class="card" style="display:none">
+    <div class="row">
+      <div>
+        <label style="margin-top:0">Espesor de película δ</label>
+        <input type="number" id="f_delta" inputmode="decimal" placeholder="1.0" min="0">
+      </div>
+      <div>
+        <label style="margin-top:0">Unidad</label>
+        <select id="f_deltaU">
+          <option value="m">m</option>
+          <option value="cm">cm</option>
+          <option value="mm" selected>mm</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Ángulo de inclinación θ</label>
+        <input type="number" id="f_theta" inputmode="decimal" placeholder="45" min="0" max="90">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <select disabled><option>grados (°)</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Viscosidad dinámica μ</label>
+        <input type="number" id="f_mu" inputmode="decimal" placeholder="1.002" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="f_muU">
+          <option value="Pas">Pa·s</option>
+          <option value="cP" selected>cP</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Densidad ρ</label>
+        <input type="number" id="f_rho" inputmode="decimal" placeholder="998.2" min="0">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <select disabled><option>kg/m³</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Ancho de placa b <span style="color:var(--muted);font-size:11px">(opcional)</span></label>
+        <input type="number" id="f_b" inputmode="decimal" placeholder="—" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="f_bU">
+          <option value="m" selected>m</option>
+          <option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── COUETTE PLANO ─── -->
+  <div id="inputs-couette" class="card" style="display:none">
+    <div class="row">
+      <div>
+        <label style="margin-top:0">Separación entre placas H</label>
+        <input type="number" id="c_H" inputmode="decimal" placeholder="1.0" min="0">
+      </div>
+      <div>
+        <label style="margin-top:0">Unidad</label>
+        <select id="c_HU">
+          <option value="m">m</option>
+          <option value="cm">cm</option>
+          <option value="mm" selected>mm</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Velocidad placa superior U</label>
+        <input type="number" id="c_U" inputmode="decimal" placeholder="0.1">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="c_UU">
+          <option value="ms">m/s</option>
+          <option value="cms">cm/s</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Viscosidad dinámica μ</label>
+        <input type="number" id="c_mu" inputmode="decimal" placeholder="1.002" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="c_muU">
+          <option value="Pas">Pa·s</option>
+          <option value="cP" selected>cP</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Densidad ρ <span style="color:var(--muted);font-size:11px">(opcional, para Re)</span></label>
+        <input type="number" id="c_rho" inputmode="decimal" placeholder="998.2" min="0">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <select disabled><option>kg/m³</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Ancho b <span style="color:var(--muted);font-size:11px">(opcional, para Q)</span></label>
+        <input type="number" id="c_b" inputmode="decimal" placeholder="—" min="0">
+      </div>
+      <div>
+        <label>Unidad</label>
+        <select id="c_bU">
+          <option value="m" selected>m</option>
+          <option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-calc" id="btnCalc">Calcular perfil</button>
+
+  <!-- Results -->
+  <div id="results" style="display:none">
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;font-weight:600">RESULTADOS</div>
+      <div class="res-grid" id="resGrid"></div>
+      <div id="warnDiv"></div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">Unidad de caudal:</div>
+      <div class="qunit" id="qUnitBar">
+        <button class="on" data-qu="m3s">m³/s</button>
+        <button data-qu="Ls">L/s</button>
+        <button data-qu="Lmin">L/min</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Perfil de velocidad</div>
+      <canvas id="chart" width="520" height="320"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB: APRENDIZAJE
+══════════════════════════════════════════════════════════ -->
+<div id="tab-learn" style="display:none">
+
+  <!-- PIPE -->
+  <div id="learn-pipe">
+    <div class="card">
+      <div class="learn-sec">
+        <h3>¿Qué representa este modelo?</h3>
+        <p>El flujo de Hagen-Poiseuille describe un fluido viscoso incompresible que fluye dentro de un tubo circular bajo una diferencia de presión constante. Se obtiene un perfil parabólico de velocidades, simétrico respecto al eje del tubo, y es el modelo laminar fundamental para flujos internos en ingeniería.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Suposiciones del modelo</h3>
+        <ul>
+          <li>Fluido newtoniano (esfuerzo cortante ∝ gradiente de velocidad)</li>
+          <li>Flujo incompresible (densidad constante)</li>
+          <li>Estado estacionario (sin variación en el tiempo)</li>
+          <li>Flujo laminar (Re &lt; 2100)</li>
+          <li>Flujo axialmente simétrico y completamente desarrollado</li>
+          <li>Tubo recto y circular</li>
+          <li>Condición de no deslizamiento en la pared (v = 0 en r = R)</li>
+          <li>Propiedades del fluido constantes (μ, ρ independientes de T)</li>
+        </ul>
+      </div>
+      <div class="learn-sec">
+        <h3>Coordenada y condiciones de frontera</h3>
+        <p>Se usa la coordenada radial <em>r</em>, medida desde el eje del tubo (r = 0) hasta la pared (r = R).</p>
+        <div class="bc-block">
+          <div class="bc-row">
+            <span class="mv">r</span><span class="mo">=</span><span>0</span><span class="mo">:</span>
+            <span class="mfrac"><span class="num">d<span class="mv">v</span></span><span class="den">d<span class="mv">r</span></span></span>
+            <span class="mo">=</span><span>0</span>
+            <span class="bc-note">— simetría axial (gradiente nulo en el eje)</span>
+          </div>
+          <div class="bc-row">
+            <span class="mv">r</span><span class="mo">=</span><span class="mv">R</span><span class="mo">:</span>
+            <span class="mv">v</span><span class="mo">=</span><span>0</span>
+            <span class="bc-note">— no deslizamiento en la pared sólida</span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Solución analítica</h3>
+        <div class="math-block">
+          <div class="meq">
+            <span class="mv">v</span>(<span class="mv">r</span>)<span class="mo">=</span>
+            <span class="mfrac"><span class="num">Δ<span class="mv">P</span>·(<span class="mv">R</span>²−<span class="mv">r</span>²)</span><span class="den">4<span class="mg">μ</span><span class="mv">L</span></span></span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>máx</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num">Δ<span class="mv">P</span>·<span class="mv">R</span>²</span><span class="den">4<span class="mg">μ</span><span class="mv">L</span></span></span>
+            <span class="mnote">en r = 0</span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>prom</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mv">v</span><sub>máx</sub></span><span class="den">2</span></span>
+            <span class="mnote">siempre: v<sub>máx</sub> = 2·v<sub>prom</sub></span>
+          </div>
+          <div class="meq">
+            <span class="mv">Q</span><span class="mo">=</span>
+            <span class="mfrac"><span class="num">π·Δ<span class="mv">P</span>·<span class="mv">R</span>⁴</span><span class="den">8<span class="mg">μ</span><span class="mv">L</span></span></span>
+            <span class="mnote">Ley de Poiseuille</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span>(<span class="mv">r</span>)<span class="mo">=</span>
+            <span class="mfrac"><span class="num">Δ<span class="mv">P</span>·<span class="mv">r</span></span><span class="den">2<span class="mv">L</span></span></span>
+            <span class="mnote">lineal con r</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span><sub>w</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num">Δ<span class="mv">P</span>·<span class="mv">R</span></span><span class="den">2<span class="mv">L</span></span></span>
+            <span class="mnote">esfuerzo en la pared</span>
+          </div>
+          <div class="meq">
+            Re<span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span>·<span class="mv">v</span><sub>prom</sub>·<span class="mv">D</span></span><span class="den"><span class="mg">μ</span></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Interpretación física</h3>
+        <p>La velocidad es máxima en el eje porque la fuerza viscosa es mínima allí (el fluido central está "protegido" de la pared). La relación <strong>v_max = 2·v_prom</strong> es característica del flujo laminar en tubo y puede usarse para verificar experimentos.</p>
+        <p>El caudal es proporcional a R⁴ (Ley de Poiseuille): duplicar el radio <strong>multiplica el caudal por 16</strong>. Esta sensibilidad extrema al radio explica por qué arterias o tuberías parcialmente obstruidas reducen drásticamente el flujo.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Errores comunes</h3>
+        <div class="err-box">
+❌ Usar D donde se necesita R: error de factor 4 en v_max y factor 16 en Q
+❌ Ingresar μ en cP sin dividir entre 1000 para obtener Pa·s
+❌ Aplicar el perfil parabólico cuando Re > 2100 (flujo turbulento)
+❌ Ignorar la longitud de entrada: L_e ≈ 0.05·Re·D antes del perfil desarrollado
+❌ Calcular Q ∝ R⁴ con errores pequeños en R: se amplifican al cuarto poder</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILM -->
+  <div id="learn-film" style="display:none">
+    <div class="card">
+      <div class="learn-sec">
+        <h3>¿Qué representa este modelo?</h3>
+        <p>Una lámina delgada de líquido newtoniano desciende sobre una superficie inclinada impulsada únicamente por la gravedad. Es el modelo base para columnas de relleno, evaporadores de película delgada, recubrimientos, absorción gas-líquido y flujos de lluvia sobre superficies.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Suposiciones del modelo</h3>
+        <ul>
+          <li>Fluido newtoniano</li>
+          <li>Estado estacionario</li>
+          <li>Flujo laminar y unidimensional</li>
+          <li>Película de espesor uniforme δ (sin variación en la dirección del flujo)</li>
+          <li>Sin gradiente de presión externo: la gravedad impulsa el flujo</li>
+          <li>La superficie libre (y = δ) está en contacto con un gas a P constante</li>
+          <li>Esfuerzo cortante despreciable en la superficie libre (interfaz gas-líquido)</li>
+          <li>No deslizamiento en la pared sólida</li>
+          <li>Propiedades constantes</li>
+        </ul>
+      </div>
+      <div class="learn-sec">
+        <h3>Coordenada y condiciones de frontera</h3>
+        <p>Coordenada <em>y</em> perpendicular a la placa: y = 0 en la pared sólida, y = δ en la superficie libre.</p>
+        <div class="bc-block">
+          <div class="bc-row">
+            <span class="mv">y</span><span class="mo">=</span><span>0</span><span class="mo">:</span>
+            <span class="mv">v</span><span class="mo">=</span><span>0</span>
+            <span class="bc-note">— no deslizamiento en la pared sólida</span>
+          </div>
+          <div class="bc-row">
+            <span class="mv">y</span><span class="mo">=</span><span class="mg">δ</span><span class="mo">:</span>
+            <span class="mfrac"><span class="num">d<span class="mv">v</span></span><span class="den">d<span class="mv">y</span></span></span>
+            <span class="mo">=</span><span>0</span>
+            <span class="bc-note">— esfuerzo cortante nulo en la superficie libre (<span class="mg">τ</span> = <span class="mg">μ</span>·dv/dy = 0)</span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Solución analítica</h3>
+        <div class="math-block">
+          <div class="meq">
+            <span class="mv">v</span>(<span class="mv">y</span>)<span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)(2<span class="mg">δ</span><span class="mv">y</span>−<span class="mv">y</span>²)</span><span class="den">2<span class="mg">μ</span></span></span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>máx</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)<span class="mg">δ</span>²</span><span class="den">2<span class="mg">μ</span></span></span>
+            <span class="mnote">en y = δ (superficie libre)</span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>prom</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)<span class="mg">δ</span>²</span><span class="den">3<span class="mg">μ</span></span></span>
+          </div>
+          <div class="meq">
+            <span class="mv">q</span><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)<span class="mg">δ</span>³</span><span class="den">3<span class="mg">μ</span></span></span>
+            <span class="mnote">caudal por unidad de ancho [m²/s]</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span>(<span class="mv">y</span>)<span class="mo">=</span>
+            <span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)(<span class="mg">δ</span>−<span class="mv">y</span>)
+            <span class="mnote">lineal, decrece hacia la superficie libre</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span><sub>w</sub><span class="mo">=</span>
+            <span class="mg">ρ</span><span class="mv">g</span> sin(<span class="mg">θ</span>)<span class="mg">δ</span>
+            <span class="mnote">máximo en la pared</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span><sub>sup</sub><span class="mo">=</span><span>0</span>
+            <span class="mnote">cero en la superficie libre</span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Interpretación física</h3>
+        <p>A diferencia del tubo circular, la velocidad máxima está en la <strong>superficie libre</strong> (y = δ), no en el interior. Esto ocurre porque la superficie libre no impone condición de no deslizamiento: el gas circundante ejerce un esfuerzo cortante negligible.</p>
+        <p>El esfuerzo cortante decrece linealmente desde la pared (máximo) hasta cero en la superficie libre. El caudal por unidad de ancho crece con δ³: triplicar el espesor de película <strong>multiplica el caudal por 27</strong>.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Errores comunes</h3>
+        <div class="err-box">
+❌ Usar θ en grados directamente en sin(θ) sin convertir a radianes
+❌ Creer que la velocidad máxima está en la pared (está en la superficie libre)
+❌ Pensar que el esfuerzo cortante es máximo en la superficie libre (es cero)
+❌ No verificar que el flujo sea laminar antes de aplicar el modelo
+❌ Olvidar que q ∝ δ³: pequeños errores en δ se amplifican al cubo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUETTE -->
+  <div id="learn-couette" style="display:none">
+    <div class="card">
+      <div class="learn-sec">
+        <h3>¿Qué representa este modelo?</h3>
+        <p>El flujo de Couette plano es el movimiento de un fluido entre dos placas paralelas, donde una placa se mueve con velocidad U y la otra permanece fija, <strong>sin gradiente de presión externo</strong>. Es el modelo fundamental de flujo arrastrado por viscosidad y la base teórica de viscosímetros de placas paralelas y cojinetes lubricados.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Suposiciones del modelo</h3>
+        <ul>
+          <li>Fluido newtoniano</li>
+          <li>Estado estacionario</li>
+          <li>Flujo laminar</li>
+          <li>Sin gradiente de presión (dP/dx = 0)</li>
+          <li>Placas paralelas de extensión infinita</li>
+          <li>No deslizamiento en ambas placas</li>
+          <li>Propiedades constantes</li>
+        </ul>
+      </div>
+      <div class="learn-sec">
+        <h3>Coordenada y condiciones de frontera</h3>
+        <p>Coordenada <em>y</em> perpendicular a las placas: y = 0 (placa fija), y = H (placa móvil con velocidad U).</p>
+        <div class="bc-block">
+          <div class="bc-row">
+            <span class="mv">y</span><span class="mo">=</span><span>0</span><span class="mo">:</span>
+            <span class="mv">v</span><span class="mo">=</span><span>0</span>
+            <span class="bc-note">— no deslizamiento, placa fija</span>
+          </div>
+          <div class="bc-row">
+            <span class="mv">y</span><span class="mo">=</span><span class="mv">H</span><span class="mo">:</span>
+            <span class="mv">v</span><span class="mo">=</span><span class="mv">U</span>
+            <span class="bc-note">— no deslizamiento, placa móvil</span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Solución analítica</h3>
+        <div class="math-block">
+          <div class="meq">
+            <span class="mv">v</span>(<span class="mv">y</span>)<span class="mo">=</span>
+            <span class="mv">U</span>·
+            <span class="mfrac"><span class="num"><span class="mv">y</span></span><span class="den"><span class="mv">H</span></span></span>
+            <span class="mnote">perfil lineal</span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>máx</sub><span class="mo">=</span>
+            <span class="mv">U</span>
+            <span class="mnote">en y = H (placa móvil)</span>
+          </div>
+          <div class="meq">
+            <span class="mv">v</span><sub>prom</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mv">U</span></span><span class="den">2</span></span>
+            <span class="mnote">independiente de μ y H</span>
+          </div>
+          <div class="meq">
+            <span class="mv">q</span><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mv">U</span>·<span class="mv">H</span></span><span class="den">2</span></span>
+            <span class="mnote">caudal por unidad de ancho [m²/s]</span>
+          </div>
+          <div class="meq">
+            <span class="mg">τ</span><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">μ</span>·<span class="mv">U</span></span><span class="den"><span class="mv">H</span></span></span>
+            <span class="mnote">constante en todo el espacio inter-placas</span>
+          </div>
+          <div class="meq">
+            Re<sub>H</sub><span class="mo">=</span>
+            <span class="mfrac"><span class="num"><span class="mg">ρ</span>·|<span class="mv">U</span>|·<span class="mv">H</span></span><span class="den"><span class="mg">μ</span></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="learn-sec">
+        <h3>Interpretación física</h3>
+        <p>El perfil es <strong>lineal</strong> porque sin gradiente de presión, la ecuación de momento se reduce a d²v/dy² = 0. Las condiciones de frontera determinan la solución única: v = U·y/H.</p>
+        <p>El esfuerzo cortante τ = μ·U/H es <strong>constante</strong> en todo el espacio inter-placas. Esto contrasta con el flujo de Poiseuille, donde τ varía linealmente con r. Esta configuración es la base de los viscosímetros de placas paralelas: midiendo τ y conociendo U y H, se puede calcular μ.</p>
+      </div>
+      <div class="learn-sec">
+        <h3>Errores comunes</h3>
+        <div class="err-box">
+❌ Creer que se necesita ΔP para mantener el flujo (el motor aquí es la placa móvil)
+❌ Olvidar la condición de no deslizamiento en la placa fija (v = 0 en y = 0)
+❌ Confundir el perfil lineal de Couette con el perfil parabólico de Poiseuille
+❌ Asumir que τ varía con y (en Couette puro sin ΔP, τ es constante)</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-learn -->
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB: EXPLORACIÓN
+══════════════════════════════════════════════════════════ -->
+<div id="tab-explore" style="display:none">
+
+  <!-- PIPE explore -->
+  <div id="explore-pipe">
+    <div class="card">
+      <div class="learn-sec" style="margin-bottom:8px">
+        <h3>Tubo circular — Exploración interactiva</h3>
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>ΔP (Pa)</span><span class="sval" id="ep_dP_v">10</span></div>
+        <input type="range" id="ep_dP" min="1" max="2000" step="1" value="10">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Radio R (mm)</span><span class="sval" id="ep_R_v">5.0</span></div>
+        <input type="range" id="ep_R" min="0.5" max="50" step="0.5" value="5">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>μ (cP)</span><span class="sval" id="ep_mu_v">1.0</span></div>
+        <input type="range" id="ep_mu" min="0.1" max="200" step="0.1" value="1.0">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Longitud L (m)</span><span class="sval" id="ep_L_v">1.0</span></div>
+        <input type="range" id="ep_L" min="0.1" max="20" step="0.1" value="1.0">
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="exp-chart-pipe" width="520" height="260"></canvas>
+      <div class="res-grid" id="exp-res-pipe" style="margin-top:12px"></div>
+      <div class="explore-insight" id="exp-insight-pipe"></div>
+    </div>
+  </div>
+
+  <!-- FILM explore -->
+  <div id="explore-film" style="display:none">
+    <div class="card">
+      <div class="learn-sec" style="margin-bottom:8px">
+        <h3>Película descendente — Exploración interactiva</h3>
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Espesor δ (mm)</span><span class="sval" id="ef_delta_v">0.5</span></div>
+        <input type="range" id="ef_delta" min="0.1" max="5" step="0.1" value="0.5">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Ángulo θ (°)</span><span class="sval" id="ef_theta_v">45</span></div>
+        <input type="range" id="ef_theta" min="0" max="90" step="1" value="45">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>μ (cP)</span><span class="sval" id="ef_mu_v">1.0</span></div>
+        <input type="range" id="ef_mu" min="0.1" max="200" step="0.1" value="1.0">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>ρ (kg/m³)</span><span class="sval" id="ef_rho_v">998</span></div>
+        <input type="range" id="ef_rho" min="500" max="1500" step="10" value="998">
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="exp-chart-film" width="520" height="260"></canvas>
+      <div class="res-grid" id="exp-res-film" style="margin-top:12px"></div>
+      <div class="explore-insight" id="exp-insight-film"></div>
+    </div>
+  </div>
+
+  <!-- COUETTE explore -->
+  <div id="explore-couette" style="display:none">
+    <div class="card">
+      <div class="learn-sec" style="margin-bottom:8px">
+        <h3>Couette plano — Exploración interactiva</h3>
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Velocidad U (cm/s)</span><span class="sval" id="ec_U_v">10.0</span></div>
+        <input type="range" id="ec_U" min="0.1" max="200" step="0.1" value="10">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>Separación H (mm)</span><span class="sval" id="ec_H_v">1.0</span></div>
+        <input type="range" id="ec_H" min="0.1" max="20" step="0.1" value="1.0">
+      </div>
+      <div class="slider-row">
+        <div class="slabel"><span>μ (cP)</span><span class="sval" id="ec_mu_v">1.0</span></div>
+        <input type="range" id="ec_mu" min="0.1" max="200" step="0.1" value="1.0">
+      </div>
+    </div>
+    <div class="card">
+      <canvas id="exp-chart-couette" width="520" height="260"></canvas>
+      <div class="res-grid" id="exp-res-couette" style="margin-top:12px"></div>
+      <div class="explore-insight" id="exp-insight-couette"></div>
+    </div>
+  </div>
+
+</div><!-- /tab-explore -->
+
+</div><!-- /wrap -->
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────
+const G_ACC = 9.80665; // m/s²
+
+const FLUIDS = {
+  agua:      { rho: 998.2, mu: 1.002e-3 },
+  aire:      { rho: 1.204, mu: 1.82e-5  },
+  glicerina: { rho: 1261,  mu: 1.412    },
+  etanol:    { rho: 789,   mu: 1.2e-3   },
+  aceite:    { rho: 870,   mu: 0.072    },
+};
+
+// ─────────────────────────────────────────────────────────────
+// UNIT CONVERSIONS
+// ─────────────────────────────────────────────────────────────
+function toLen(v, u)  { return u === 'cm' ? v/100 : u === 'mm' ? v/1000 : v; }
+function toPress(v, u){ return u === 'kPa' ? v*1000 : u === 'bar' ? v*1e5 : v; }
+function toVisc(v, u) { return u === 'cP' ? v/1000 : v; }
+function toVel(v, u)  { return u === 'cms' ? v/100 : v; }
+
+function fmtQ(v, unit) {
+  if (v === null || !isFinite(v)) return '—';
+  if (unit === 'Ls')   return (v * 1000).toExponential(3) + ' L/s';
+  if (unit === 'Lmin') return (v * 1000 * 60).toExponential(3) + ' L/min';
+  return v.toExponential(3) + ' m³/s';
+}
+
+function fmt(v, d) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  d = d ?? 4;
+  if (v === 0) return '0';
+  const a = Math.abs(v);
+  if (a >= 1000 || (a < 0.001 && a > 0)) return v.toExponential(3);
+  return v.toFixed(d);
+}
+
+// ─────────────────────────────────────────────────────────────
+// CALCULATIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Hagen-Poiseuille: laminar flow in a circular tube.
+ * All inputs in SI units.
+ */
+function calcPipe(R, L, mu, rho, dP) {
+  const D     = 2 * R;
+  const vmax  = dP * R * R / (4 * mu * L);
+  const vavg  = vmax / 2;
+  const Q     = Math.PI * dP * Math.pow(R, 4) / (8 * mu * L);
+  const tau_w = dP * R / (2 * L);
+  const Re    = rho * Math.abs(vavg) * D / mu;
+  const Le    = 0.05 * Re * D;
+
+  // Profile: r/R from -1 to 1 (symmetric)
+  const N = 101;
+  const pts = [];
+  for (let i = 0; i < N; i++) {
+    const rn = -1 + 2 * i / (N - 1);
+    pts.push({ pos: rn, vel: vmax * (1 - rn * rn) });
+  }
+
+  const warns = [];
+  if (dP === 0)  warns.push({ t:'info',  m:'ΔP = 0: no hay flujo.' });
+  if (Re > 2100) warns.push({ t:'warn',  m:`Re = ${Re.toFixed(1)} > 2100. El flujo puede no ser laminar. El perfil de Hagen-Poiseuille podría no ser válido.` });
+  if (L < Le)    warns.push({ t:'info',  m:`Longitud de entrada estimada L_e ≈ ${fmt(Le)} m (= 0.05·Re·D). El tubo puede ser demasiado corto para flujo completamente desarrollado.` });
+
+  return { case:'pipe', vmax, vavg, Q, tau_w, Re, D, warnings:warns, pts,
+           posLabel:'r/R', posRange:[-1,1] };
+}
+
+/**
+ * Falling film on inclined plate.
+ * theta in degrees; b optional (m).
+ */
+function calcFilm(delta, mu, rho, theta_deg, b) {
+  const sinT  = Math.sin(theta_deg * Math.PI / 180);
+  const coeff = rho * G_ACC * sinT / mu;
+  const vmax  = coeff * delta * delta / 2;
+  const vavg  = coeff * delta * delta / 3;
+  const q_w   = coeff * delta * delta * delta / 3;
+  const Q     = (b && b > 0) ? b * q_w : null;
+  const tau_w = rho * G_ACC * sinT * delta;
+
+  const N = 51;
+  const pts = [];
+  for (let i = 0; i < N; i++) {
+    const yn = i / (N - 1);
+    const y  = yn * delta;
+    pts.push({ pos: yn, vel: coeff * (2 * delta * y - y * y) / 2 });
+  }
+
+  const warns = [];
+  if (theta_deg === 0) warns.push({ t:'warn', m:'θ = 0°: sin(θ) = 0. No hay componente gravitacional en la dirección del flujo.' });
+  warns.push({ t:'info', m:'Modelo válido para película laminar estable y de espesor uniforme. A mayores caudales pueden aparecer ondulaciones superficiales.' });
+
+  return { case:'film', vmax, vavg, q_w, Q, tau_w, warnings:warns, pts,
+           posLabel:'y/δ', posRange:[0,1] };
+}
+
+/**
+ * Plane Couette flow (no pressure gradient).
+ * rho and b optional.
+ */
+function calcCouette(H, U, mu, rho, b) {
+  const vmax = U;
+  const vavg = U / 2;
+  const q_w  = U * H / 2;
+  const Q    = (b && b > 0) ? b * q_w : null;
+  const tau  = mu * Math.abs(U) / H;
+  const Re   = (rho && rho > 0) ? rho * Math.abs(U) * H / mu : null;
+
+  const N = 51;
+  const pts = [];
+  for (let i = 0; i < N; i++) {
+    const yn = i / (N - 1);
+    pts.push({ pos: yn, vel: U * yn });
+  }
+
+  const warns = [];
+  warns.push({ t:'info', m:'Sin gradiente de presión: el único motor del flujo es el movimiento de la placa superior.' });
+
+  return { case:'couette', vmax, vavg, q_w, Q, tau, Re, warnings:warns, pts,
+           posLabel:'y/H', posRange:[0,1] };
+}
+
+// ─────────────────────────────────────────────────────────────
+// CANVAS CHART
+// x-axis (horizontal): velocity (m/s)
+// y-axis (vertical): normalized position
+// ─────────────────────────────────────────────────────────────
+function drawProfile(canvas, pts, posLabel, posRange) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const PAD = { top:18, right:18, bottom:46, left:56 };
+  const pW = W - PAD.left - PAD.right;
+  const pH = H - PAD.top - PAD.bottom;
+
+  ctx.fillStyle = '#fffdf8';
+  ctx.fillRect(0, 0, W, H);
+
+  const vels = pts.map(p => p.vel);
+  let velMax = Math.max(...vels);
+  if (!isFinite(velMax) || velMax === 0) velMax = 1;
+  velMax *= 1.12;
+
+  const posMin = posRange[0], posMax = posRange[1];
+  const mapV = v   => PAD.left + v / velMax * pW;
+  const mapP = pos => PAD.top + (1 - (pos - posMin) / (posMax - posMin)) * pH;
+
+  // Grid
+  const STEPS = 4;
+  ctx.strokeStyle = '#ded6c8';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= STEPS; i++) {
+    const x = PAD.left + i / STEPS * pW;
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + pH); ctx.stroke();
+    const y = PAD.top + i / STEPS * pH;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + pW, y); ctx.stroke();
+  }
+
+  // Zero velocity line
+  ctx.strokeStyle = '#b8aa95';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, PAD.top + pH); ctx.stroke();
+
+  // Filled area
+  ctx.beginPath();
+  ctx.moveTo(PAD.left, mapP(pts[0].pos));
+  for (const p of pts) ctx.lineTo(mapV(p.vel), mapP(p.pos));
+  ctx.lineTo(PAD.left, mapP(pts[pts.length - 1].pos));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(37,99,235,0.12)';
+  ctx.fill();
+
+  // Profile curve
+  ctx.beginPath();
+  ctx.moveTo(mapV(pts[0].vel), mapP(pts[0].pos));
+  for (const p of pts) ctx.lineTo(mapV(p.vel), mapP(p.pos));
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Axes
+  ctx.strokeStyle = '#9aa7b4';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top+pH); ctx.lineTo(PAD.left+pW, PAD.top+pH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, PAD.top+pH); ctx.stroke();
+
+  ctx.fillStyle = '#667085';
+  ctx.font = '11px system-ui';
+
+  // X-axis ticks (velocity)
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= STEPS; i++) {
+    const v = i / STEPS * velMax;
+    const x = mapV(v);
+    const lbl = v === 0 ? '0' : v < 0.001 ? v.toExponential(1) : (v < 1 ? v.toPrecision(2) : v.toFixed(2));
+    ctx.fillText(lbl, x, PAD.top + pH + 14);
+  }
+  ctx.fillStyle = '#10263f';
+  ctx.font = '12px system-ui';
+  ctx.fillText('v (m/s)', PAD.left + pW / 2, PAD.top + pH + 32);
+
+  // Y-axis ticks (position)
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#667085';
+  ctx.font = '11px system-ui';
+  for (let i = 0; i <= STEPS; i++) {
+    const p = posMin + (posMax - posMin) * (1 - i / STEPS);
+    const y = PAD.top + i / STEPS * pH;
+    ctx.fillText(p.toFixed(2), PAD.left - 6, y + 4);
+  }
+
+  // Y-axis label (rotated)
+  ctx.save();
+  ctx.translate(13, PAD.top + pH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#10263f';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(posLabel, 0, 0);
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI STATE
+// ─────────────────────────────────────────────────────────────
+let curCase  = 'pipe';
+let curTab   = 'calc';
+let curQUnit = 'm3s';
+let lastRes  = null;
+
+function switchCase(c) {
+  curCase = c;
+  document.querySelectorAll('#caseBar button').forEach(b =>
+    b.classList.toggle('on', b.dataset.c === c));
+  ['pipe','film','couette'].forEach(x => {
+    document.getElementById('inputs-' + x).style.display  = x === c ? '' : 'none';
+    document.getElementById('learn-'  + x).style.display  = x === c ? '' : 'none';
+    document.getElementById('explore-'+ x).style.display  = x === c ? '' : 'none';
+  });
+  document.getElementById('results').style.display = 'none';
+}
+
+function switchTab(t) {
+  curTab = t;
+  document.querySelectorAll('#tabBar button').forEach(b =>
+    b.classList.toggle('on', b.dataset.t === t));
+  ['calc','learn','explore'].forEach(x =>
+    document.getElementById('tab-' + x).style.display = x === t ? '' : 'none');
+}
+
+// ─────────────────────────────────────────────────────────────
+// PARSE & VALIDATE
+// ─────────────────────────────────────────────────────────────
+function parseInputs() {
+  if (curCase === 'pipe') {
+    const isD = document.querySelector('#rdSel button.on').dataset.rd === 'D';
+    let R = toLen(parseFloat(document.getElementById('p_rd').value),
+                  document.getElementById('p_rdU').value);
+    if (isD) R /= 2;
+    return {
+      case: 'pipe',
+      R,
+      L:   toLen(  parseFloat(document.getElementById('p_L').value),   document.getElementById('p_LU').value),
+      dP:  toPress(parseFloat(document.getElementById('p_dP').value),  document.getElementById('p_dPU').value),
+      mu:  toVisc( parseFloat(document.getElementById('p_mu').value),  document.getElementById('p_muU').value),
+      rho: parseFloat(document.getElementById('p_rho').value),
+    };
+  }
+  if (curCase === 'film') {
+    const bRaw = document.getElementById('f_b').value;
+    return {
+      case:  'film',
+      delta: toLen( parseFloat(document.getElementById('f_delta').value), document.getElementById('f_deltaU').value),
+      theta: parseFloat(document.getElementById('f_theta').value),
+      mu:    toVisc(parseFloat(document.getElementById('f_mu').value),    document.getElementById('f_muU').value),
+      rho:   parseFloat(document.getElementById('f_rho').value),
+      b:     bRaw ? toLen(parseFloat(bRaw), document.getElementById('f_bU').value) : null,
+    };
+  }
+  if (curCase === 'couette') {
+    const rhoRaw = document.getElementById('c_rho').value;
+    const bRaw   = document.getElementById('c_b').value;
+    return {
+      case: 'couette',
+      H:   toLen( parseFloat(document.getElementById('c_H').value),  document.getElementById('c_HU').value),
+      U:   toVel( parseFloat(document.getElementById('c_U').value),  document.getElementById('c_UU').value),
+      mu:  toVisc(parseFloat(document.getElementById('c_mu').value), document.getElementById('c_muU').value),
+      rho: rhoRaw ? parseFloat(rhoRaw) : null,
+      b:   bRaw   ? toLen(parseFloat(bRaw), document.getElementById('c_bU').value) : null,
+    };
+  }
+}
+
+function validate(inp) {
+  const e = [];
+  if (inp.case === 'pipe') {
+    if (!(inp.R > 0))   e.push('El radio (o diámetro) debe ser mayor que cero.');
+    if (!(inp.L > 0))   e.push('La longitud L debe ser mayor que cero.');
+    if (!(inp.mu > 0))  e.push('La viscosidad μ debe ser mayor que cero.');
+    if (!(inp.rho > 0)) e.push('La densidad ρ debe ser mayor que cero.');
+    if (isNaN(inp.dP))  e.push('Ingresa un valor de ΔP.');
+  }
+  if (inp.case === 'film') {
+    if (!(inp.delta > 0))                      e.push('El espesor δ debe ser mayor que cero.');
+    if (isNaN(inp.theta) || inp.theta < 0 || inp.theta > 90) e.push('El ángulo θ debe estar entre 0° y 90°.');
+    if (!(inp.mu > 0))  e.push('La viscosidad μ debe ser mayor que cero.');
+    if (!(inp.rho > 0)) e.push('La densidad ρ debe ser mayor que cero.');
+  }
+  if (inp.case === 'couette') {
+    if (!(inp.H > 0))  e.push('La separación H debe ser mayor que cero.');
+    if (isNaN(inp.U))  e.push('Ingresa una velocidad U para la placa superior.');
+    if (!(inp.mu > 0)) e.push('La viscosidad μ debe ser mayor que cero.');
+  }
+  return e;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER RESULTS
+// ─────────────────────────────────────────────────────────────
+function card(val, lbl, cls, unit) {
+  return `<div class="res-card ${cls||''}">
+    <div class="val">${val}</div>
+    <div class="lbl">${lbl}</div>
+    ${unit ? `<div class="unit">${unit}</div>` : ''}
+  </div>`;
+}
+
+function renderResults(res) {
+  const grid = document.getElementById('resGrid');
+  const wDiv = document.getElementById('warnDiv');
+  const cvs  = document.getElementById('chart');
+
+  drawProfile(cvs, res.pts, res.posLabel, res.posRange);
+
+  wDiv.innerHTML = res.warnings.map(w =>
+    `<div class="warn-box ${w.t}">
+      ${w.t==='warn'?'⚠':w.t==='err'?'⛔':'ℹ'} ${w.m}
+    </div>`
+  ).join('');
+
+  let cards = '';
+  if (res.case === 'pipe') {
+    const reCls = res.Re < 2100 ? 'ok' : 'warn';
+    const reTag = res.Re < 2100 ? 'Laminar ✓' : 'Posible turbulencia ⚠';
+    cards += card(fmt(res.vmax)+' m/s', 'Velocidad máxima v<sub>max</sub>');
+    cards += card(fmt(res.vavg)+' m/s', 'Velocidad promedio &nbsp;(= v<sub>max</sub>/2)');
+    cards += `<div class="res-card full"><div class="val" id="qCard">${fmtQ(res.Q, curQUnit)}</div><div class="lbl">Caudal volumétrico Q</div></div>`;
+    cards += card(fmt(res.tau_w)+' Pa', 'Esfuerzo cortante τ<sub>w</sub>');
+    cards += card(fmt(res.Re,1), `Re — ${reTag}`, reCls);
+  }
+  if (res.case === 'film') {
+    cards += card(fmt(res.vmax)+' m/s', 'v<sub>max</sub> (superficie libre)');
+    cards += card(fmt(res.vavg)+' m/s', 'Velocidad promedio');
+    cards += card(fmt(res.q_w)+' m²/s', 'Caudal por unidad de ancho q', 'full');
+    if (res.Q !== null)
+      cards += `<div class="res-card full"><div class="val" id="qCard">${fmtQ(res.Q, curQUnit)}</div><div class="lbl">Caudal total Q (con ancho b)</div></div>`;
+    cards += card(fmt(res.tau_w)+' Pa', 'τ<sub>w</sub> en la pared');
+    cards += card('0 Pa', 'τ en superficie libre');
+  }
+  if (res.case === 'couette') {
+    cards += card(fmt(res.vmax)+' m/s', 'v<sub>max</sub> = U');
+    cards += card(fmt(res.vavg)+' m/s', 'v<sub>prom</sub> = U/2');
+    cards += card(fmt(res.q_w)+' m²/s', 'Caudal por unidad de ancho', 'full');
+    if (res.Q !== null)
+      cards += `<div class="res-card full"><div class="val" id="qCard">${fmtQ(res.Q, curQUnit)}</div><div class="lbl">Caudal total Q (con ancho b)</div></div>`;
+    cards += card(fmt(res.tau)+' Pa', 'Esfuerzo cortante τ (constante)', 'full');
+    if (res.Re !== null) {
+      const reCls = res.Re < 2100 ? 'ok' : 'warn';
+      cards += card(fmt(res.Re,1), 'Re<sub>H</sub>', `${reCls} full`);
+    }
+  }
+  grid.innerHTML = cards;
+}
+
+function calculate() {
+  const inp = parseInputs();
+  if (!inp) return;
+
+  const errs = validate(inp);
+  const resDiv = document.getElementById('results');
+
+  if (errs.length) {
+    resDiv.style.display = 'block';
+    document.getElementById('resGrid').innerHTML = '';
+    document.getElementById('warnDiv').innerHTML =
+      errs.map(e => `<div class="warn-box err">⛔ ${e}</div>`).join('');
+    return;
+  }
+
+  let res;
+  if (inp.case === 'pipe')    res = calcPipe(inp.R, inp.L, inp.mu, inp.rho, inp.dP);
+  if (inp.case === 'film')    res = calcFilm(inp.delta, inp.mu, inp.rho, inp.theta, inp.b);
+  if (inp.case === 'couette') res = calcCouette(inp.H, inp.U, inp.mu, inp.rho, inp.b);
+
+  lastRes = res;
+  renderResults(res);
+  resDiv.style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPLORATION MODE
+// ─────────────────────────────────────────────────────────────
+function miniCard(v, lbl) {
+  return `<div class="res-card"><div class="val">${fmt(v)}</div><div class="lbl">${lbl}</div></div>`;
+}
+
+function updateExpPipe() {
+  const dP  = parseFloat(document.getElementById('ep_dP').value);
+  const Rmm = parseFloat(document.getElementById('ep_R').value);
+  const muCP= parseFloat(document.getElementById('ep_mu').value);
+  const L   = parseFloat(document.getElementById('ep_L').value);
+  const R   = Rmm / 1000;
+  const mu  = muCP / 1000;
+  document.getElementById('ep_dP_v').textContent = dP;
+  document.getElementById('ep_R_v').textContent  = Rmm.toFixed(1);
+  document.getElementById('ep_mu_v').textContent = muCP.toFixed(1);
+  document.getElementById('ep_L_v').textContent  = L.toFixed(1);
+  const res = calcPipe(R, L, mu, 1000, dP);
+  drawProfile(document.getElementById('exp-chart-pipe'), res.pts, res.posLabel, res.posRange);
+  document.getElementById('exp-res-pipe').innerHTML =
+    miniCard(res.vmax,'v_max (m/s)') + miniCard(res.vavg,'v_prom (m/s)') +
+    miniCard(res.Q,'Q (m³/s)') + miniCard(res.tau_w,'τ_w (Pa)');
+  const msgs = [];
+  if (Rmm > 20) msgs.push(`R = ${Rmm} mm → Q ∝ R⁴. Duplicar R multiplica Q por 16.`);
+  if (muCP > 20) msgs.push(`μ alta: el fluido resiste más → velocidades menores.`);
+  if (L > 10) msgs.push(`L grande: mayor resistencia hidráulica → menor Q para el mismo ΔP.`);
+  if (dP > 1000) msgs.push(`ΔP alto → Q aumenta linealmente: Q ∝ ΔP.`);
+  if (res.Re > 2100) msgs.push(`⚠ Re = ${res.Re.toFixed(0)}: en la realidad el flujo sería turbulento.`);
+  if (!msgs.length) msgs.push('Mueve los deslizadores para explorar cómo cambian los resultados.');
+  document.getElementById('exp-insight-pipe').innerHTML = msgs.map(m=>`💡 ${m}`).join('<br>');
+}
+
+function updateExpFilm() {
+  const dMM = parseFloat(document.getElementById('ef_delta').value);
+  const th  = parseFloat(document.getElementById('ef_theta').value);
+  const muCP= parseFloat(document.getElementById('ef_mu').value);
+  const rho = parseFloat(document.getElementById('ef_rho').value);
+  const delta = dMM / 1000;
+  const mu  = muCP / 1000;
+  document.getElementById('ef_delta_v').textContent = dMM.toFixed(1);
+  document.getElementById('ef_theta_v').textContent = th;
+  document.getElementById('ef_mu_v').textContent    = muCP.toFixed(1);
+  document.getElementById('ef_rho_v').textContent   = rho;
+  const res = calcFilm(delta, mu, rho, th, null);
+  drawProfile(document.getElementById('exp-chart-film'), res.pts, res.posLabel, res.posRange);
+  document.getElementById('exp-res-film').innerHTML =
+    miniCard(res.vmax,'v_max (m/s)') + miniCard(res.vavg,'v_prom (m/s)') +
+    miniCard(res.q_w,'q (m²/s)') + miniCard(res.tau_w,'τ_w (Pa)');
+  const msgs = [];
+  if (dMM > 2) msgs.push(`δ = ${dMM} mm → q ∝ δ³. Triplicar δ multiplica q por 27.`);
+  if (th > 60) msgs.push(`θ > 60°: sin(θ) aumenta fuertemente → mayor velocidad.`);
+  if (th < 5)  msgs.push(`θ ≈ 0°: sin(θ) ≈ 0 → flujo gravitacional casi nulo.`);
+  if (muCP > 20) msgs.push(`Fluido viscoso: velocidades reducidas. El esfuerzo cortante domina.`);
+  msgs.push(`τ_w = ${fmt(res.tau_w)} Pa en la pared. En la superficie libre, τ = 0 siempre.`);
+  document.getElementById('exp-insight-film').innerHTML = msgs.map(m=>`💡 ${m}`).join('<br>');
+}
+
+function updateExpCouette() {
+  const Ucms = parseFloat(document.getElementById('ec_U').value);
+  const Hmm  = parseFloat(document.getElementById('ec_H').value);
+  const muCP = parseFloat(document.getElementById('ec_mu').value);
+  const U  = Ucms / 100;
+  const H  = Hmm  / 1000;
+  const mu = muCP / 1000;
+  document.getElementById('ec_U_v').textContent  = Ucms.toFixed(1);
+  document.getElementById('ec_H_v').textContent  = Hmm.toFixed(1);
+  document.getElementById('ec_mu_v').textContent = muCP.toFixed(1);
+  const res = calcCouette(H, U, mu, 1000, null);
+  drawProfile(document.getElementById('exp-chart-couette'), res.pts, res.posLabel, res.posRange);
+  document.getElementById('exp-res-couette').innerHTML =
+    miniCard(res.vmax,'v_max = U (m/s)') + miniCard(res.vavg,'v_prom = U/2 (m/s)') +
+    miniCard(res.q_w,'q (m²/s)') + miniCard(res.tau,'τ (Pa)');
+  const msgs = [
+    `v_prom = U/2 = ${fmt(res.vavg)} m/s. Siempre la mitad de U, sin importar μ o H.`,
+    `El perfil es lineal porque no hay gradiente de presión.`,
+    `τ = μ·U/H = ${fmt(res.tau)} Pa. Aumenta si sube U o si baja H.`,
+  ];
+  document.getElementById('exp-insight-couette').innerHTML = msgs.map(m=>`💡 ${m}`).join('<br>');
+}
+
+// ─────────────────────────────────────────────────────────────
+// EVENT WIRING
+// ─────────────────────────────────────────────────────────────
+
+// Case / tab selectors
+document.querySelectorAll('#caseBar button').forEach(b =>
+  b.addEventListener('click', () => switchCase(b.dataset.c)));
+document.querySelectorAll('#tabBar button').forEach(b =>
+  b.addEventListener('click', () => switchTab(b.dataset.t)));
+
+// R/D toggle
+document.querySelectorAll('#rdSel button').forEach(b =>
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#rdSel button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+  }));
+
+// Calculate button
+document.getElementById('btnCalc').addEventListener('click', calculate);
+
+// Fluid prefill
+document.getElementById('fluidSel').addEventListener('change', function() {
+  const f = FLUIDS[this.value];
+  if (!f) return;
+  const muCP = (f.mu * 1000).toPrecision(4);
+  if (curCase === 'pipe') {
+    document.getElementById('p_mu').value  = muCP;
+    document.getElementById('p_muU').value = 'cP';
+    document.getElementById('p_rho').value = f.rho;
+  } else if (curCase === 'film') {
+    document.getElementById('f_mu').value  = muCP;
+    document.getElementById('f_muU').value = 'cP';
+    document.getElementById('f_rho').value = f.rho;
+  } else {
+    document.getElementById('c_mu').value  = muCP;
+    document.getElementById('c_muU').value = 'cP';
+    document.getElementById('c_rho').value = f.rho;
+  }
+});
+
+// Q unit switcher
+document.querySelectorAll('#qUnitBar button').forEach(b =>
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#qUnitBar button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    curQUnit = b.dataset.qu;
+    if (lastRes) {
+      const el = document.getElementById('qCard');
+      const qVal = lastRes.Q ?? lastRes.q_w;
+      if (el && qVal !== null) el.textContent = fmtQ(qVal, curQUnit);
+    }
+  }));
+
+// Exploration sliders
+['ep_dP','ep_R','ep_mu','ep_L'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updateExpPipe));
+['ef_delta','ef_theta','ef_mu','ef_rho'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updateExpFilm));
+['ec_U','ec_H','ec_mu'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updateExpCouette));
+
+// Initialize exploration charts on load
+updateExpPipe();
+updateExpFilm();
+updateExpCouette();
+</script>
+</body>
+</html>

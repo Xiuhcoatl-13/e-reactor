@@ -1,0 +1,18 @@
+{
+  "titulo": "Selectividad y rendimiento",
+  "descripcion": "Distingue conversión, selectividad y rendimiento cuando hay un producto deseado y subproductos de reacciones competitivas.",
+  "materia": "reactores",
+  "tema": "Reacciones múltiples, selectividad y rendimiento",
+  "archivo": "/modulos/selectivity_yield.html",
+  "tipo": "simulacion",
+  "sigla": "η",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "selectividad",
+    "rendimiento",
+    "reacciones competitivas",
+    "conversión"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

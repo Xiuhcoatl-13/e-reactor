@@ -1,0 +1,19 @@
+{
+  "titulo": "CSTR vs. PFR: volumen requerido y gráfica de Levenspiel",
+  "descripcion": "Script de Python que calcula el volumen de un CSTR y de un PFR para una reacción de orden n y lo interpreta con la gráfica de Levenspiel. Modifica k, n o la conversión y ejecútalo aquí mismo.",
+  "materia": "reactores",
+  "tema": "Reactores ideales",
+  "tambien_en": [{"materia": "numericos", "tema": "Python para ingeniería"}],
+  "archivo": "cstr_vs_pfr.py",
+  "tipo": "python",
+  "sigla": "Py",
+  "nivel": "intermedio",
+  "etiquetas": ["CSTR", "PFR", "Levenspiel", "Python", "integración numérica"],
+  "objetivos": [
+    "Plantear el balance de materia de un CSTR y de un PFR en términos de conversión.",
+    "Interpretar el volumen como un área (PFR) o un rectángulo (CSTR) en la gráfica de Levenspiel.",
+    "Verificar una integral numérica contra la solución analítica."
+  ],
+  "destacado": true,
+  "fecha": "2026-10-21"
+}

@@ -1,0 +1,24 @@
+{
+  "titulo": "Grado de avance de reacción",
+  "descripcion": "nᵢ = nᵢ,₀ + νᵢξ: relaciona grado de avance, conversión y composición, y verifica la factibilidad física de la mezcla.",
+  "materia": "balances",
+  "tema": "Estequiometría y grado de avance",
+  "tambien_en": [
+    {
+      "materia": "reactores",
+      "tema": "Cinética química"
+    }
+  ],
+  "archivo": "/modulos/reaction_extent.html",
+  "tipo": "simulacion",
+  "sigla": "ξ",
+  "nivel": "basico",
+  "etiquetas": [
+    "grado de avance",
+    "estequiometría",
+    "conversión",
+    "reactivo limitante"
+  ],
+  "destacado": true,
+  "fecha": "2026-10-21"
+}

@@ -1,0 +1,30 @@
+{
+  "titulo": "Entalpía de reacción y efecto de la temperatura",
+  "descripcion": "Construye una reacción, calcula ΔH°rxn con entalpías de formación y corrígela a otra temperatura con la ecuación de Kirchhoff y correlaciones de Cp.",
+  "materia": "termodinamica",
+  "tema": "Termoquímica",
+  "tambien_en": [
+    {
+      "materia": "balances",
+      "tema": "Balances de energía y termoquímica"
+    }
+  ],
+  "archivo": "/modulos/reaction_enthalpy.html",
+  "tipo": "calculadora",
+  "sigla": "ΔH",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "entalpía de reacción",
+    "Kirchhoff",
+    "Cp",
+    "ley de Hess"
+  ],
+  "objetivos": [
+    "Calcular ΔH°rxn a 298 K a partir de entalpías de formación.",
+    "Corregir ΔHrxn con la temperatura usando Cp(T).",
+    "Interpretar cada contribución del desglose."
+  ],
+  "destacado": true,
+  "publicado": false,
+  "fecha": "2026-10-21"
+}

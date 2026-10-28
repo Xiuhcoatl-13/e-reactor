@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Números adimensionales v2.0 — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{
+  --bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);
+  --muted:var(--paper-muted);--accent:var(--paper-accent);--ok:var(--paper-accent-2);--warn:#92400e;
+  --err:#b42318;--line:var(--paper-line);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,Roboto,'Segoe UI',sans-serif;font-size:16px}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 48px}
+
+/* topbar */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.back{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;font-weight:600;flex-shrink:0}
+h1{font-size:18px;margin:0;line-height:1.3}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 14px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+label:first-child{margin-top:0}
+input[type=number],select{width:100%;padding:10px 11px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card2);color:var(--txt);
+  font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.row{display:flex;gap:10px}
+.row>div{flex:1;min-width:0}
+
+/* segmented */
+.seg{display:flex;background:var(--card2);border:1px solid var(--line);
+  border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:10px 4px;border:0;background:transparent;
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.seg button.on{background:var(--accent);color:#04121f}
+
+/* tabs */
+.tabs{display:flex;background:var(--card2);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;margin-bottom:12px}
+.tabs button{flex:1;padding:10px 2px;border:0;background:transparent;
+  color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
+.tabs button.on{background:var(--accent);color:#04121f}
+
+/* calc button */
+.btn-calc{width:100%;padding:13px;background:var(--accent);color:#04121f;
+  border:0;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;
+  margin:12px 0;transition:.15s}
+.btn-calc:active{opacity:.85}
+
+/* results */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.res-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:12px;text-align:center}
+.res-card .val{font-size:20px;font-weight:700;color:#bfe3ff;margin-bottom:3px}
+.res-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.res-card.full{grid-column:1/-1;text-align:left}
+.res-card .interp{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+.regime{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;
+  padding:2px 9px;margin-top:5px}
+.regime.lam{background:#0d2218;color:#2ecc71;border:1px solid #1a5e3a}
+.regime.trans{background:#2a1e00;color:#f1c40f;border:1px solid #5a4000}
+.regime.turb{background:#1f0808;color:#e74c3c;border:1px solid #5a1010}
+.regime.ok{background:#0d2218;color:#2ecc71;border:1px solid #1a5e3a}
+.regime.warn2{background:#2a1e00;color:#f1c40f;border:1px solid #5a4000}
+.res-card.insuf .val{color:var(--muted);font-size:14px;font-weight:400}
+
+/* warning boxes */
+.warn-box{border-radius:10px;padding:11px 13px;margin:8px 0;font-size:13px;line-height:1.6}
+.warn-box.warn{background:#1f1800;border:1px solid #4a3800;color:var(--warn)}
+.warn-box.info{background:#001833;border:1px solid #003366;color:#5db8ff}
+.warn-box.ok{background:#001a10;border:1px solid #004422;color:#2ecc71}
+
+/* math */
+.math-block{background:#0d1e2e;border:1px solid #1e3a52;
+  border-left:3px solid var(--accent);border-radius:8px;
+  padding:11px 13px;margin:8px 0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.meq{display:flex;align-items:center;flex-wrap:nowrap;white-space:nowrap;
+  gap:2px;margin:5px 0;font-size:14px;color:#c8e4ff;
+  font-family:Georgia,'Times New Roman',serif}
+.meq:first-child{margin-top:0}.meq:last-child{margin-bottom:0}
+.mfrac{display:inline-flex;flex-direction:column;align-items:center;
+  vertical-align:middle;line-height:1.15;margin:0 2px}
+.mfrac .num{border-bottom:1.5px solid #aacde8;padding:1px 5px;font-size:.8em;text-align:center;white-space:nowrap}
+.mfrac .den{padding:2px 5px;font-size:.8em;text-align:center;white-space:nowrap}
+.mv{font-style:italic}
+.mg{color:#a0ccf0}
+.mo{color:#6a8a9a;margin:0 3px}
+.mnote{color:var(--muted);font-size:12px;margin-left:8px;
+  font-family:system-ui,sans-serif;font-style:normal;white-space:normal}
+
+/* learning accordion */
+.learn-num{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:10px;overflow:hidden}
+.ln-header{display:flex;align-items:center;gap:10px;padding:14px 16px;
+  cursor:pointer;user-select:none}
+.ln-sym{font-size:17px;font-weight:800;color:var(--accent);min-width:40px}
+.ln-title{flex:1;font-size:15px;font-weight:600}
+.ln-arr{color:var(--accent);font-size:20px;transition:.2s;flex-shrink:0}
+.ln-arr.open{transform:rotate(90deg)}
+.ln-body{padding:0 16px 14px;border-top:1px solid var(--line);display:none}
+.learn-sec{margin-top:12px}
+.learn-sec h4{font-size:11px;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.7px;margin:0 0 6px;font-weight:700}
+.learn-sec p{font-size:14px;line-height:1.6;margin:0 0 5px;color:var(--txt)}
+.learn-sec ul{margin:2px 0;padding-left:18px}
+.learn-sec li{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:2px}
+.err-box{background:#1a0808;border:1px solid #3a1515;border-radius:8px;
+  padding:9px 12px;margin:6px 0;font-size:13px;color:#ff9090;line-height:1.85}
+
+/* exploration */
+.slider-row{margin:10px 0}
+.slider-lbl{display:flex;justify-content:space-between;font-size:13px;
+  color:var(--muted);margin-bottom:3px}
+.slider-lbl span{color:#bfe3ff;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.insight{background:#001a10;border:1px solid #004422;border-radius:10px;
+  padding:11px 13px;margin:10px 0;font-size:13px;color:#80e0a0;line-height:1.6}
+.re-bar{height:16px;border-radius:8px;overflow:hidden;display:flex;
+  margin:10px 0;border:1px solid var(--line);background:var(--card2)}
+.re-bar-seg{height:100%;transition:.4s;display:flex;align-items:center;
+  justify-content:center;font-size:9px;font-weight:700;color:#04121f}
+.exp-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.exp-pill{background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  padding:10px;text-align:center}
+.exp-pill .val{font-size:18px;font-weight:700;color:#bfe3ff}
+.exp-pill .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* misc */
+.sec-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1px;margin:14px 0 7px;font-weight:600}
+.fluid-note{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.lc-helper{background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  padding:11px;margin-top:8px}
+.lc-helper label{color:var(--accent);font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px}
+
+/* correlaciones tab */
+.corr-hdr{font-size:13px;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.5px;margin:0 0 3px}
+.corr-sub{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+.fluid-sel-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:nowrap}
+.fluid-sel-row label{font-size:12px;color:var(--muted);margin:0;
+  white-space:nowrap;flex-shrink:0}
+.fluid-sel-row select{flex:1;padding:8px 8px;font-size:13px}
+.fluid-sel-row button{padding:8px 12px;background:var(--accent);color:#04121f;
+  border:0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.map-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.map-helper{background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:12px;margin:10px 0}
+.map-helper-title{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.map-helper p{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 8px}
+.map-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.map-tag{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;
+  border-radius:999px;background:var(--card);border:1px solid var(--line);
+  color:var(--muted);font-size:10px;font-weight:800}
+.map-tag.primary{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#1d4ed8}
+.map-note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:8px}
+
+/* Paper design-system migration.
+   Keep existing IDs/classes because calculator logic binds to them. */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:760px}
+.module-hero{margin-bottom:14px}
+.module-tabs{margin-bottom:16px}
+.card,.learn-num{
+  background:var(--paper-surface);
+  border-color:var(--paper-line);
+  box-shadow:0 1px 0 rgba(31,41,51,.03);
+}
+label,.sub,.fluid-note,.mnote,.res-card .lbl,.res-card .unit,.res-card .interp,
+.learn-sec li,.ln-body,.corr-sub,.sec-lbl,.slider-lbl,.exp-pill .lbl{
+  color:var(--paper-muted);
+}
+input[type=number],select{
+  background:#fffdf8;
+  color:var(--paper-ink);
+  border-color:var(--paper-line);
+}
+input:focus,select:focus{
+  border-color:var(--paper-accent);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+.seg,.tabs,.qunit{
+  background:var(--paper-surface-2);
+  border-color:var(--paper-line);
+}
+.seg button,.tabs button,.qunit button{color:var(--paper-muted)}
+.seg button.on,.tabs button.on,.qunit button.on{
+  background:var(--paper-surface);
+  color:var(--paper-ink);
+  box-shadow:0 1px 4px rgba(31,41,51,.08);
+}
+.btn-calc,.fluid-sel-row button{
+  background:#10263f;
+  color:#f8fafc;
+}
+.res-card,.exp-pill,.lc-helper,.map-helper{
+  background:var(--paper-surface-2);
+  border-color:var(--paper-line);
+}
+.res-card .val,.exp-pill .val,.ln-sym,.ln-arr,.learn-sec h4,.corr-hdr,.lc-helper label{
+  color:#10263f;
+}
+.res-card.ok .val{color:#0f766e}
+.res-card.warn .val{color:#b45309}
+.res-card.insuf .val{color:var(--paper-muted)}
+.regime.lam,.regime.ok{background:#e7f5ef;color:#0f5132;border-color:#b7dbc9}
+.regime.trans,.regime.warn2{background:var(--paper-soft-amber);color:#92400e;border-color:#f3d391}
+.regime.turb{background:#fff0ed;color:#9f2a1d;border-color:#f0b9b0}
+.warn-box.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.warn-box.err,.err-box{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.warn-box.info{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#1d4ed8}
+.warn-box.ok,.insight,.explore-insight{
+  background:#e7f5ef;
+  border-color:#b7dbc9;
+  color:#0f5132;
+}
+.math-block,.eq-box{
+  background:var(--paper-soft-blue);
+  border-color:#cbdaf7;
+  color:#10263f;
+}
+.meq{color:#10263f}
+.mfrac .num{border-color:#8fa9d6}
+.mg{color:#1d4ed8}
+.mo{color:#667085}
+.ln-header{background:var(--paper-surface)}
+.ln-body{border-color:var(--paper-line)}
+.re-bar{
+  background:#fffdf8;
+  border-color:var(--paper-line);
+}
+.re-bar-seg{color:#10263f}
+.slider-lbl span{color:#10263f}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row,.exp-trio,.map-grid{display:grid;grid-template-columns:1fr}
+  .fluid-sel-row{flex-wrap:wrap}
+  .fluid-sel-row label,.fluid-sel-row select,.fluid-sel-row button{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+
+<div class="module-hero">
+  <div class="module-topbar">
+    <a class="back-link" href="../index.html">‹ Inicio</a>
+    <span class="module-kicker">Fenómenos de transporte</span>
+  </div>
+  <h1 class="module-heading">📐 Números adimensionales v2.0</h1>
+  <p class="module-subtitle">Analizador · aprendizaje · mapa de correlaciones para transporte</p>
+</div>
+
+<div class="module-tabs" id="mainTabs">
+  <button class="on" onclick="switchTab('calc',0)">Calculadora</button>
+  <button onclick="switchTab('learn',1)">Aprendizaje</button>
+  <button onclick="switchTab('explore',2)">Exploración</button>
+  <button onclick="switchTab('corr',3)">Mapa</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB: CALCULADORA
+══════════════════════════════════════════════════════════ -->
+<div id="tab-calc">
+
+  <div class="seg" style="margin-bottom:12px">
+    <button class="on" onclick="switchCalcMode('individual',0)">Por número</button>
+    <button onclick="switchCalcMode('integrated',1)">Integrada</button>
+  </div>
+
+  <!-- ── MODO INDIVIDUAL ── -->
+  <div id="mode-individual">
+    <div class="card">
+      <label>Número adimensional</label>
+      <select id="numSel" onchange="showNumForm()">
+        <option value="">— Seleccionar —</option>
+        <option value="re">Reynolds (Re)</option>
+        <option value="pr">Prandtl (Pr)</option>
+        <option value="sc">Schmidt (Sc)</option>
+        <option value="le">Lewis (Le)</option>
+        <option value="pet">Péclet térmico (Pe_T)</option>
+        <option value="pem">Péclet de masa (Pe_M)</option>
+        <option value="nu">Nusselt (Nu)</option>
+        <option value="sh">Sherwood (Sh)</option>
+        <option value="bi">Biot (Bi)</option>
+        <option value="fo">Fourier (Fo)</option>
+        <option value="gr">Grashof (Gr)</option>
+        <option value="ra">Rayleigh (Ra)</option>
+      </select>
+    </div>
+
+    <!-- Fluid prefill (shown for Re, Pr, Sc, Le, Pe) -->
+    <div class="card" id="fluidCard" style="display:none">
+      <label>Prefill de fluido aproximado (opcional)</label>
+      <select id="fluidSel" onchange="prefillFluid()">
+        <option value="">— Sin prefill —</option>
+        <option value="agua">Agua a 20 °C</option>
+        <option value="aire">Aire a 20 °C, 1 atm</option>
+        <option value="etanol">Etanol a 20 °C</option>
+        <option value="glicerina">Glicerina a 20 °C</option>
+      </select>
+      <p class="fluid-note">⚠ Propiedades aproximadas. Para cálculos formales, verifica en tablas o correlaciones.</p>
+    </div>
+
+    <!-- FORM Reynolds -->
+    <div class="card num-form" id="form-re" style="display:none">
+      <div class="row">
+        <div><label>ρ densidad</label><input type="number" id="re-rho" placeholder="e.g. 1000" min="0"></div>
+        <div><label>Unidad</label><select id="re-rho-u"><option value="kg/m3">kg/m³</option><option value="g/cm3">g/cm³</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>V velocidad</label><input type="number" id="re-V" placeholder="e.g. 1" min="0"></div>
+        <div><label>Unidad</label><select id="re-V-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option><option value="mm/s">mm/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub> long. característica</label><input type="number" id="re-Lc" placeholder="e.g. 0.01" min="0"></div>
+        <div><label>Unidad</label><select id="re-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>μ viscosidad dinámica</label><input type="number" id="re-mu" placeholder="e.g. 0.001" min="0"></div>
+        <div><label>Unidad</label><select id="re-mu-u"><option value="Pa.s">Pa·s</option><option value="cP">cP</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Ingresa ν (viscosidad cinemática) y omite ρ y μ.
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">ν viscosidad cinemática</label><input type="number" id="re-nu" placeholder="e.g. 1e-6"></div>
+          <div><label style="color:var(--muted)">Unidad</label><select id="re-nu-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option><option value="cSt">cSt</option></select></div>
+        </div>
+      </div>
+      <div class="lc-helper" style="margin-top:8px">
+        <label>Ayuda para L<sub>c</sub></label>
+        <select id="re-lc-geo" onchange="calcLcHelper('re')" style="margin-top:6px">
+          <option value="">— Seleccionar geometría —</option>
+          <option value="manual">Manual (ya ingresé Lc)</option>
+          <option value="tube">Tubo circular: Lc = D</option>
+          <option value="plate">Placa plana: Lc = L</option>
+          <option value="dh">Diámetro hidráulico: Dh = 4Ac/Pm</option>
+          <option value="annulus">Anillo concéntrico: Dh = Do − Di</option>
+        </select>
+        <div id="re-lc-extra" style="display:none;margin-top:8px"></div>
+        <div class="warn-box warn" style="margin-top:8px">⚠ Lc depende del fenómeno, geometría y correlación usada. Verifica la definición.</div>
+      </div>
+    </div>
+
+    <!-- FORM Prandtl -->
+    <div class="card num-form" id="form-pr" style="display:none">
+      <div class="row">
+        <div><label>μ viscosidad dinámica</label><input type="number" id="pr-mu" placeholder="Pa·s" min="0"></div>
+        <div><label>Unidad</label><select id="pr-mu-u"><option value="Pa.s">Pa·s</option><option value="cP">cP</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>C<sub>p</sub> calor específico</label><input type="number" id="pr-Cp" placeholder="J/(kg K)" min="0"></div>
+        <div><label>Unidad</label><select id="pr-Cp-u"><option value="J/(kg K)">J/(kg K)</option><option value="kJ/(kg K)">kJ/(kg K)</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>k conductividad térmica (fluido)</label><input type="number" id="pr-k" placeholder="W/(m K)" min="0"></div>
+        <div><label>Unidad</label><select id="pr-k-u"><option value="W/(m K)">W/(m K)</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Ingresa ν y α directamente.
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">ν</label><input type="number" id="pr-nu" placeholder="m²/s"></div>
+          <div><label style="color:var(--muted)">Unidad</label><select id="pr-nu-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option><option value="cSt">cSt</option></select></div>
+        </div>
+        <div class="row" style="margin-top:4px">
+          <div><label style="color:var(--muted)">α difusividad térmica</label><input type="number" id="pr-alpha" placeholder="m²/s"></div>
+          <div><label style="color:var(--muted)">Unidad</label><select id="pr-alpha-u"><option value="m2/s">m²/s</option><option value="mm2/s">mm²/s</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM Schmidt -->
+    <div class="card num-form" id="form-sc" style="display:none">
+      <div class="row">
+        <div><label>μ viscosidad dinámica</label><input type="number" id="sc-mu" placeholder="Pa·s" min="0"></div>
+        <div><label>Unidad</label><select id="sc-mu-u"><option value="Pa.s">Pa·s</option><option value="cP">cP</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>ρ densidad</label><input type="number" id="sc-rho" placeholder="kg/m³" min="0"></div>
+        <div><label>Unidad</label><select id="sc-rho-u"><option value="kg/m3">kg/m³</option><option value="g/cm3">g/cm³</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>D<sub>AB</sub> difusividad de masa</label><input type="number" id="sc-DAB" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="sc-DAB-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Ingresa ν directamente.
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">ν</label><input type="number" id="sc-nu" placeholder="m²/s"></div>
+          <div><label style="color:var(--muted)">Unidad</label><select id="sc-nu-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option><option value="cSt">cSt</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM Lewis -->
+    <div class="card num-form" id="form-le" style="display:none">
+      <div class="row">
+        <div><label>α difusividad térmica</label><input type="number" id="le-alpha" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="le-alpha-u"><option value="m2/s">m²/s</option><option value="mm2/s">mm²/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>D<sub>AB</sub> difusividad de masa</label><input type="number" id="le-DAB" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="le-DAB-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Le = Sc / Pr
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">Sc</label><input type="number" id="le-Sc" placeholder="—"></div>
+          <div><label style="color:var(--muted)">Pr</label><input type="number" id="le-Pr" placeholder="—"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM Péclet térmico -->
+    <div class="card num-form" id="form-pet" style="display:none">
+      <div class="row">
+        <div><label>V velocidad</label><input type="number" id="pet-V" placeholder="m/s" min="0"></div>
+        <div><label>Unidad</label><select id="pet-V-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option><option value="mm/s">mm/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub></label><input type="number" id="pet-Lc" placeholder="m" min="0"></div>
+        <div><label>Unidad</label><select id="pet-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>α difusividad térmica</label><input type="number" id="pet-alpha" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="pet-alpha-u"><option value="m2/s">m²/s</option><option value="mm2/s">mm²/s</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Pe_T = Re × Pr
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">Re</label><input type="number" id="pet-Re" placeholder="—"></div>
+          <div><label style="color:var(--muted)">Pr</label><input type="number" id="pet-Pr" placeholder="—"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM Péclet masa -->
+    <div class="card num-form" id="form-pem" style="display:none">
+      <div class="row">
+        <div><label>V velocidad</label><input type="number" id="pem-V" placeholder="m/s" min="0"></div>
+        <div><label>Unidad</label><select id="pem-V-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option><option value="mm/s">mm/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub></label><input type="number" id="pem-Lc" placeholder="m" min="0"></div>
+        <div><label>Unidad</label><select id="pem-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>D<sub>AB</sub> difusividad de masa</label><input type="number" id="pem-DAB" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="pem-DAB-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option></select></div>
+      </div>
+      <div class="warn-box info" style="margin-top:8px">
+        <strong>Alternativa:</strong> Pe_M = Re × Sc
+        <div class="row" style="margin-top:6px">
+          <div><label style="color:var(--muted)">Re</label><input type="number" id="pem-Re" placeholder="—"></div>
+          <div><label style="color:var(--muted)">Sc</label><input type="number" id="pem-Sc" placeholder="—"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM Nusselt -->
+    <div class="card num-form" id="form-nu" style="display:none">
+      <div class="row">
+        <div><label>h coef. convectivo [W/(m²K)]</label><input type="number" id="nu-h" placeholder="e.g. 100" min="0"></div>
+        <div><label>L<sub>c</sub> [m]</label><input type="number" id="nu-Lc" placeholder="e.g. 0.05" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>k<sub>fluido</sub> cond. térmica [W/(m K)]</label><input type="number" id="nu-k" placeholder="e.g. 0.6" min="0"></div>
+        <div><label>Unidad L<sub>c</sub></label><select id="nu-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="warn-box warn">⚠ Usar k del <strong>fluido</strong>. Este módulo calcula Nu = hL<sub>c</sub>/k; no selecciona correlaciones.</div>
+    </div>
+
+    <!-- FORM Sherwood -->
+    <div class="card num-form" id="form-sh" style="display:none">
+      <div class="row">
+        <div><label>k<sub>c</sub> coef. transf. masa</label><input type="number" id="sh-kc" placeholder="m/s" min="0"></div>
+        <div><label>Unidad</label><select id="sh-kc-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub></label><input type="number" id="sh-Lc" placeholder="m" min="0"></div>
+        <div><label>Unidad</label><select id="sh-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>D<sub>AB</sub> difusividad de masa</label><input type="number" id="sh-DAB" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="sh-DAB-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option></select></div>
+      </div>
+      <div class="warn-box warn">⚠ D<sub>AB</sub> es difusividad de masa [m²/s], no diámetro. k<sub>c</sub> en [m/s].</div>
+    </div>
+
+    <!-- FORM Biot -->
+    <div class="card num-form" id="form-bi" style="display:none">
+      <div class="row">
+        <div><label>h coef. convectivo [W/(m²K)]</label><input type="number" id="bi-h" placeholder="e.g. 50" min="0"></div>
+        <div><label>L<sub>c</sub></label><input type="number" id="bi-Lc" placeholder="m" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>k<sub>s</sub> cond. del <strong>sólido</strong> [W/(m K)]</label><input type="number" id="bi-ks" placeholder="e.g. 200" min="0"></div>
+        <div><label>Unidad L<sub>c</sub></label><select id="bi-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+      <div class="warn-box warn">⚠ k<sub>s</sub> es del <strong>sólido</strong>, no del fluido. No confundir con k del Nusselt. Bi = hL<sub>c</sub>/k<sub>s</sub>.</div>
+    </div>
+
+    <!-- FORM Fourier -->
+    <div class="card num-form" id="form-fo" style="display:none">
+      <div class="row">
+        <div><label>α difusividad térmica</label><input type="number" id="fo-alpha" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="fo-alpha-u"><option value="m2/s">m²/s</option><option value="mm2/s">mm²/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>t tiempo</label><input type="number" id="fo-t" placeholder="s" min="0"></div>
+        <div><label>Unidad</label><select id="fo-t-u"><option value="s">s</option><option value="min">min</option><option value="h">h</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub></label><input type="number" id="fo-Lc" placeholder="m" min="0"></div>
+        <div><label>Unidad</label><select id="fo-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+    </div>
+
+    <!-- FORM Grashof -->
+    <div class="card num-form" id="form-gr" style="display:none">
+      <div class="row">
+        <div><label>β coef. expan. vol. [1/K]</label><input type="number" id="gr-beta" placeholder="e.g. 0.0033" min="0"></div>
+        <div><label>g [m/s²]</label><input type="number" id="gr-g" value="9.80665"></div>
+      </div>
+      <div class="warn-box info">Para gas ideal: β ≈ 1/T<sub>film</sub> con T<sub>film</sub> en Kelvin.</div>
+      <div class="row">
+        <div><label>ΔT diferencia de temperatura</label><input type="number" id="gr-dT" placeholder="K (= °C en magnitud)"></div>
+        <div><label>L<sub>c</sub></label><input type="number" id="gr-Lc" placeholder="m" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>ν viscosidad cinemática</label><input type="number" id="gr-nu" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad ν</label><select id="gr-nu-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option><option value="cSt">cSt</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>Unidad L<sub>c</sub></label><select id="gr-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+        <div></div>
+      </div>
+      <div class="warn-box warn">⚠ ΔT se toma como valor absoluto. El signo físico depende de la orientación y condiciones.</div>
+    </div>
+
+    <!-- FORM Rayleigh -->
+    <div class="card num-form" id="form-ra" style="display:none">
+      <div class="warn-box info">Ra = Gr × Pr. Ingresa Gr y Pr directamente, o bien todas las variables para calcularlos.</div>
+      <div class="row" style="margin-top:4px">
+        <div><label>Gr (Grashof calculado)</label><input type="number" id="ra-Gr" placeholder="—"></div>
+        <div><label>Pr (Prandtl calculado)</label><input type="number" id="ra-Pr" placeholder="—"></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:10px 0 4px">O ingresa variables para calcular Gr:</p>
+      <div class="row">
+        <div><label>β [1/K]</label><input type="number" id="ra-beta" placeholder="1/K" min="0"></div>
+        <div><label>g [m/s²]</label><input type="number" id="ra-g" value="9.80665"></div>
+      </div>
+      <div class="row">
+        <div><label>ΔT [K]</label><input type="number" id="ra-dT" placeholder="K"></div>
+        <div><label>L<sub>c</sub> [m]</label><input type="number" id="ra-Lc" placeholder="m" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>ν [m²/s]</label><input type="number" id="ra-nu" placeholder="m²/s" min="0"></div>
+        <div><label>μC<sub>p</sub>/k → Pr</label><input type="number" id="ra-Pr2" placeholder="Pr alt."></div>
+      </div>
+    </div>
+
+    <div id="indiv-calc-btn" style="display:none">
+      <button class="btn-calc" onclick="calcIndividual()">Calcular</button>
+    </div>
+    <div id="indiv-results"></div>
+
+  </div><!-- /mode-individual -->
+
+  <!-- ── MODO INTEGRADO ── -->
+  <div id="mode-integrated" style="display:none">
+
+    <div class="card">
+      <div class="sec-lbl">Prefill de fluido</div>
+      <select id="integ-fluid" onchange="prefillIntegrated()">
+        <option value="">— Sin prefill —</option>
+        <option value="agua">Agua a 20 °C</option>
+        <option value="aire">Aire a 20 °C, 1 atm</option>
+        <option value="etanol">Etanol a 20 °C</option>
+        <option value="glicerina">Glicerina a 20 °C</option>
+      </select>
+      <p class="fluid-note">⚠ Propiedades aproximadas a temperatura ambiente.</p>
+    </div>
+
+    <div class="card">
+      <div class="sec-lbl">Propiedades de flujo</div>
+      <div class="row">
+        <div><label>ρ densidad</label><input type="number" id="i-rho" placeholder="kg/m³" min="0"></div>
+        <div><label>Unidad</label><select id="i-rho-u"><option value="kg/m3">kg/m³</option><option value="g/cm3">g/cm³</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>μ viscosidad dinámica</label><input type="number" id="i-mu" placeholder="Pa·s" min="0"></div>
+        <div><label>Unidad</label><select id="i-mu-u"><option value="Pa.s">Pa·s</option><option value="cP">cP</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>ν (opcional)</label><input type="number" id="i-nu" placeholder="m²/s (opcional)"></div>
+        <div><label>Unidad</label><select id="i-nu-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option><option value="cSt">cSt</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>V velocidad</label><input type="number" id="i-V" placeholder="m/s" min="0"></div>
+        <div><label>Unidad</label><select id="i-V-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option><option value="mm/s">mm/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>L<sub>c</sub></label><input type="number" id="i-Lc" placeholder="m" min="0"></div>
+        <div><label>Unidad</label><select id="i-Lc-u"><option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option></select></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-lbl">Propiedades térmicas</div>
+      <div class="row">
+        <div><label>C<sub>p</sub> calor específico</label><input type="number" id="i-Cp" placeholder="J/(kg K)" min="0"></div>
+        <div><label>Unidad</label><select id="i-Cp-u"><option value="J/(kg K)">J/(kg K)</option><option value="kJ/(kg K)">kJ/(kg K)</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>k fluido [W/(m K)]</label><input type="number" id="i-kf" placeholder="W/(m K)" min="0"></div>
+        <div><label>k sólido [W/(m K)]</label><input type="number" id="i-ks" placeholder="W/(m K)" min="0"></div>
+      </div>
+      <div class="warn-box info" style="margin:4px 0 6px">k fluido → Nu y Pr · k sólido → Bi · No intercambiarlos.</div>
+      <div class="row">
+        <div><label>α térmica (opcional)</label><input type="number" id="i-alpha" placeholder="m²/s (opcional)"></div>
+        <div><label>Unidad</label><select id="i-alpha-u"><option value="m2/s">m²/s</option><option value="mm2/s">mm²/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>h coef. convectivo [W/(m²K)]</label><input type="number" id="i-h" placeholder="W/(m²K)" min="0"></div>
+        <div><label>t tiempo</label><input type="number" id="i-t" placeholder="s" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>Unidad t</label><select id="i-t-u"><option value="s">s</option><option value="min">min</option><option value="h">h</option></select></div>
+        <div><label>β [1/K]</label><input type="number" id="i-beta" placeholder="1/K" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label>ΔT [K]</label><input type="number" id="i-dT" placeholder="K o °C"></div>
+        <div><label>g [m/s²]</label><input type="number" id="i-g" value="9.80665"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-lbl">Propiedades de masa</div>
+      <div class="row">
+        <div><label>D<sub>AB</sub> difusividad</label><input type="number" id="i-DAB" placeholder="m²/s" min="0"></div>
+        <div><label>Unidad</label><select id="i-DAB-u"><option value="m2/s">m²/s</option><option value="cm2/s">cm²/s</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>k<sub>c</sub> coef. transf. masa</label><input type="number" id="i-kc" placeholder="m/s" min="0"></div>
+        <div><label>Unidad</label><select id="i-kc-u"><option value="m/s">m/s</option><option value="cm/s">cm/s</option></select></div>
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calcIntegrated()">Calcular todos los números</button>
+    <div id="integ-results"></div>
+
+  </div><!-- /mode-integrated -->
+
+</div><!-- /tab-calc -->
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB: APRENDIZAJE
+══════════════════════════════════════════════════════════ -->
+<div id="tab-learn" style="display:none">
+  <div id="learn-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB: EXPLORACIÓN
+══════════════════════════════════════════════════════════ -->
+<div id="tab-explore" style="display:none">
+
+  <!-- Explorer 1: Reynolds -->
+  <div class="card">
+    <div class="sec-lbl">Explorador 1 — Régimen de flujo (Reynolds)</div>
+    <div class="slider-row">
+      <div class="slider-lbl">ρ densidad (kg/m³) <span id="xr-rho-v">1000</span></div>
+      <input type="range" id="xr-rho" min="1" max="2000" value="1000" step="1" oninput="updateExpRe()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">V velocidad (m/s) <span id="xr-V-v">1.0</span></div>
+      <input type="range" id="xr-V" min="0.01" max="10" value="1" step="0.01" oninput="updateExpRe()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">L<sub>c</sub> (m) <span id="xr-Lc-v">0.010</span></div>
+      <input type="range" id="xr-Lc" min="0.001" max="0.5" value="0.01" step="0.001" oninput="updateExpRe()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">μ×10³ (mPa·s) <span id="xr-mu-v">1.00</span></div>
+      <input type="range" id="xr-mu" min="0.1" max="1500" value="1" step="0.1" oninput="updateExpRe()">
+    </div>
+    <div class="res-card full" style="margin-top:4px">
+      <div class="val" id="xr-Re">—</div>
+      <div class="lbl">Reynolds</div>
+      <div id="xr-regime"></div>
+    </div>
+    <div class="re-bar">
+      <div class="re-bar-seg" id="xrb-lam" style="background:#2ecc71;width:21%">Lam</div>
+      <div class="re-bar-seg" id="xrb-trans" style="background:#f1c40f;width:19%">Trans</div>
+      <div class="re-bar-seg" id="xrb-turb" style="background:#e74c3c;width:60%">Turb</div>
+    </div>
+    <div class="insight" id="xr-insight">Usa los sliders para explorar el régimen de flujo.</div>
+  </div>
+
+  <!-- Explorer 2: Pr, Sc, Le -->
+  <div class="card">
+    <div class="sec-lbl">Explorador 2 — Difusión: Prandtl · Schmidt · Lewis</div>
+    <div class="slider-row">
+      <div class="slider-lbl">ν×10⁶ (μm²/s) <span id="xd-nu-v">1.00</span></div>
+      <input type="range" id="xd-nu" min="0.1" max="2000" value="1" step="0.1" oninput="updateExpDiff()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">α×10⁶ (μm²/s) <span id="xd-alpha-v">0.143</span></div>
+      <input type="range" id="xd-alpha" min="0.01" max="500" value="0.143" step="0.001" oninput="updateExpDiff()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">D<sub>AB</sub>×10⁹ (nm²/s) <span id="xd-DAB-v">1.00</span></div>
+      <input type="range" id="xd-DAB" min="0.01" max="100" value="1" step="0.01" oninput="updateExpDiff()">
+    </div>
+    <div class="exp-trio">
+      <div class="exp-pill"><div class="val" id="xd-Pr">—</div><div class="lbl">Prandtl</div></div>
+      <div class="exp-pill"><div class="val" id="xd-Sc">—</div><div class="lbl">Schmidt</div></div>
+      <div class="exp-pill"><div class="val" id="xd-Le">—</div><div class="lbl">Lewis</div></div>
+    </div>
+    <div class="insight" id="xd-insight">Ajusta ν, α y D_AB para ver cómo cambian Pr, Sc y Le.</div>
+  </div>
+
+  <!-- Explorer 3: Biot & Fourier -->
+  <div class="card">
+    <div class="sec-lbl">Explorador 3 — Transitorio térmico: Biot · Fourier</div>
+    <div class="slider-row">
+      <div class="slider-lbl">h [W/(m²K)] <span id="xb-h-v">100</span></div>
+      <input type="range" id="xb-h" min="1" max="5000" value="100" step="1" oninput="updateExpBiFo()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">L<sub>c</sub> (m) <span id="xb-Lc-v">0.010</span></div>
+      <input type="range" id="xb-Lc" min="0.001" max="0.5" value="0.01" step="0.001" oninput="updateExpBiFo()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">k<sub>s</sub> sólido [W/(m K)] <span id="xb-ks-v">50</span></div>
+      <input type="range" id="xb-ks" min="0.1" max="500" value="50" step="0.1" oninput="updateExpBiFo()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">α×10⁶ (μm²/s) <span id="xb-alpha-v">12.0</span></div>
+      <input type="range" id="xb-alpha" min="0.1" max="200" value="12" step="0.1" oninput="updateExpBiFo()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">t tiempo (s) <span id="xb-t-v">100</span></div>
+      <input type="range" id="xb-t" min="1" max="10000" value="100" step="1" oninput="updateExpBiFo()">
+    </div>
+    <div class="exp-trio" style="grid-template-columns:1fr 1fr">
+      <div class="exp-pill"><div class="val" id="xb-Bi">—</div><div class="lbl">Biot</div></div>
+      <div class="exp-pill"><div class="val" id="xb-Fo">—</div><div class="lbl">Fourier</div></div>
+    </div>
+    <div id="xb-lumped"></div>
+    <div class="insight" id="xb-insight">Ajusta los sliders para explorar el balance entre resistencias.</div>
+  </div>
+
+  <!-- Explorer 4: Convección natural -->
+  <div class="card">
+    <div class="sec-lbl">Explorador 4 — Convección natural: Grashof · Rayleigh</div>
+    <div class="slider-row">
+      <div class="slider-lbl">β×10³ [1/K] <span id="xn-beta-v">3.30</span></div>
+      <input type="range" id="xn-beta" min="0.1" max="10" value="3.3" step="0.1" oninput="updateExpNat()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">ΔT [K] <span id="xn-dT-v">10</span></div>
+      <input type="range" id="xn-dT" min="1" max="100" value="10" step="1" oninput="updateExpNat()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">L<sub>c</sub> (m) <span id="xn-Lc-v">0.10</span></div>
+      <input type="range" id="xn-Lc" min="0.01" max="1" value="0.1" step="0.01" oninput="updateExpNat()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">ν×10⁶ (μm²/s) <span id="xn-nu-v">15.0</span></div>
+      <input type="range" id="xn-nu" min="0.5" max="1500" value="15" step="0.5" oninput="updateExpNat()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-lbl">Pr <span id="xn-Pr-v">0.71</span></div>
+      <input type="range" id="xn-Pr" min="0.01" max="100" value="0.71" step="0.01" oninput="updateExpNat()">
+    </div>
+    <div class="exp-trio" style="grid-template-columns:1fr 1fr">
+      <div class="exp-pill"><div class="val" id="xn-Gr">—</div><div class="lbl">Grashof</div></div>
+      <div class="exp-pill"><div class="val" id="xn-Ra">—</div><div class="lbl">Rayleigh</div></div>
+    </div>
+    <div class="insight" id="xn-insight">Ra = Gr × Pr. Clave para seleccionar correlaciones de convección natural.</div>
+  </div>
+
+</div><!-- /tab-explore -->
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB: CORRELACIONES
+══════════════════════════════════════════════════════════ -->
+<div id="tab-corr" style="display:none">
+
+  <div class="card">
+    <p class="corr-hdr">Mapa de correlaciones</p>
+    <p class="corr-sub">Elige el fenómeno, la geometría y el régimen. El módulo te lleva a una familia de correlaciones representativa y muestra qué números adimensionales controlan el caso.</p>
+    <div class="map-grid">
+      <div>
+        <label>Fenómeno</label>
+        <select id="map-phen">
+          <option value="heat">Transferencia de calor</option>
+          <option value="mass">Transferencia de masa</option>
+          <option value="momentum">Momento / flujo</option>
+        </select>
+      </div>
+      <div>
+        <label>Geometría / caso</label>
+        <select id="map-geom">
+          <option value="tube">Tubo circular / flujo interno</option>
+          <option value="flat">Placa plana / flujo externo</option>
+          <option value="vertical">Placa vertical</option>
+        </select>
+      </div>
+      <div>
+        <label>Condición</label>
+        <select id="map-regime">
+          <option value="forced">Convección forzada</option>
+          <option value="natural">Convección natural</option>
+          <option value="internal">Interno desarrollado</option>
+          <option value="laminar">Laminar</option>
+          <option value="turbulent">Turbulento</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="applyCorrMap()">¿Qué correlación uso?</button>
+    <div class="map-helper" id="map-helper">
+      <div class="map-helper-title">Guía rápida</div>
+      <p>Para empezar: calor + tubo circular + interno desarrollado selecciona el bloque de flujo interno. Ahí se combinan Re, Pr, Nu y, si aplica, factor de fricción.</p>
+      <div class="map-tags">
+        <span class="map-tag primary">Re</span><span class="map-tag primary">Pr</span><span class="map-tag primary">Nu</span>
+        <span class="map-tag">flujo interno</span><span class="map-tag">laminar/turbulento</span>
+      </div>
+    </div>
+    <div class="map-note">Este mapa es una guía educativa de selección. En diseño formal, confirma propiedades a temperatura de película, longitud característica, condición de frontera y rango de validez.</div>
+  </div>
+
+  <div class="seg" id="corrTabs" style="flex-wrap:wrap;gap:5px;margin-bottom:14px">
+    <button class="on" onclick="showCorrForm('pipe',0)">A · Tubo</button>
+    <button onclick="showCorrForm('flatForced',1)">B · Placa forz.</button>
+    <button onclick="showCorrForm('vertNat',2)">C · Placa nat.</button>
+    <button onclick="showCorrForm('flatMass',3)">D · Masa placa</button>
+    <button onclick="showCorrForm('pipeMass',4)">E · Masa tubo</button>
+  </div>
+
+  <!-- ── A: Tubo circular ── -->
+  <div id="cform-pipe">
+    <div class="card">
+      <p class="corr-hdr">A · Flujo interno en tubo circular</p>
+      <p class="corr-sub">f<sub>D</sub> · ΔP · Nu (Hagen-Poiseuille / Dittus-Boelter / Gnielinski)</p>
+      <div class="fluid-sel-row">
+        <label>Fluido aprox.</label>
+        <select id="cp-fluid"><option value="">— manual —</option><option>agua</option><option>aire</option><option>etanol</option><option>glicerina</option></select>
+        <button onclick="prefillCorrFluid('cp')">Usar</button>
+      </div>
+      <div class="row"><div><label>Re</label><input id="cp-Re" type="number" placeholder="ej. 10000"></div>
+        <div><label>Pr</label><input id="cp-Pr" type="number" placeholder="ej. 7.0"></div></div>
+      <div class="row"><div><label>Diámetro D</label><input id="cp-D" type="number" placeholder="0.05"></div>
+        <div><label>Unidad</label><select id="cp-Du"><option>m</option><option>cm</option><option>mm</option></select></div></div>
+      <div class="row"><div><label>Longitud L</label><input id="cp-L" type="number" placeholder="2.0"></div>
+        <div><label>Unidad</label><select id="cp-Lu"><option>m</option><option>cm</option></select></div></div>
+      <div class="row"><div><label>Rugosidad ε/D</label><input id="cp-eD" type="number" value="0" placeholder="0=liso"></div>
+        <div><label>k fluido (W/(m·K))</label><input id="cp-k" type="number" placeholder="ej. 0.598"></div></div>
+      <div class="row"><div><label>μ (Pa·s)</label><input id="cp-mu" type="number" placeholder="ej. 1e-3"></div>
+        <div><label>ρ (kg/m³)</label><input id="cp-rho" type="number" placeholder="ej. 998"></div></div>
+      <label>Modo térmico</label>
+      <select id="cp-mode"><option value="0.4">Calentamiento del fluido (n = 0.4)</option><option value="0.3">Enfriamiento del fluido (n = 0.3)</option></select>
+      <button class="btn-calc" onclick="calcCorrPipe()">Calcular</button>
+      <div id="cres-pipe"></div>
+    </div>
+  </div>
+
+  <!-- ── B: Placa plana forzada ── -->
+  <div id="cform-flatForced" style="display:none">
+    <div class="card">
+      <p class="corr-hdr">B · Convección forzada sobre placa plana</p>
+      <p class="corr-sub">Nu<sub>L</sub> promedio · h̄ · régimen laminar/turbulento</p>
+      <div class="fluid-sel-row">
+        <label>Fluido aprox.</label>
+        <select id="cb-fluid"><option value="">— manual —</option><option>agua</option><option>aire</option><option>etanol</option><option>glicerina</option></select>
+        <button onclick="prefillCorrFluid('cb')">Usar</button>
+      </div>
+      <div class="row"><div><label>Re<sub>L</sub></label><input id="cb-Re" type="number" placeholder="ej. 3e5"></div>
+        <div><label>Pr</label><input id="cb-Pr" type="number" placeholder="ej. 0.71"></div></div>
+      <div class="row"><div><label>Longitud L</label><input id="cb-L" type="number" placeholder="0.5"></div>
+        <div><label>Unidad</label><select id="cb-Lu"><option>m</option><option>cm</option></select></div></div>
+      <label>k fluido (W/(m·K))</label>
+      <input id="cb-k" type="number" placeholder="ej. 0.0257">
+      <button class="btn-calc" onclick="calcCorrFlatForced()">Calcular</button>
+      <div id="cres-flatForced"></div>
+    </div>
+  </div>
+
+  <!-- ── C: Placa vertical, convección natural ── -->
+  <div id="cform-vertNat" style="display:none">
+    <div class="card">
+      <p class="corr-hdr">C · Convección natural sobre placa vertical</p>
+      <p class="corr-sub">Churchill-Chu (1975) · válido para todo Ra</p>
+      <div class="fluid-sel-row">
+        <label>Fluido aprox.</label>
+        <select id="cc-fluid"><option value="">— manual —</option><option>agua</option><option>aire</option><option>etanol</option><option>glicerina</option></select>
+        <button onclick="prefillCorrFluid('cc')">Usar</button>
+      </div>
+      <div class="warn-box info">Ingresa Ra directamente, o ingresa β, ν y ΔT para calcularlo.</div>
+      <div class="row"><div><label>Ra<sub>L</sub> (opcional)</label><input id="cc-Ra" type="number" placeholder="ej. 1e8"></div>
+        <div><label>Pr</label><input id="cc-Pr" type="number" placeholder="ej. 7.0"></div></div>
+      <div class="row"><div><label>Longitud L</label><input id="cc-L" type="number" placeholder="0.3"></div>
+        <div><label>Unidad</label><select id="cc-Lu"><option>m</option><option>cm</option></select></div></div>
+      <label>k fluido (W/(m·K))</label><input id="cc-k" type="number" placeholder="ej. 0.598">
+      <div class="row"><div><label>β coef. expansión (1/K)</label><input id="cc-beta" type="number" placeholder="ej. 0.00343"></div>
+        <div><label>ν cinemática (m²/s)</label><input id="cc-nu" type="number" placeholder="ej. 1e-6"></div></div>
+      <label>ΔT = T<sub>s</sub> − T<sub>∞</sub> (K)</label><input id="cc-dT" type="number" placeholder="ej. 30">
+      <button class="btn-calc" onclick="calcCorrVertNat()">Calcular</button>
+      <div id="cres-vertNat"></div>
+    </div>
+  </div>
+
+  <!-- ── D: Transferencia de masa, placa plana ── -->
+  <div id="cform-flatMass" style="display:none">
+    <div class="card">
+      <p class="corr-hdr">D · Transferencia de masa — placa plana</p>
+      <p class="corr-sub">Analogía calor-masa · Sh<sub>L</sub> · k̄<sub>c</sub></p>
+      <div class="row"><div><label>Re<sub>L</sub></label><input id="cd-Re" type="number" placeholder="ej. 3e5"></div>
+        <div><label>Sc</label><input id="cd-Sc" type="number" placeholder="ej. 600"></div></div>
+      <div class="row"><div><label>Longitud L</label><input id="cd-L" type="number" placeholder="0.5"></div>
+        <div><label>Unidad</label><select id="cd-Lu"><option>m</option><option>cm</option></select></div></div>
+      <div class="row"><div><label>D<sub>AB</sub></label><input id="cd-DAB" type="number" placeholder="ej. 1e-9"></div>
+        <div><label>Unidad</label><select id="cd-DABu"><option>m²/s</option><option>cm²/s</option></select></div></div>
+      <button class="btn-calc" onclick="calcCorrFlatMass()">Calcular</button>
+      <div id="cres-flatMass"></div>
+    </div>
+  </div>
+
+  <!-- ── E: Transferencia de masa, tubo circular ── -->
+  <div id="cform-pipeMass" style="display:none">
+    <div class="card">
+      <p class="corr-hdr">E · Transferencia de masa — tubo circular</p>
+      <p class="corr-sub">Analogía Dittus-Boelter · Sh · k̄<sub>c</sub></p>
+      <div class="row"><div><label>Re</label><input id="ce-Re" type="number" placeholder="ej. 10000"></div>
+        <div><label>Sc</label><input id="ce-Sc" type="number" placeholder="ej. 600"></div></div>
+      <div class="row"><div><label>Diámetro D</label><input id="ce-D" type="number" placeholder="0.05"></div>
+        <div><label>Unidad</label><select id="ce-Du"><option>m</option><option>cm</option><option>mm</option></select></div></div>
+      <div class="row"><div><label>D<sub>AB</sub></label><input id="ce-DAB" type="number" placeholder="ej. 1e-9"></div>
+        <div><label>Unidad</label><select id="ce-DABu"><option>m²/s</option><option>cm²/s</option></select></div></div>
+      <button class="btn-calc" onclick="calcCorrPipeMass()">Calcular</button>
+      <div id="cres-pipeMass"></div>
+    </div>
+  </div>
+
+</div><!-- /tab-corr -->
+
+</div><!-- /module-shell -->
+<script>
+'use strict';
+
+// ══════════════════════════════════════
+// FLUIDS DATABASE
+// ══════════════════════════════════════
+const FLUIDS = {
+  agua:      {rho:998,  mu:1.002e-3, Cp:4182, k:0.598,   alpha:1.43e-7},
+  aire:      {rho:1.204,mu:1.825e-5, Cp:1007, k:0.0257,  alpha:2.12e-5},
+  etanol:    {rho:789,  mu:1.2e-3,   Cp:2440, k:0.171,   alpha:8.88e-8},
+  glicerina: {rho:1260, mu:1.49,     Cp:2400, k:0.285,   alpha:9.48e-8},
+};
+
+// ══════════════════════════════════════
+// UNIT CONVERSIONS
+// ══════════════════════════════════════
+const cvt = {
+  len:  (v,u) => u==='cm'?v/100:u==='mm'?v/1000:v,
+  vel:  (v,u) => u==='cm/s'?v/100:u==='mm/s'?v/1000:v,
+  rho:  (v,u) => u==='g/cm3'?v*1000:v,
+  mu:   (v,u) => u==='cP'?v/1e3:v,
+  nu:   (v,u) => u==='cm2/s'?v/1e4:u==='cSt'?v/1e6:v,
+  Cp:   (v,u) => u==='kJ/(kg K)'?v*1e3:v,
+  alpha:(v,u) => u==='mm2/s'?v/1e6:v,
+  DAB:  (v,u) => u==='cm2/s'?v/1e4:v,
+  time: (v,u) => u==='min'?v*60:u==='h'?v*3600:v,
+  kc:   (v,u) => u==='cm/s'?v/100:v,
+};
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+function g(id){return document.getElementById(id);}
+function gv(id){const el=g(id);return el?parseFloat(el.value):NaN;}
+function gs(id){const el=g(id);return el?el.value:'';}
+function fmt(v,sig=4){
+  if(!isFinite(v)||isNaN(v)) return '—';
+  if(v===0) return '0';
+  const a=Math.abs(v);
+  if(a>=1e5||a<0.001) return v.toPrecision(sig);
+  return parseFloat(v.toPrecision(sig)).toString();
+}
+
+// ══════════════════════════════════════
+// PURE CALCULATION FUNCTIONS
+// ══════════════════════════════════════
+function calcRe({rho,V,Lc,mu,nu}){
+  let n=nu>0?nu:(mu>0&&rho>0?mu/rho:NaN);
+  if(!(n>0)||!(Lc>0)||!isFinite(V)) return NaN;
+  return Math.abs(V)*Lc/n;
+}
+function calcPr({mu,Cp,k,nu,alpha}){
+  if(nu>0&&alpha>0) return nu/alpha;
+  if(mu>0&&Cp>0&&k>0) return mu*Cp/k;
+  return NaN;
+}
+function calcAlpha({k,rho,Cp}){
+  return (k>0&&rho>0&&Cp>0)?k/(rho*Cp):NaN;
+}
+function calcSc({mu,rho,DAB,nu}){
+  let n=nu>0?nu:(mu>0&&rho>0?mu/rho:NaN);
+  if(!(n>0)||!(DAB>0)) return NaN;
+  return n/DAB;
+}
+function calcLe({alpha,DAB,Sc,Pr}){
+  if(alpha>0&&DAB>0) return alpha/DAB;
+  if(Sc>0&&Pr>0) return Sc/Pr;
+  return NaN;
+}
+function calcPeT({V,Lc,alpha,Re,Pr}){
+  if(Re>0&&Pr>0) return Re*Pr;
+  if(isFinite(V)&&Lc>0&&alpha>0) return Math.abs(V)*Lc/alpha;
+  return NaN;
+}
+function calcPeM({V,Lc,DAB,Re,Sc}){
+  if(Re>0&&Sc>0) return Re*Sc;
+  if(isFinite(V)&&Lc>0&&DAB>0) return Math.abs(V)*Lc/DAB;
+  return NaN;
+}
+function calcNu({h,Lc,k}){return (h>0&&Lc>0&&k>0)?h*Lc/k:NaN;}
+function calcSh({kc,Lc,DAB}){return (kc>0&&Lc>0&&DAB>0)?kc*Lc/DAB:NaN;}
+function calcBi({h,Lc,ks}){return (h>0&&Lc>0&&ks>0)?h*Lc/ks:NaN;}
+function calcFo({alpha,t,Lc}){return (alpha>0&&t>=0&&Lc>0)?alpha*t/(Lc*Lc):NaN;}
+function calcGr({g_acc,beta,dT,Lc,nu}){
+  if(!(beta>0)||!(Lc>0)||!(nu>0)||!isFinite(dT)) return NaN;
+  return g_acc*beta*Math.abs(dT)*Math.pow(Lc,3)/(nu*nu);
+}
+function calcRa({Gr,Pr}){return (Gr>0&&Pr>0)?Gr*Pr:NaN;}
+
+// ══════════════════════════════════════
+// INTERPRETATION FUNCTIONS
+// ══════════════════════════════════════
+function interpRe(Re){
+  if(!isFinite(Re)||isNaN(Re)) return '';
+  let cls,lab,txt;
+  if(Re<2100){cls='lam';lab='Laminar';
+    txt='Perfil de velocidad parabólico, predecible. Criterio típico para tubo circular.';}
+  else if(Re<=4000){cls='trans';lab='Transición';
+    txt='Zona inestable (≈ 2100–4000 en tubo circular). Evitar correlaciones laminares o turbulentas sin verificar.';}
+  else{cls='turb';lab='Turbulento';
+    txt='Mezcla intensa de momento. Criterio depende de geometría, perturbaciones y rugosidad superficial.';}
+  return `<div><span class="regime ${cls}">${lab}</span></div>
+    <div class="interp">Re = <b>${fmt(Re)}</b>. ${txt}</div>`;
+}
+function interpPr(Pr){
+  if(!isFinite(Pr)) return '';
+  let s;
+  if(Pr<0.05) s='Metales líquidos. Difusión térmica muy superior a difusión de momento.';
+  else if(Pr<0.7) s='Capa límite térmica más gruesa que la hidrodinámica.';
+  else if(Pr<3) s='Típico de gases. Difusión de momento y térmica comparables.';
+  else if(Pr<10) s='Líquidos acuosos (agua ≈ 7). Difusión de momento supera a la térmica.';
+  else s='Líquido viscoso. Capa límite hidrodinámica mucho más gruesa que la térmica.';
+  return `<div class="interp">Pr = <b>${fmt(Pr)}</b>. ${s}</div>`;
+}
+function interpSc(Sc){
+  if(!isFinite(Sc)) return '';
+  let s;
+  if(Sc<1) s='Difusión de masa más rápida que difusión de momento.';
+  else if(Sc<10) s='Difusión de masa y momento comparables.';
+  else if(Sc<1000) s='Difusión de momento supera a la difusión de masa.';
+  else s='Difusión de masa muy lenta (típico en líquidos: agua/gas ≈ 500–1000).';
+  return `<div class="interp">Sc = <b>${fmt(Sc)}</b>. ${s}</div>`;
+}
+function interpLe(Le){
+  if(!isFinite(Le)) return '';
+  let s;
+  if(Le<0.9) s='Difusión de masa más rápida que difusión térmica.';
+  else if(Le<1.1) s='Le ≈ 1: difusión térmica y de masa muy similares.';
+  else s='Difusión térmica más rápida que difusión de masa.';
+  return `<div class="interp">Le = <b>${fmt(Le)}</b>. ${s} Le = Sc / Pr.</div>`;
+}
+function interpPe(Pe,tipo){
+  if(!isFinite(Pe)) return '';
+  let s;
+  if(Pe<0.1) s='Difusión claramente dominante sobre la convección.';
+  else if(Pe<10) s='Convección y difusión son comparables. Ninguna puede ignorarse.';
+  else s='Convección domina sobre la difusión.';
+  return `<div class="interp">Pe<sub>${tipo}</sub> = <b>${fmt(Pe)}</b>. ${s}</div>`;
+}
+function interpNu(Nu){
+  if(!isFinite(Nu)) return '';
+  let s;
+  if(Nu<3) s='Nu pequeño: convección similar a conducción. Flujo laminar muy desarrollado.';
+  else if(Nu<50) s='Transferencia convectiva moderada.';
+  else s='Convección significativamente mayor que conducción característica del fluido.';
+  return `<div class="interp">Nu = <b>${fmt(Nu)}</b>. ${s} Nu = hL<sub>c</sub>/k (definición, no correlación).</div>`;
+}
+function interpSh(Sh){
+  if(!isFinite(Sh)) return '';
+  return `<div class="interp">Sh = <b>${fmt(Sh)}</b>. Razón entre transferencia convectiva de masa y difusión molecular. Análogo al Nusselt para transferencia de masa. Sh = k<sub>c</sub>L<sub>c</sub>/D<sub>AB</sub>.</div>`;
+}
+function interpBi(Bi){
+  if(!isFinite(Bi)) return '';
+  let lab,cls,s;
+  if(Bi<0.1){lab='Lumped OK';cls='ok';s='Bi < 0.1: modelo de sistema concentrado (lumped) puede ser razonable. Gradientes internos tipicamente pequeños.';}
+  else if(Bi<1){lab='Lumped no apto';cls='warn2';s='Bi ∈ [0.1, 1): resistencias interna y externa comparables. El modelo lumped no es apropiado.';}
+  else{lab='Gradientes internos';cls='warn2';s='Bi ≥ 1: gradientes de temperatura importantes dentro del sólido. Se requiere solución completa de conducción interna.';}
+  return `<div><span class="regime ${cls}">${lab}</span></div>
+    <div class="interp">Bi = <b>${fmt(Bi)}</b>. ${s}</div>`;
+}
+function interpFo(Fo){
+  if(!isFinite(Fo)) return '';
+  let s;
+  if(Fo<0.2) s='Tiempo adimensional pequeño. El calor aún no ha penetrado significativamente.';
+  else if(Fo<1) s='El frente térmico avanza hacia el interior del cuerpo.';
+  else s='Difusión térmica significativa. El cuerpo ha respondido térmicamente en buena medida.';
+  return `<div class="interp">Fo = <b>${fmt(Fo)}</b>. ${s} Fo = αt/L<sub>c</sub>².</div>`;
+}
+function interpGr(Gr){
+  if(!isFinite(Gr)) return '';
+  let s;
+  if(Gr<1e4) s='Convección natural débil; conducción probablemente domina.';
+  else if(Gr<1e8) s='Convección natural laminar de moderada a significativa.';
+  else s='Convección natural intensa; puede haber turbulencia.';
+  return `<div class="interp">Gr = <b>${fmt(Gr)}</b>. ${s}</div>`;
+}
+function interpRa(Ra){
+  if(!isFinite(Ra)) return '';
+  let s;
+  if(Ra<1e4) s='Conducción puede dominar; convección natural poco importante.';
+  else if(Ra<1e9) s='Convección natural laminar. Ra es el número clave para correlaciones de convección natural.';
+  else s='Convección natural turbulenta. Se requieren correlaciones específicas.';
+  return `<div class="interp">Ra = <b>${fmt(Ra)}</b>. ${s} Ra = Gr·Pr.</div>`;
+}
+
+// ══════════════════════════════════════
+// RESULT CARD BUILDERS
+// ══════════════════════════════════════
+function resCard(sym,val,interpHtml,full){
+  const valid=isFinite(val)&&!isNaN(val);
+  return `<div class="res-card${full?' full':''}${!valid?' insuf':''}">
+    <div class="val">${valid?fmt(val):'Datos insuficientes'}</div>
+    <div class="lbl">${sym}</div>
+    ${valid?interpHtml:''}
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// TAB / MODE SWITCHING
+// ══════════════════════════════════════
+function switchTab(name,idx){
+  ['tab-calc','tab-learn','tab-explore','tab-corr'].forEach((t,i)=>{
+    const el=g(t); if(el) el.style.display=i===(['calc','learn','explore','corr'].indexOf(name))?'':'none';
+  });
+  const btns=g('mainTabs').querySelectorAll('button');
+  btns.forEach((b,i)=>b.classList.toggle('on',i===idx));
+  if(name==='learn'&&!learnRendered){renderLearn();learnRendered=true;}
+}
+function switchCalcMode(mode,idx){
+  g('mode-individual').style.display=mode==='individual'?'':'none';
+  g('mode-integrated').style.display=mode==='integrated'?'':'none';
+  const seg=document.getElementById('mode-integrated')?.parentElement?.querySelector('.seg');
+  // update seg buttons
+  const btns=document.querySelectorAll('#tab-calc .seg button');
+  btns.forEach((b,i)=>b.classList.toggle('on',i===idx));
+}
+
+// ══════════════════════════════════════
+// INDIVIDUAL CALCULATOR
+// ══════════════════════════════════════
+const FLUID_NUMS = ['re','pr','sc','le','pet','pem'];
+
+function showNumForm(){
+  const sel=gs('numSel');
+  document.querySelectorAll('.num-form').forEach(f=>f.style.display='none');
+  g('indiv-calc-btn').style.display=sel?'':'none';
+  g('fluidCard').style.display=(sel&&FLUID_NUMS.includes(sel))?'':'none';
+  g('indiv-results').innerHTML='';
+  if(sel) g('form-'+sel).style.display='';
+}
+
+// Fluid prefill for individual mode
+function prefillFluid(){
+  const fk=gs('fluidSel'); if(!fk) return;
+  const f=FLUIDS[fk]; if(!f) return;
+  const num=gs('numSel');
+  // Map fluid properties to visible form fields
+  const setPair=(valId,unitSel,val,unit)=>{
+    const el=g(valId); const us=g(unitSel);
+    if(el) el.value=val;
+    if(us) us.value=unit;
+  };
+  if(num==='re'){
+    setPair('re-rho','re-rho-u',f.rho,'kg/m3');
+    setPair('re-mu','re-mu-u',f.mu,'Pa.s');
+  } else if(num==='pr'){
+    setPair('pr-mu','pr-mu-u',f.mu,'Pa.s');
+    setPair('pr-Cp','pr-Cp-u',f.Cp,'J/(kg K)');
+    setPair('pr-k','pr-k-u',f.k,'W/(m K)');
+  } else if(num==='sc'){
+    setPair('sc-mu','sc-mu-u',f.mu,'Pa.s');
+    setPair('sc-rho','sc-rho-u',f.rho,'kg/m3');
+  }
+}
+
+// Fluid prefill for integrated mode
+function prefillIntegrated(){
+  const fk=gs('integ-fluid'); if(!fk) return;
+  const f=FLUIDS[fk]; if(!f) return;
+  const s=(id,v)=>{const e=g(id);if(e)e.value=v;};
+  s('i-rho',f.rho); g('i-rho-u').value='kg/m3';
+  s('i-mu',f.mu);   g('i-mu-u').value='Pa.s';
+  s('i-Cp',f.Cp);   g('i-Cp-u').value='J/(kg K)';
+  s('i-kf',f.k);
+  s('i-alpha',f.alpha); g('i-alpha-u').value='m2/s';
+}
+
+// Lc helper
+function calcLcHelper(prefix){
+  const geo=gs(prefix+'-lc-geo');
+  const ext=g(prefix+'-lc-extra');
+  if(geo==='manual'||geo==='tube'||geo==='plate'){
+    ext.style.display='none';
+  } else if(geo==='dh'){
+    ext.style.display='';
+    ext.innerHTML=`<div class="row">
+      <div><label>A<sub>c</sub> sección trans. [m²]</label><input type="number" id="${prefix}-Ac" placeholder="m²" min="0"></div>
+      <div><label>P<sub>m</sub> perímetro mojado [m]</label><input type="number" id="${prefix}-Pm" placeholder="m" min="0"></div>
+    </div>
+    <button style="margin-top:6px;padding:6px 14px;background:var(--accent);color:#04121f;border:0;border-radius:8px;font-weight:600;cursor:pointer"
+      onclick="applyDh('${prefix}')">Calcular D<sub>h</sub> y aplicar</button>`;
+  } else if(geo==='annulus'){
+    ext.style.display='';
+    ext.innerHTML=`<div class="row">
+      <div><label>D<sub>o</sub> diám. exterior [m]</label><input type="number" id="${prefix}-Do" placeholder="m" min="0"></div>
+      <div><label>D<sub>i</sub> diám. interior [m]</label><input type="number" id="${prefix}-Di" placeholder="m" min="0"></div>
+    </div>
+    <button style="margin-top:6px;padding:6px 14px;background:var(--accent);color:#04121f;border:0;border-radius:8px;font-weight:600;cursor:pointer"
+      onclick="applyAnnulus('${prefix}')">Calcular D<sub>h</sub> y aplicar</button>`;
+  }
+}
+function applyDh(prefix){
+  const Ac=parseFloat(g(prefix+'-Ac')?.value)||0;
+  const Pm=parseFloat(g(prefix+'-Pm')?.value)||0;
+  if(Ac>0&&Pm>0){const Dh=4*Ac/Pm;const el=g(prefix+'-Lc');if(el){el.value=Dh.toPrecision(4);g(prefix+'-Lc-u').value='m';}}
+}
+function applyAnnulus(prefix){
+  const Do=parseFloat(g(prefix+'-Do')?.value)||0;
+  const Di=parseFloat(g(prefix+'-Di')?.value)||0;
+  if(Do>Di&&Di>=0){const Dh=Do-Di;const el=g(prefix+'-Lc');if(el){el.value=Dh.toPrecision(4);g(prefix+'-Lc-u').value='m';}}
+}
+
+function calcIndividual(){
+  const num=gs('numSel');
+  if(!num) return;
+  let html='';
+  if(num==='re'){
+    const rho=cvt.rho(gv('re-rho'),gs('re-rho-u'));
+    const V=cvt.vel(gv('re-V'),gs('re-V-u'));
+    const Lc=cvt.len(gv('re-Lc'),gs('re-Lc-u'));
+    const mu=cvt.mu(gv('re-mu'),gs('re-mu-u'));
+    const nu=cvt.nu(gv('re-nu'),gs('re-nu-u'));
+    const Re=calcRe({rho,V,Lc,mu,nu});
+    html=`<div class="res-grid">${resCard('Reynolds (Re)',Re,interpRe(Re),true)}</div>`;
+  } else if(num==='pr'){
+    const mu=cvt.mu(gv('pr-mu'),gs('pr-mu-u'));
+    const Cp=cvt.Cp(gv('pr-Cp'),gs('pr-Cp-u'));
+    const k=gv('pr-k');
+    const nu=cvt.nu(gv('pr-nu'),gs('pr-nu-u'));
+    const alpha=cvt.alpha(gv('pr-alpha'),gs('pr-alpha-u'));
+    const Pr=calcPr({mu,Cp,k,nu,alpha});
+    html=`<div class="res-grid">${resCard('Prandtl (Pr)',Pr,interpPr(Pr),true)}</div>`;
+  } else if(num==='sc'){
+    const mu=cvt.mu(gv('sc-mu'),gs('sc-mu-u'));
+    const rho=cvt.rho(gv('sc-rho'),gs('sc-rho-u'));
+    const DAB=cvt.DAB(gv('sc-DAB'),gs('sc-DAB-u'));
+    const nu=cvt.nu(gv('sc-nu'),gs('sc-nu-u'));
+    const Sc=calcSc({mu,rho,DAB,nu});
+    html=`<div class="res-grid">${resCard('Schmidt (Sc)',Sc,interpSc(Sc),true)}</div>`;
+  } else if(num==='le'){
+    const alpha=cvt.alpha(gv('le-alpha'),gs('le-alpha-u'));
+    const DAB=cvt.DAB(gv('le-DAB'),gs('le-DAB-u'));
+    const Sc=gv('le-Sc'); const Pr=gv('le-Pr');
+    const Le=calcLe({alpha,DAB,Sc,Pr});
+    html=`<div class="res-grid">${resCard('Lewis (Le)',Le,interpLe(Le),true)}</div>`;
+  } else if(num==='pet'){
+    const V=cvt.vel(gv('pet-V'),gs('pet-V-u'));
+    const Lc=cvt.len(gv('pet-Lc'),gs('pet-Lc-u'));
+    const alpha=cvt.alpha(gv('pet-alpha'),gs('pet-alpha-u'));
+    const Re=gv('pet-Re'); const Pr=gv('pet-Pr');
+    const Pe=calcPeT({V,Lc,alpha,Re,Pr});
+    html=`<div class="res-grid">${resCard('Péclet térmico (Pe_T)',Pe,interpPe(Pe,'T'),true)}</div>`;
+  } else if(num==='pem'){
+    const V=cvt.vel(gv('pem-V'),gs('pem-V-u'));
+    const Lc=cvt.len(gv('pem-Lc'),gs('pem-Lc-u'));
+    const DAB=cvt.DAB(gv('pem-DAB'),gs('pem-DAB-u'));
+    const Re=gv('pem-Re'); const Sc=gv('pem-Sc');
+    const Pe=calcPeM({V,Lc,DAB,Re,Sc});
+    html=`<div class="res-grid">${resCard('Péclet de masa (Pe_M)',Pe,interpPe(Pe,'M'),true)}</div>`;
+  } else if(num==='nu'){
+    const h=gv('nu-h');
+    const Lc=cvt.len(gv('nu-Lc'),gs('nu-Lc-u'));
+    const k=gv('nu-k');
+    const Nu=calcNu({h,Lc,k});
+    html=`<div class="res-grid">${resCard('Nusselt (Nu)',Nu,interpNu(Nu),true)}</div>`;
+  } else if(num==='sh'){
+    const kc=cvt.kc(gv('sh-kc'),gs('sh-kc-u'));
+    const Lc=cvt.len(gv('sh-Lc'),gs('sh-Lc-u'));
+    const DAB=cvt.DAB(gv('sh-DAB'),gs('sh-DAB-u'));
+    const Sh=calcSh({kc,Lc,DAB});
+    html=`<div class="res-grid">${resCard('Sherwood (Sh)',Sh,interpSh(Sh),true)}</div>`;
+  } else if(num==='bi'){
+    const h=gv('bi-h');
+    const Lc=cvt.len(gv('bi-Lc'),gs('bi-Lc-u'));
+    const ks=gv('bi-ks');
+    const Bi=calcBi({h,Lc,ks});
+    html=`<div class="res-grid">${resCard('Biot (Bi)',Bi,interpBi(Bi),true)}</div>`;
+  } else if(num==='fo'){
+    const alpha=cvt.alpha(gv('fo-alpha'),gs('fo-alpha-u'));
+    const t=cvt.time(gv('fo-t'),gs('fo-t-u'));
+    const Lc=cvt.len(gv('fo-Lc'),gs('fo-Lc-u'));
+    const Fo=calcFo({alpha,t,Lc});
+    html=`<div class="res-grid">${resCard('Fourier (Fo)',Fo,interpFo(Fo),true)}</div>`;
+  } else if(num==='gr'){
+    const beta=gv('gr-beta');
+    const g_acc=gv('gr-g')||9.80665;
+    const dT=gv('gr-dT');
+    const Lc=cvt.len(gv('gr-Lc'),gs('gr-Lc-u'));
+    const nu=cvt.nu(gv('gr-nu'),gs('gr-nu-u'));
+    const Gr=calcGr({g_acc,beta,dT,Lc,nu});
+    html=`<div class="res-grid">${resCard('Grashof (Gr)',Gr,interpGr(Gr),true)}</div>`;
+  } else if(num==='ra'){
+    let Gr=gv('ra-Gr'); let Pr=gv('ra-Pr');
+    if(!(Gr>0)){
+      const beta=gv('ra-beta');const g_acc=gv('ra-g')||9.80665;
+      const dT=gv('ra-dT');const Lc=gv('ra-Lc');const nu=gv('ra-nu');
+      Gr=calcGr({g_acc,beta,dT,Lc,nu});
+    }
+    if(!(Pr>0)) Pr=gv('ra-Pr2');
+    const Ra=calcRa({Gr,Pr});
+    html=`<div class="res-grid">
+      ${resCard('Grashof (Gr)',Gr,interpGr(Gr),false)}
+      ${resCard('Prandtl (Pr)',Pr,'',false)}
+      ${resCard('Rayleigh (Ra)',Ra,interpRa(Ra),true)}
+    </div>`;
+  }
+  g('indiv-results').innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// INTEGRATED CALCULATOR
+// ══════════════════════════════════════
+function calcIntegrated(){
+  const rho=cvt.rho(gv('i-rho'),gs('i-rho-u'));
+  const mu=cvt.mu(gv('i-mu'),gs('i-mu-u'));
+  let   nu=cvt.nu(gv('i-nu'),gs('i-nu-u'));
+  const V=cvt.vel(gv('i-V'),gs('i-V-u'));
+  const Lc=cvt.len(gv('i-Lc'),gs('i-Lc-u'));
+  const Cp=cvt.Cp(gv('i-Cp'),gs('i-Cp-u'));
+  const kf=gv('i-kf'); const ks=gv('i-ks');
+  let alpha=cvt.alpha(gv('i-alpha'),gs('i-alpha-u'));
+  const h=gv('i-h');
+  const t=cvt.time(gv('i-t'),gs('i-t-u'));
+  const beta=gv('i-beta'); const dT=gv('i-dT');
+  const g_acc=gv('i-g')||9.80665;
+  const DAB=cvt.DAB(gv('i-DAB'),gs('i-DAB-u'));
+  const kc=cvt.kc(gv('i-kc'),gs('i-kc-u'));
+
+  // Derived
+  if(!(nu>0)&&mu>0&&rho>0) nu=mu/rho;
+  if(!(alpha>0)&&kf>0&&rho>0&&Cp>0) alpha=calcAlpha({k:kf,rho,Cp});
+
+  const Re=calcRe({rho,V,Lc,mu,nu});
+  const Pr=calcPr({mu,Cp,k:kf,nu,alpha});
+  const Sc=calcSc({mu,rho,DAB,nu});
+  const Le=calcLe({alpha,DAB,Sc,Pr});
+  const PeT=calcPeT({V,Lc,alpha,Re,Pr});
+  const PeM=calcPeM({V,Lc,DAB,Re,Sc});
+  const Nu=calcNu({h,Lc,k:kf});
+  const Sh=calcSh({kc,Lc,DAB});
+  const Bi=calcBi({h,Lc,ks});
+  const Fo=calcFo({alpha,t,Lc});
+  const Gr=calcGr({g_acc,beta,dT,Lc,nu});
+  const Ra=calcRa({Gr,Pr});
+
+  g('integ-results').innerHTML=`<div class="res-grid">
+    ${resCard('Reynolds',Re,interpRe(Re),isFinite(Re))}
+    ${resCard('Prandtl',Pr,interpPr(Pr),false)}
+    ${resCard('Schmidt',Sc,interpSc(Sc),false)}
+    ${resCard('Lewis',Le,interpLe(Le),false)}
+    ${resCard('Pe<sub>T</sub>',PeT,interpPe(PeT,'T'),false)}
+    ${resCard('Pe<sub>M</sub>',PeM,interpPe(PeM,'M'),false)}
+    ${resCard('Nusselt',Nu,interpNu(Nu),false)}
+    ${resCard('Sherwood',Sh,interpSh(Sh),false)}
+    ${resCard('Biot',Bi,interpBi(Bi),false)}
+    ${resCard('Fourier',Fo,interpFo(Fo),false)}
+    ${resCard('Grashof',Gr,interpGr(Gr),false)}
+    ${resCard('Rayleigh',Ra,interpRa(Ra),isFinite(Ra))}
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// LEARNING TAB — DATA-DRIVEN RENDER
+// ══════════════════════════════════════
+let learnRendered=false;
+
+const LEARN_DATA=[
+  {sym:'Re',name:'Reynolds',
+   formula:`<div class="math-block">
+    <div class="meq">Re<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">ρ</span><span class="mv">VL</span><sub>c</sub></span><span class="den"><span class="mg">μ</span></span></span><span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">VL</span><sub>c</sub></span><span class="den"><span class="mg">ν</span></span></span></div>
+   </div>`,
+   meaning:'Razón entre efectos inerciales y efectos viscosos. Determina si el flujo tiende a ser laminar (predominan efectos viscosos) o turbulento (predominan efectos inerciales).',
+   vars:['ρ: densidad del fluido [kg/m³]','V: velocidad característica [m/s]','L<sub>c</sub>: longitud característica [m]','μ: viscosidad dinámica [Pa·s]','ν = μ/ρ: viscosidad cinemática [m²/s]'],
+   use:'Estimación del régimen de flujo. En tubo circular: Re < 2100 → laminar; 2100–4000 → transición; > 4000 → turbulento. Los límites dependen de la geometría.',
+   errors:['Usar radio R cuando la correlación define L<sub>c</sub> = D (diámetro): error de factor 2 en Re','Ingresar μ en cP sin dividir entre 1000 para obtener Pa·s','Aplicar los límites de tubo circular (2100/4000) a cualquier geometría','Asumir que Re determina turbulencia en todos los casos (rugosidad, perturbaciones también influyen)']},
+  {sym:'Pr',name:'Prandtl',
+   formula:`<div class="math-block">
+    <div class="meq">Pr<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">μ</span><span class="mv">C</span><sub>p</sub></span><span class="den"><span class="mv">k</span></span></span><span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">ν</span></span><span class="den"><span class="mg">α</span></span></span></div>
+    <div class="meq"><span class="mg">α</span><span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">k</span></span><span class="den"><span class="mg">ρ</span><span class="mv">C</span><sub>p</sub></span></span><span class="mnote">difusividad térmica</span></div>
+   </div>`,
+   meaning:'Razón entre difusión de momento (viscosidad cinemática ν) y difusión térmica (α). Compara los espesores de capa límite hidrodinámica y térmica.',
+   vars:['μ: viscosidad dinámica [Pa·s]','C<sub>p</sub>: calor específico [J/(kg K)]','k: conductividad térmica del fluido [W/(m K)]','ν: viscosidad cinemática [m²/s]','α = k/(ρC<sub>p</sub>): difusividad térmica [m²/s]'],
+   use:'Determina la relación entre las capas límite hidrodinámica y térmica. Aparece en casi todas las correlaciones de transferencia de calor por convección.',
+   errors:['Confundir k (conductividad) con h (coef. convectivo)','Usar C<sub>p</sub> en kJ/(kg K) sin multiplicar por 1000','No distinguir α (difusividad térmica) de α en otros contextos','Usar k del sólido en vez del fluido']},
+  {sym:'Sc',name:'Schmidt',
+   formula:`<div class="math-block">
+    <div class="meq">Sc<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">ν</span></span><span class="den"><span class="mv">D</span><sub>AB</sub></span></span><span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">μ</span></span><span class="den"><span class="mg">ρ</span><span class="mv">D</span><sub>AB</sub></span></span></div>
+   </div>`,
+   meaning:'Razón entre difusión de momento (ν) y difusión de masa (D_AB). Análogo al Prandtl para transferencia de masa.',
+   vars:['ν: viscosidad cinemática [m²/s]','D<sub>AB</sub>: difusividad binaria de masa [m²/s]','μ: viscosidad dinámica [Pa·s]','ρ: densidad [kg/m³]'],
+   use:'Determina la relación entre las capas límite hidrodinámica y de concentración. Aparece en correlaciones de transferencia de masa por convección.',
+   errors:['Confundir D<sub>AB</sub> (difusividad de masa) con D (diámetro)','Usar D<sub>AB</sub> sin verificar unidades [m²/s]','Asumir que Sc ≈ 1 para todos los fluidos (en líquidos suele ser >> 1)']},
+  {sym:'Le',name:'Lewis',
+   formula:`<div class="math-block">
+    <div class="meq">Le<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">α</span></span><span class="den"><span class="mv">D</span><sub>AB</sub></span></span><span class="mo">=</span><span class="mfrac"><span class="num">Sc</span><span class="den">Pr</span></span></div>
+   </div>`,
+   meaning:'Razón entre difusividad térmica (α) y difusividad de masa (D_AB). Compara las tasas de difusión térmica y másica.',
+   vars:['α: difusividad térmica [m²/s]','D<sub>AB</sub>: difusividad de masa [m²/s]','Sc: número de Schmidt','Pr: número de Prandtl'],
+   use:'Importante en sistemas con transferencia simultánea de calor y masa (combustión, secado, absorción). Le ≈ 1 simplifica ciertos análisis.',
+   errors:['Confundir Lewis con Péclet','No distinguir α (térmico) de D<sub>AB</sub> (másico) cuando ambos tienen las mismas unidades [m²/s]']},
+  {sym:'Pe_T',name:'Péclet térmico',
+   formula:`<div class="math-block">
+    <div class="meq">Pe<sub>T</sub><span class="mo">=</span>Re·Pr<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">VL</span><sub>c</sub></span><span class="den"><span class="mg">α</span></span></span></div>
+   </div>`,
+   meaning:'Razón entre transporte convectivo de energía y transporte conductivo de energía. Pe_T ≫ 1 → la convección domina; Pe_T ≪ 1 → la difusión térmica domina.',
+   vars:['V: velocidad [m/s]','L<sub>c</sub>: longitud característica [m]','α: difusividad térmica [m²/s]','Re, Pr: sus respectivos valores'],
+   use:'Análisis de transporte convectivo-difusivo de energía. Aparece en modelos de flujo en reactores y transferencia de calor.',
+   errors:['Usar α del sólido en lugar del fluido','No verificar las unidades de V y L<sub>c</sub>']},
+  {sym:'Pe_M',name:'Péclet de masa',
+   formula:`<div class="math-block">
+    <div class="meq">Pe<sub>M</sub><span class="mo">=</span>Re·Sc<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">VL</span><sub>c</sub></span><span class="den"><span class="mv">D</span><sub>AB</sub></span></span></div>
+   </div>`,
+   meaning:'Razón entre transporte convectivo de masa y transporte difusivo de masa. Pe_M ≫ 1 → convección domina; Pe_M ≪ 1 → difusión domina.',
+   vars:['V, L<sub>c</sub>: velocidad y longitud característica','D<sub>AB</sub>: difusividad de masa [m²/s]'],
+   use:'Diseño de reactores de flujo pistón vs. mezcla perfecta, análisis de dispersión en medios porosos.',
+   errors:['Confundir D<sub>AB</sub> con diámetro','Usar Péclet térmico donde se necesita el de masa o viceversa']},
+  {sym:'Nu',name:'Nusselt',
+   formula:`<div class="math-block">
+    <div class="meq">Nu<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">hL</span><sub>c</sub></span><span class="den"><span class="mv">k</span></span></span></div>
+   </div>`,
+   meaning:'Razón entre la transferencia convectiva de calor y la conducción térmica característica en el fluido. Nu > 1 indica que la convección mejora la transferencia respecto a la conducción pura.',
+   vars:['h: coeficiente convectivo de calor [W/(m²K)]','L<sub>c</sub>: longitud característica [m]','k: conductividad térmica del <strong>fluido</strong> [W/(m K)]'],
+   use:'Nu se calcula a partir de su definición (dado h) o se predice con correlaciones empíricas (dado Re y Pr). Este módulo solo calcula Nu desde h.',
+   errors:['Usar k del sólido en lugar del fluido','Pensar que Nu es una correlación; es un número adimensional definido','Usar L<sub>c</sub> incorrecta (debe coincidir con la de la correlación)','Confundir Nusselt con Biot (Bi usa k del sólido)']},
+  {sym:'Sh',name:'Sherwood',
+   formula:`<div class="math-block">
+    <div class="meq">Sh<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">k</span><sub>c</sub><span class="mv">L</span><sub>c</sub></span><span class="den"><span class="mv">D</span><sub>AB</sub></span></span></div>
+   </div>`,
+   meaning:'Razón entre transferencia convectiva de masa y difusión molecular característica. Análogo al Nusselt para transferencia de masa.',
+   vars:['k<sub>c</sub>: coeficiente de transferencia de masa [m/s]','L<sub>c</sub>: longitud característica [m]','D<sub>AB</sub>: difusividad de masa [m²/s]'],
+   use:'Sherwood aparece en correlaciones de transferencia de masa (análogas a las de Nusselt). Sh = f(Re, Sc) en la mayoría de geometrías.',
+   errors:['Confundir D<sub>AB</sub> con D (diámetro)','Usar k<sub>c</sub> con unidades incorrectas (debe ser m/s)','Aplicar la analogía calor-masa sin verificar condiciones de frontera similares']},
+  {sym:'Bi',name:'Biot',
+   formula:`<div class="math-block">
+    <div class="meq">Bi<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">hL</span><sub>c</sub></span><span class="den"><span class="mv">k</span><sub>s</sub></span></span></div>
+   </div>`,
+   meaning:'Razón entre la resistencia conductiva interna del sólido y la resistencia convectiva externa. Bi pequeño → el sólido es térmicamente "delgado" (gradientes internos pequeños).',
+   vars:['h: coeficiente convectivo externo [W/(m²K)]','L<sub>c</sub>: longitud característica del sólido [m]','k<sub>s</sub>: conductividad del <strong>sólido</strong> [W/(m K)]'],
+   use:'Determinar si se puede usar el modelo de sistema concentrado (lumped system). Bi < 0.1 → lumped razonable. Bi ≥ 0.1 → requiere análisis de conducción interna.',
+   errors:['Confundir Bi con Nu (Nu usa k del fluido; Bi usa k del sólido)','Usar Bi < 0.1 como regla absoluta sin revisar geometría','Usar L<sub>c</sub> incorrecta (e.g., para esfera L<sub>c</sub> = V/A = R/3, no R)']},
+  {sym:'Fo',name:'Fourier',
+   formula:`<div class="math-block">
+    <div class="meq">Fo<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mg">α</span><span class="mv">t</span></span><span class="den"><span class="mv">L</span><sub>c</sub>²</span></span></div>
+   </div>`,
+   meaning:'Tiempo adimensional para la difusión de calor en conducción transitoria. Representa cuánto "avance" ha experimentado el frente térmico relativo al tamaño del sistema.',
+   vars:['α: difusividad térmica del sólido o medio [m²/s]','t: tiempo [s]','L<sub>c</sub>: longitud característica [m]'],
+   use:'Análisis de conducción transitoria. Soluciones en serie convergen rápidamente para Fo > 0.2. Aparece junto a Bi en las cartas de Heisler.',
+   errors:['Usar α del fluido en lugar del sólido','Olvidar elevar L<sub>c</sub> al cuadrado en el denominador','Usar Fo independientemente de Bi sin considerar que ambos definen el problema']},
+  {sym:'Gr',name:'Grashof',
+   formula:`<div class="math-block">
+    <div class="meq">Gr<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">g</span><span class="mg">β</span>ΔT<span class="mv">L</span><sub>c</sub>³</span><span class="den"><span class="mg">ν</span>²</span></span></div>
+    <div class="meq"><span class="mg">β</span><span class="mo">≈</span><span class="mfrac"><span class="num">1</span><span class="den"><span class="mv">T</span><sub>film</sub></span></span><span class="mnote">para gas ideal (T en K)</span></div>
+   </div>`,
+   meaning:'Razón entre las fuerzas de flotación (boyancy) y las fuerzas viscosas. Es el número central en la convección natural, análogo al Re en convección forzada.',
+   vars:['g = 9.80665 m/s²','β: coef. de expansión volumétrica [1/K]','ΔT: diferencia de temperatura [K]','L<sub>c</sub>: longitud característica [m]','ν: viscosidad cinemática [m²/s]'],
+   use:'Junto con Pr (a través de Ra = Gr·Pr), determina el régimen y la intensidad de la convección natural. Gr ≫ 1 indica que las fuerzas de flotación dominan sobre las viscosas.',
+   errors:['No convertir β a 1/K si está en 1/°C (son iguales en magnitud, pero verificar)','Usar ν en cm²/s sin convertir a m²/s','Olvidar elevar L<sub>c</sub> al cubo','Ignorar que ΔT debe ser valor absoluto para Gr']},
+  {sym:'Ra',name:'Rayleigh',
+   formula:`<div class="math-block">
+    <div class="meq">Ra<span class="mo">=</span>Gr·Pr<span class="mo">=</span><span class="mfrac"><span class="num"><span class="mv">g</span><span class="mg">β</span>ΔT<span class="mv">L</span><sub>c</sub>³</span><span class="den"><span class="mg">ν α</span></span></span></div>
+   </div>`,
+   meaning:'Número adimensional clave en convección natural. Combina las fuerzas de flotación, la viscosidad y la difusión térmica. Ra determina el régimen de convección natural y la selección de correlaciones.',
+   vars:['Gr: número de Grashof','Pr: número de Prandtl','α: difusividad térmica [m²/s]'],
+   use:'Selección de correlaciones de convección natural (placa vertical, cilindro horizontal, cavidades, etc.). El régimen cambia tipicamente alrededor de Ra ≈ 10⁹.',
+   errors:['Usar Ra en lugar de Gr (o viceversa) en una correlación','No verificar que la correlación corresponde a la geometría del problema','Ignorar el efecto de Pr al usar Ra para seleccionar el régimen']},
+];
+
+function renderLearn(){
+  g('learn-content').innerHTML=LEARN_DATA.map(d=>`
+    <div class="learn-num">
+      <div class="ln-header" onclick="toggleLearn('${d.sym}')">
+        <span class="ln-sym">${d.sym}</span>
+        <span class="ln-title">${d.name}</span>
+        <span class="ln-arr" id="arr-${d.sym}">›</span>
+      </div>
+      <div class="ln-body" id="lnb-${d.sym}">
+        <div class="learn-sec">
+          <h4>Fórmula</h4>
+          ${d.formula}
+        </div>
+        <div class="learn-sec">
+          <h4>Significado físico</h4>
+          <p>${d.meaning}</p>
+        </div>
+        <div class="learn-sec">
+          <h4>Variables</h4>
+          <ul>${d.vars.map(v=>`<li>${v}</li>`).join('')}</ul>
+        </div>
+        <div class="learn-sec">
+          <h4>Uso típico</h4>
+          <p>${d.use}</p>
+        </div>
+        <div class="learn-sec">
+          <h4>Errores comunes</h4>
+          <div class="err-box">${d.errors.map(e=>`❌ ${e}`).join('<br>')}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleLearn(sym){
+  const body=g('lnb-'+sym);
+  const arr=g('arr-'+sym);
+  if(!body) return;
+  const open=body.style.display!=='none'&&body.style.display!=='';
+  body.style.display=open?'none':'block';
+  if(arr) arr.classList.toggle('open',!open);
+}
+
+// ══════════════════════════════════════
+// EXPLORATION
+// ══════════════════════════════════════
+function updateExpRe(){
+  const rho=parseFloat(g('xr-rho').value);
+  const V=parseFloat(g('xr-V').value);
+  const Lc=parseFloat(g('xr-Lc').value);
+  const mu_mPa=parseFloat(g('xr-mu').value);
+  const mu=mu_mPa/1000;
+  g('xr-rho-v').textContent=rho;
+  g('xr-V-v').textContent=V.toFixed(2);
+  g('xr-Lc-v').textContent=Lc.toFixed(3);
+  g('xr-mu-v').textContent=mu_mPa.toFixed(2);
+  const Re=rho*V*Lc/mu;
+  g('xr-Re').textContent=fmt(Re);
+  let regHtml,insight,lamPct,transPct,turbPct;
+  if(Re<2100){
+    regHtml='<span class="regime lam">Laminar</span>';
+    lamPct=Math.min(100,Re/2100*100); transPct=0; turbPct=0;
+    insight=`Re = ${fmt(Re)} → Flujo laminar en tubo circular. Aumentar V o L<sub>c</sub> eleva Re linealmente. Aumentar μ lo reduce.`;
+  } else if(Re<=4000){
+    regHtml='<span class="regime trans">Transición</span>';
+    lamPct=100; transPct=Math.min(100,(Re-2100)/1900*100); turbPct=0;
+    insight=`Re = ${fmt(Re)} → Zona de transición (2100–4000). Flujo inestable. Evitar correlaciones laminares o turbulentas sin verificar.`;
+  } else {
+    regHtml='<span class="regime turb">Turbulento</span>';
+    lamPct=100; transPct=100; turbPct=Math.min(100,(Re-4000)/46000*100+5);
+    insight=`Re = ${fmt(Re)} → Flujo turbulento. La mezcla intensa aumenta la transferencia de calor y masa, pero también las pérdidas de presión.`;
+  }
+  g('xr-regime').innerHTML=regHtml;
+  g('xr-insight').innerHTML=insight;
+  // Update bar widths to indicate current position
+  const barLam=g('xrb-lam'); const barTrans=g('xrb-trans'); const barTurb=g('xrb-turb');
+  // Visual: bar highlights active segment
+  barLam.style.opacity=Re<2100?'1':'0.35';
+  barTrans.style.opacity=(Re>=2100&&Re<=4000)?'1':'0.35';
+  barTurb.style.opacity=Re>4000?'1':'0.35';
+}
+
+function updateExpDiff(){
+  const nu_us=parseFloat(g('xd-nu').value)*1e-6;
+  const alpha_us=parseFloat(g('xd-alpha').value)*1e-6;
+  const DAB_ns=parseFloat(g('xd-DAB').value)*1e-9;
+  g('xd-nu-v').textContent=parseFloat(g('xd-nu').value).toFixed(2);
+  g('xd-alpha-v').textContent=parseFloat(g('xd-alpha').value).toFixed(3);
+  g('xd-DAB-v').textContent=parseFloat(g('xd-DAB').value).toFixed(2);
+  const Pr=nu_us/alpha_us;
+  const Sc=nu_us/DAB_ns;
+  const Le=alpha_us/DAB_ns;
+  g('xd-Pr').textContent=fmt(Pr);
+  g('xd-Sc').textContent=fmt(Sc);
+  g('xd-Le').textContent=fmt(Le);
+  let txt='';
+  if(Pr<0.1) txt='Pr muy pequeño: difusión térmica muy superior al transporte de momento. ';
+  else if(Pr>100) txt='Pr grande: líquido viscoso; capa límite hidrodinámica mucho mayor. ';
+  else txt=`Pr = ${fmt(Pr)}: razón difusión de momento / térmica. `;
+  txt+=`Sc = ${fmt(Sc)}: razón difusión momento / masa. Le = Sc/Pr = ${fmt(Le)}: razón térmica / masa.`;
+  g('xd-insight').innerHTML=txt;
+}
+
+function updateExpBiFo(){
+  const h=parseFloat(g('xb-h').value);
+  const Lc=parseFloat(g('xb-Lc').value);
+  const ks=parseFloat(g('xb-ks').value);
+  const alpha_us=parseFloat(g('xb-alpha').value)*1e-6;
+  const t=parseFloat(g('xb-t').value);
+  g('xb-h-v').textContent=h;
+  g('xb-Lc-v').textContent=Lc.toFixed(3);
+  g('xb-ks-v').textContent=ks.toFixed(1);
+  g('xb-alpha-v').textContent=parseFloat(g('xb-alpha').value).toFixed(1);
+  g('xb-t-v').textContent=t;
+  const Bi=h*Lc/ks;
+  const Fo=alpha_us*t/(Lc*Lc);
+  g('xb-Bi').textContent=fmt(Bi);
+  g('xb-Fo').textContent=fmt(Fo);
+  let lumpedHtml='';
+  if(Bi<0.1) lumpedHtml='<div class="warn-box ok">✅ Bi < 0.1 → Modelo lumped puede ser razonable</div>';
+  else lumpedHtml='<div class="warn-box warn">⚠ Bi ≥ 0.1 → Gradientes internos importantes; no usar lumped</div>';
+  g('xb-lumped').innerHTML=lumpedHtml;
+  const txt=`Bi = ${fmt(Bi)} (resistencia interna / resistencia convectiva). Fo = ${fmt(Fo)} (tiempo adimensional de difusión). ${Fo<0.2?'Fo pequeño: frente térmico aún en etapa inicial.':Fo<1?'El calor avanza hacia el interior.':'Difusión térmica significativa.'}`;
+  g('xb-insight').textContent=txt;
+}
+
+function updateExpNat(){
+  const beta=parseFloat(g('xn-beta').value)*1e-3;
+  const dT=parseFloat(g('xn-dT').value);
+  const Lc=parseFloat(g('xn-Lc').value);
+  const nu=parseFloat(g('xn-nu').value)*1e-6;
+  const Pr=parseFloat(g('xn-Pr').value);
+  g('xn-beta-v').textContent=parseFloat(g('xn-beta').value).toFixed(2);
+  g('xn-dT-v').textContent=dT;
+  g('xn-Lc-v').textContent=Lc.toFixed(2);
+  g('xn-nu-v').textContent=parseFloat(g('xn-nu').value).toFixed(1);
+  g('xn-Pr-v').textContent=Pr;
+  const Gr=9.80665*beta*Math.abs(dT)*Math.pow(Lc,3)/(nu*nu);
+  const Ra=Gr*Pr;
+  g('xn-Gr').textContent=fmt(Gr);
+  g('xn-Ra').textContent=fmt(Ra);
+  let txt=`Gr = ${fmt(Gr)}, Ra = ${fmt(Ra)}. `;
+  if(Ra<1e4) txt+='Ra pequeño: conducción domina; convección natural débil.';
+  else if(Ra<1e9) txt+='Ra en rango laminar. Selecciona correlaciones de convección natural laminar.';
+  else txt+='Ra > 10⁹: posible turbulencia en convección natural. Usa correlaciones turbulentas.';
+  g('xn-insight').textContent=txt;
+}
+
+// ══════════════════════════════════════
+// CORRELACIONES
+// ══════════════════════════════════════
+
+function errBox(msg){
+  return `<div class="warn-box warn">⚠ ${msg}</div>`;
+}
+
+// Raw-string result card (accepts HTML strings for value and sub-text)
+function resCardRaw(sym,valHtml,subHtml,full){
+  return `<div class="res-card${full?' full':''}">
+    <div class="val">${valHtml}</div>
+    <div class="lbl">${sym}</div>
+    ${subHtml?`<div class="interp">${subHtml}</div>`:''}
+  </div>`;
+}
+
+function showCorrForm(name,idx){
+  ['pipe','flatForced','vertNat','flatMass','pipeMass'].forEach(n=>{
+    const el=g('cform-'+n);
+    if(el) el.style.display=n===name?'':'none';
+  });
+  const btns=g('corrTabs').querySelectorAll('button');
+  btns.forEach((b,i)=>b.classList.toggle('on',i===idx));
+}
+
+const CORR_MAP_GUIDE={
+  pipe:{
+    idx:0,
+    title:'Flujo interno en tubo circular',
+    text:'Usa este bloque cuando el fluido circula dentro de un tubo. Re define el régimen; Pr conecta momento con calor; Nu estima h. En turbulento, compara Dittus-Boelter y Gnielinski; en laminar plenamente desarrollado, Nu≈3.66 para pared a temperatura constante.',
+    tags:['Re','Pr','Nu','f_D','flujo interno','tubo circular','laminar/turbulento']
+  },
+  flatForced:{
+    idx:1,
+    title:'Convección forzada sobre placa plana',
+    text:'Usa este bloque para una corriente externa sobre placa plana. Re_L selecciona capa límite laminar o turbulenta; Pr entra por la capa límite térmica; Nu_L promedio permite estimar h sobre la longitud L.',
+    tags:['Re_L','Pr','Nu_L','convección forzada','flujo externo','placa plana']
+  },
+  vertNat:{
+    idx:2,
+    title:'Convección natural sobre placa vertical',
+    text:'Usa este bloque cuando el movimiento lo genera la flotación térmica, no una velocidad impuesta. Ra=Gr·Pr gobierna el régimen; Churchill-Chu da una forma compacta para placa vertical en un rango amplio.',
+    tags:['Gr','Pr','Ra','Nu_L','convección natural','placa vertical','flotación']
+  },
+  flatMass:{
+    idx:3,
+    title:'Transferencia de masa sobre placa plana',
+    text:'Usa este bloque para una capa límite de concentración sobre placa plana. La analogía calor-masa reemplaza Pr por Sc y Nu por Sh; Sh_L permite estimar k_c a partir de D_AB y L.',
+    tags:['Re_L','Sc','Sh_L','k_c','masa','flujo externo','analogía calor-masa']
+  },
+  pipeMass:{
+    idx:4,
+    title:'Transferencia de masa en tubo circular',
+    text:'Usa este bloque para transporte de especie en flujo interno. Re define el régimen; Sc reemplaza Pr; Sh estima k_c. En laminar plenamente desarrollado se usa Sh≈3.66 como punto de partida educativo.',
+    tags:['Re','Sc','Sh','k_c','masa','flujo interno','tubo circular']
+  }
+};
+
+function renderCorrGuide(key){
+  const d=CORR_MAP_GUIDE[key]||CORR_MAP_GUIDE.pipe;
+  const tags=d.tags.map((t,i)=>`<span class="map-tag ${i<3?'primary':''}">${t}</span>`).join('');
+  g('map-helper').innerHTML=`<div class="map-helper-title">${d.title}</div>
+    <p>${d.text}</p>
+    <div class="map-tags">${tags}</div>`;
+}
+
+function applyCorrMap(){
+  const phen=g('map-phen').value;
+  const geom=g('map-geom').value;
+  const regime=g('map-regime').value;
+  let key='pipe';
+
+  if(phen==='mass'&&geom==='flat') key='flatMass';
+  else if(phen==='mass') key='pipeMass';
+  else if(phen==='heat'&&regime==='natural') key='vertNat';
+  else if(phen==='heat'&&geom==='vertical') key='vertNat';
+  else if(phen==='heat'&&geom==='flat') key='flatForced';
+  else if(phen==='momentum'&&geom==='flat') key='flatForced';
+  else key='pipe';
+
+  showCorrForm(key,CORR_MAP_GUIDE[key].idx);
+  renderCorrGuide(key);
+}
+
+function prefillCorrFluid(prefix){
+  const sel=g(prefix+'-fluid');
+  if(!sel||!sel.value) return;
+  const f=FLUIDS[sel.value];
+  if(!f) return;
+  const nu=f.mu/f.rho;
+  const Pr=+(f.mu*f.Cp/f.k).toFixed(4);
+  const setIf=(id,val)=>{const el=g(id);if(el&&val!==undefined&&val!==null)el.value=val;};
+  setIf(prefix+'-Pr', Pr);
+  setIf(prefix+'-k',  f.k);
+  setIf(prefix+'-mu', f.mu);
+  setIf(prefix+'-rho',f.rho);
+  // for natural convection: ideal gas beta ≈ 1/T (T=293 K)
+  if(prefix==='cc'){
+    setIf('cc-beta', (1/293).toFixed(6));
+    setIf('cc-nu',   nu.toExponential(4));
+  }
+}
+
+// Friction factor correlations
+function blasiusFD(Re){ return 0.3164*Math.pow(Re,-0.25); }
+function haalandFD(Re,eD){
+  const x=Math.pow(eD<=0?1e-10:eD/3.7,1.11)+6.9/Re;
+  const inv=-1.8*Math.log10(x);
+  return 1/(inv*inv);
+}
+
+// ── Case A: Tubo circular ──
+function calcCorrPipe(){
+  const Re =parseFloat(g('cp-Re').value);
+  const Pr =parseFloat(g('cp-Pr').value);
+  const D  =cvt.len(parseFloat(g('cp-D').value),  g('cp-Du').value);
+  const L  =cvt.len(parseFloat(g('cp-L').value),  g('cp-Lu').value);
+  const eD =parseFloat(g('cp-eD').value)||0;
+  const mu =parseFloat(g('cp-mu').value);   // Pa·s (label fijo)
+  const rho=parseFloat(g('cp-rho').value);  // kg/m³ (label fijo)
+  const kf =parseFloat(g('cp-k').value);
+  const n  =parseFloat(g('cp-mode').value);
+  const out=g('cres-pipe');
+
+  if(!isFinite(Re)||Re<=0){out.innerHTML=errBox('Ingresa Re válido.');return;}
+  if(!isFinite(Pr)||Pr<=0){out.innerHTML=errBox('Ingresa Pr válido.');return;}
+
+  const isLam=Re<2300, isTrans=Re>=2300&&Re<4000, isTurb=Re>=4000;
+  const rcls=isLam?'lam':isTrans?'trans':'turb';
+  const rTxt=isLam?'Laminar (Re&lt;2300)':isTrans?'Transición (2300–4000)':'Turbulento (Re&gt;4000)';
+
+  // Friction factor
+  let fD=NaN, fD_method='';
+  if(isLam){fD=64/Re;fD_method='Hagen-Poiseuille';}
+  else if(isTurb){
+    if(eD<=0){fD=blasiusFD(Re);fD_method='Blasius (liso)';}
+    else{fD=haalandFD(Re,eD);fD_method='Haaland (rugoso)';}
+  }
+
+  // Nusselt numbers
+  const Nu_HP=isLam?3.66:NaN;
+  const Nu_DB=isTurb&&Re>=1e4?0.023*Math.pow(Re,0.8)*Math.pow(Pr,n):NaN;
+  let Nu_Gn=NaN;
+  if(isTurb&&isFinite(fD)&&Re>=3000){
+    const f8=fD/8;
+    const d=1+12.7*Math.sqrt(f8)*(Math.pow(Pr,2/3)-1);
+    if(d>0) Nu_Gn=(f8*(Re-1000)*Pr)/d;
+  }
+
+  // ΔP/L (needs V_avg from Re = ρVD/μ)
+  let dPL=NaN;
+  if(isFinite(fD)&&D>0&&isFinite(rho)&&rho>0&&isFinite(mu)&&mu>0){
+    const V=Re*mu/(rho*D);
+    dPL=fD*(1/D)*0.5*rho*V*V;
+  }
+
+  // h from Gnielinski preferred, else Dittus-Boelter, else HP
+  const Nu_use=isFinite(Nu_Gn)?Nu_Gn:(isFinite(Nu_DB)?Nu_DB:Nu_HP);
+  const h=isFinite(Nu_use)&&Nu_use>0&&D>0&&isFinite(kf)&&kf>0?Nu_use*kf/D:NaN;
+
+  let html=`<div class="res-grid">`;
+  html+=resCardRaw('Régimen',`<span class="regime ${rcls}">${rTxt}</span>`,'',true);
+  html+=resCardRaw('f<sub>D</sub>',isFinite(fD)?fmt(fD):'—',fD_method);
+  html+=resCardRaw('Nu<sub>HP</sub>',isFinite(Nu_HP)?Nu_HP.toFixed(2):'—','Lam. · T<sub>pared</sub>=const');
+  html+=resCardRaw('Nu<sub>DB</sub>',isFinite(Nu_DB)?fmt(Nu_DB):'—',`0.023·Re⁰·⁸·Pr^${n} (Re≥10⁴)`);
+  html+=resCardRaw('Nu<sub>Gn</sub>',isFinite(Nu_Gn)?fmt(Nu_Gn):'—','Gnielinski (Re≥3000)');
+  if(isFinite(dPL)) html+=resCardRaw('ΔP/L',`${fmt(dPL)} Pa/m`,'Darcy-Weisbach');
+  if(isFinite(h))   html+=resCardRaw('h convectivo',`${fmt(h)} W/(m²·K)`,'h = Nu<sub>Gn</sub>·k/D');
+  html+='</div>';
+
+  if(isTrans) html+=`<div class="warn-box warn">⚠ Zona de transición (2300–4000): correlaciones no confiables en este rango.</div>`;
+  if(isTurb&&Re>1e5&&eD<=0) html+=`<div class="warn-box warn">⚠ Re&gt;10⁵ con tubo liso: Blasius válido hasta Re≈10⁵. Considera Haaland.</div>`;
+  if(isLam&&isFinite(L)&&L>0&&D>0){
+    const xp=L/(D*Re*Pr);
+    if(xp<0.05) html+=`<div class="warn-box warn">⚠ Entrada térmica no despreciable (x⁺=${xp.toFixed(3)}&lt;0.05). Perfil no plenamente desarrollado.</div>`;
+  }
+
+  html+=`<div class="math-block">
+    <div class="meq"><span class="mv">f</span><sub>D,lam</sub><span class="mo">=</span><span class="mfrac"><span class="num">64</span><span class="den">Re</span></span></div>
+    <div class="meq"><span class="mv">f</span><sub>D,Blasius</sub><span class="mo">=</span>0.3164·Re<sup>−0.25</sup></div>
+    <div class="meq">Nu<sub>DB</sub><span class="mo">=</span>0.023·Re<sup>0.8</sup>·Pr<sup><span class="mv">n</span></sup></div>
+    <div class="meq">Nu<sub>Gn</sub><span class="mo">=</span><span class="mfrac"><span class="num">(f/8)(Re−1000)Pr</span><span class="den">1+12.7√(f/8)(Pr<sup>2/3</sup>−1)</span></span></div>
+  </div>`;
+  out.innerHTML=html;
+}
+
+// ── Case B: Placa plana forzada ──
+function calcCorrFlatForced(){
+  const Re=parseFloat(g('cb-Re').value);
+  const Pr=parseFloat(g('cb-Pr').value);
+  const L =cvt.len(parseFloat(g('cb-L').value), g('cb-Lu').value);
+  const kf=parseFloat(g('cb-k').value);
+  const out=g('cres-flatForced');
+
+  if(!isFinite(Re)||Re<=0){out.innerHTML=errBox('Ingresa Re<sub>L</sub> válido.');return;}
+  if(!isFinite(Pr)||Pr<=0){out.innerHTML=errBox('Ingresa Pr válido.');return;}
+
+  const isLam=Re<5e5;
+  const Nu_L=isLam
+    ?0.664*Math.pow(Re,0.5)*Math.pow(Pr,1/3)
+    :(0.037*Math.pow(Re,4/5)-871)*Math.pow(Pr,1/3);
+  const h=isFinite(Nu_L)&&Nu_L>0&&L>0&&isFinite(kf)&&kf>0?Nu_L*kf/L:NaN;
+
+  const rcls=isLam?'lam':'turb';
+  const rTxt=isLam?'Laminar (Re<sub>L</sub>&lt;5×10⁵)':'Turbulento mezclado (Re<sub>L</sub>&gt;5×10⁵)';
+
+  let html=`<div class="res-grid">`;
+  html+=resCardRaw('Régimen',`<span class="regime ${rcls}">${rTxt}</span>`,'',true);
+  html+=resCardRaw('Nu<sub>L</sub>',isFinite(Nu_L)&&Nu_L>0?fmt(Nu_L):'—',isLam?'0.664·Re^½·Pr^⅓':'(0.037·Re^⁴⸍⁵−871)·Pr^⅓');
+  if(isFinite(h)) html+=resCardRaw('h̄ promedio',`${fmt(h)} W/(m²·K)`,'h = Nu·k/L');
+  html+='</div>';
+
+  html+=`<div class="warn-box info">💡 Válido para 0.6≤Pr≤60. Transición a turbulencia en Re<sub>cr</sub>=5×10⁵.</div>`;
+  html+=`<div class="math-block">
+    <div class="meq">Nu<sub>L,lam</sub><span class="mo">=</span>0.664·Re<sub>L</sub><sup>½</sup>·Pr<sup>⅓</sup></div>
+    <div class="meq">Nu<sub>L,turb</sub><span class="mo">=</span>(0.037·Re<sub>L</sub><sup>4/5</sup>−871)·Pr<sup>⅓</sup></div>
+    <div class="mnote">Churchill–Ozoe · Re&lt;10⁷</div>
+  </div>`;
+  out.innerHTML=html;
+}
+
+// ── Case C: Placa vertical, convección natural ──
+function calcCorrVertNat(){
+  const out=g('cres-vertNat');
+  let Ra=parseFloat(g('cc-Ra').value);
+  const Pr  =parseFloat(g('cc-Pr').value);
+  const L   =cvt.len(parseFloat(g('cc-L').value), g('cc-Lu').value);
+  const kf  =parseFloat(g('cc-k').value);
+  const beta=parseFloat(g('cc-beta').value);
+  const nu  =parseFloat(g('cc-nu').value);
+  const dT  =parseFloat(g('cc-dT').value);
+
+  // Compute Ra from components if not provided
+  if(!(Ra>0)){
+    if(isFinite(beta)&&beta>0&&isFinite(nu)&&nu>0&&isFinite(dT)&&isFinite(L)&&L>0&&isFinite(Pr)&&Pr>0){
+      const Gr=9.80665*beta*Math.abs(dT)*Math.pow(L,3)/(nu*nu);
+      Ra=Gr*Pr;
+    } else {
+      out.innerHTML=errBox('Ingresa Ra<sub>L</sub>, o β, ν, ΔT y Pr para calcularlo.');return;
+    }
+  }
+  if(!isFinite(Pr)||Pr<=0){out.innerHTML=errBox('Ingresa Pr válido.');return;}
+
+  // Churchill-Chu (1975) — all Ra
+  const term=Math.pow(0.492/Pr,9/16);
+  const denom=Math.pow(1+term,8/27);
+  const Nu_L=Math.pow(0.825+0.387*Math.pow(Ra,1/6)/denom,2);
+  const h=isFinite(Nu_L)&&Nu_L>0&&L>0&&isFinite(kf)&&kf>0?Nu_L*kf/L:NaN;
+
+  let html=`<div class="res-grid">`;
+  html+=resCardRaw('Ra<sub>L</sub>',fmt(Ra),'Gr·Pr');
+  html+=resCardRaw('Nu<sub>L</sub>',fmt(Nu_L),'Churchill-Chu (1975)');
+  if(isFinite(h)) html+=resCardRaw('h̄ promedio',`${fmt(h)} W/(m²·K)`,'h = Nu·k/L');
+  html+='</div>';
+
+  if(Ra<1e4)       html+=`<div class="warn-box info">Ra muy pequeño: conducción domina. Convección natural despreciable.</div>`;
+  else if(Ra<1e9)  html+=`<div class="warn-box ok">✓ Régimen laminar de convección natural.</div>`;
+  else             html+=`<div class="warn-box warn">⚠ Ra&gt;10⁹: turbulencia posible. Churchill-Chu sigue aplicable.</div>`;
+
+  html+=`<div class="math-block">
+    <div class="meq">Nu<sub>L</sub><span class="mo">=</span>
+      <span class="mv">[</span>0.825<span class="mo">+</span>
+      <span class="mfrac"><span class="num">0.387·Ra<sup>1/6</sup></span><span class="den">[1+(0.492/Pr)<sup>9/16</sup>]<sup>8/27</sup></span></span>
+      <span class="mv">]</span><sup>2</sup></div>
+    <div class="mnote">Churchill &amp; Chu (1975) · placa vertical · todo Ra</div>
+  </div>`;
+  out.innerHTML=html;
+}
+
+// ── Case D: Masa sobre placa plana ──
+function calcCorrFlatMass(){
+  const out=g('cres-flatMass');
+  const Re =parseFloat(g('cd-Re').value);
+  const Sc =parseFloat(g('cd-Sc').value);
+  const L  =cvt.len(parseFloat(g('cd-L').value),   g('cd-Lu').value);
+  const DAB=cvt.DAB(parseFloat(g('cd-DAB').value),  g('cd-DABu').value);
+
+  if(!isFinite(Re)||Re<=0){out.innerHTML=errBox('Ingresa Re<sub>L</sub> válido.');return;}
+  if(!isFinite(Sc)||Sc<=0){out.innerHTML=errBox('Ingresa Sc válido.');return;}
+
+  const isLam=Re<5e5;
+  const Sh_L=isLam
+    ?0.664*Math.pow(Re,0.5)*Math.pow(Sc,1/3)
+    :(0.037*Math.pow(Re,4/5)-871)*Math.pow(Sc,1/3);
+  const kc=isFinite(Sh_L)&&Sh_L>0&&L>0&&isFinite(DAB)&&DAB>0?Sh_L*DAB/L:NaN;
+
+  const rcls=isLam?'lam':'turb';
+  const rTxt=isLam?'Laminar (Re&lt;5×10⁵)':'Turbulento mezclado';
+
+  let html=`<div class="res-grid">`;
+  html+=resCardRaw('Régimen',`<span class="regime ${rcls}">${rTxt}</span>`,'',true);
+  html+=resCardRaw('Sh<sub>L</sub>',isFinite(Sh_L)&&Sh_L>0?fmt(Sh_L):'—',isLam?'0.664·Re^½·Sc^⅓':'(0.037·Re^⁴⸍⁵−871)·Sc^⅓');
+  if(isFinite(kc)) html+=resCardRaw('k̄<sub>c</sub>',`${fmt(kc)} m/s`,'k<sub>c</sub> = Sh·D<sub>AB</sub>/L');
+  html+='</div>';
+  html+=`<div class="warn-box info">💡 Analogía calor-masa: Pr→Sc, Nu→Sh, h/k<sub>f</sub>→k<sub>c</sub>/D<sub>AB</sub></div>`;
+  html+=`<div class="math-block">
+    <div class="meq">Sh<sub>L,lam</sub><span class="mo">=</span>0.664·Re<sub>L</sub><sup>½</sup>·Sc<sup>⅓</sup></div>
+    <div class="meq">Sh<sub>L,turb</sub><span class="mo">=</span>(0.037·Re<sub>L</sub><sup>4/5</sup>−871)·Sc<sup>⅓</sup></div>
+  </div>`;
+  out.innerHTML=html;
+}
+
+// ── Case E: Masa en tubo circular ──
+function calcCorrPipeMass(){
+  const out=g('cres-pipeMass');
+  const Re =parseFloat(g('ce-Re').value);
+  const Sc =parseFloat(g('ce-Sc').value);
+  const D  =cvt.len(parseFloat(g('ce-D').value),   g('ce-Du').value);
+  const DAB=cvt.DAB(parseFloat(g('ce-DAB').value),  g('ce-DABu').value);
+
+  if(!isFinite(Re)||Re<=0){out.innerHTML=errBox('Ingresa Re válido.');return;}
+  if(!isFinite(Sc)||Sc<=0){out.innerHTML=errBox('Ingresa Sc válido.');return;}
+
+  const isLam=Re<2300, isTrans=Re>=2300&&Re<4000, isTurb=Re>=4000;
+  const rcls=isLam?'lam':isTrans?'trans':'turb';
+  const rTxt=isLam?'Laminar (Re&lt;2300)':isTrans?'Transición (2300–4000)':'Turbulento (Re&gt;4000)';
+
+  let Sh=NaN;
+  if(isLam)  Sh=3.66;  // plenamente desarrollado, concentración uniforme pared
+  if(isTurb) Sh=0.023*Math.pow(Re,0.8)*Math.pow(Sc,0.4);
+  const kc=isFinite(Sh)&&Sh>0&&D>0&&isFinite(DAB)&&DAB>0?Sh*DAB/D:NaN;
+
+  let html=`<div class="res-grid">`;
+  html+=resCardRaw('Régimen',`<span class="regime ${rcls}">${rTxt}</span>`,'',true);
+  html+=resCardRaw('Sh',isFinite(Sh)?fmt(Sh):'—',isLam?'3.66 (plenamente desarrollado)':'Analogía Dittus-Boelter');
+  if(isFinite(kc)) html+=resCardRaw('k̄<sub>c</sub>',`${fmt(kc)} m/s`,'k<sub>c</sub> = Sh·D<sub>AB</sub>/D');
+  html+='</div>';
+  if(isTrans) html+=`<div class="warn-box warn">⚠ Zona de transición: correlaciones no confiables.</div>`;
+  html+=`<div class="warn-box info">💡 Analogía: Sh=f(Re,Sc) ↔ Nu=f(Re,Pr). Reemplaza Pr→Sc, h→k<sub>c</sub></div>`;
+  html+=`<div class="math-block">
+    <div class="meq">Sh<sub>lam</sub><span class="mo">=</span>3.66</div>
+    <div class="meq">Sh<sub>turb</sub><span class="mo">=</span>0.023·Re<sup>0.8</sup>·Sc<sup>0.4</sup></div>
+  </div>`;
+  out.innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+updateExpRe();
+updateExpDiff();
+updateExpBiFo();
+updateExpNat();
+</script>
+</body>
+</html>

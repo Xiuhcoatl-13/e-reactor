@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+*.tmp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Notas internas y herramientas de Claude: se quedan en esta computadora
+CLAUDE.md
+.claude/
+
+# Módulos con datos del Yaws' Chemical Properties Handbook: no se publican hasta revisar
+# sus términos de uso. Sus fichas llevan "publicado": false; para activarlos, quita estas
+# líneas y esa marca, y corre ACTUALIZAR_CATALOGO.bat
+modulos/antoine.html
+modulos/critical.html
+modulos/enthalpy.html
+modulos/reaction_enthalpy.html
+modulos/data.js
+modulos/critical_data.js
+modulos/enthalpy_data.js
+modulos/rxn_*.js

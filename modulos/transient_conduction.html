@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Conducción transitoria / Biot-Fourier — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{--bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);--muted:var(--paper-muted);--line:var(--paper-line);--accent:var(--paper-accent)}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,'Segoe UI',sans-serif;font-size:16px}
+.module-shell{max-width:760px}.module-tabs{margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+label{display:block;color:var(--muted);font-size:12px;font-weight:800;margin:10px 0 6px}
+input,select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#fffdf8;color:var(--txt);font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.seg{display:flex;gap:3px;padding:3px;background:var(--card2);border:1px solid var(--line);border-radius:14px;margin-bottom:12px}
+.seg button{flex:1;min-height:38px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-size:12px;font-weight:800}
+.seg button.on{background:var(--card);color:var(--txt);box-shadow:0 1px 4px rgba(31,41,51,.08)}
+.btn-calc{width:100%;padding:13px;background:#10263f;color:#f8fafc;border:0;border-radius:12px;font-size:16px;font-weight:800;margin-top:12px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.res-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.res-card.full{grid-column:1/-1;text-align:left}.res-card .val{font-size:20px;font-weight:850;color:#10263f;margin-bottom:3px}
+.res-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.res-card .interp{font-size:13px;color:var(--muted);line-height:1.55;margin-top:6px}
+.warn-box{border-radius:10px;padding:11px 13px;margin:10px 0;font-size:13px;line-height:1.6}
+.warn-box.info{background:var(--paper-soft-blue);border:1px solid #cbdaf7;color:#1d4ed8}.warn-box.ok{background:var(--paper-soft-green);border:1px solid #b7dbc9;color:#0f5132}
+.warn-box.warn{background:var(--paper-soft-amber);border:1px solid #f3d391;color:#92400e}.warn-box.err{background:#fff0ed;border:1px solid #f0b9b0;color:#9f2a1d}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.tag{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:#475467;font-size:10px;font-weight:800}.tag.hot{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#1d4ed8}
+.learn h3,.corr h3{font-size:13px;color:#10263f;margin:14px 0 6px}.learn p,.learn li,.corr p,.corr li{font-size:13px;color:var(--muted);line-height:1.58}.learn ul,.corr ul{padding-left:18px;margin:8px 0}
+.slider-row{margin:12px 0}.slider-lbl{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}.slider-lbl span:last-child{color:#10263f;font-weight:800}input[type=range]{accent-color:#10263f}
+canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;background:#fffdf8;margin-top:10px}
+.technical-table{width:100%;border-collapse:collapse;margin-top:8px}.technical-table th,.technical-table td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;font-size:12px;vertical-align:top}.technical-table th{color:#10263f}.technical-table td{color:var(--muted)}
+.equation-box{background:var(--paper-soft-blue);border:1px solid #cbdaf7;border-radius:12px;color:#10263f;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.7;padding:10px;margin-top:8px;overflow:auto}
+@media (max-width:560px){.module-shell{padding-left:14px;padding-right:14px}.row,.res-grid{display:grid;grid-template-columns:1fr}.module-tabs button{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar"><a class="back-link" href="../index.html">‹ Inicio</a><span class="module-kicker">Transferencia de calor</span></div>
+    <h1 class="module-heading">Conducción transitoria / Biot-Fourier</h1>
+    <p class="module-subtitle">Criterio Bi, número Fo y temperatura transitoria con capacitancia concentrada.</p>
+  </div>
+  <div class="module-tabs" id="tabs">
+    <button class="on" onclick="showTab('calc',0)">Calculadora</button><button onclick="showTab('learn',1)">Aprendizaje</button><button onclick="showTab('explore',2)">Exploración</button><button onclick="showTab('corr',3)">Criterios</button>
+  </div>
+
+  <div id="tab-calc">
+    <div class="card">
+      <div class="seg" id="geomSeg"><button class="on" onclick="setGeom('slab',0)">Placa</button><button onclick="setGeom('cyl',1)">Cilindro</button><button onclick="setGeom('sphere',2)">Esfera</button></div>
+      <div class="warn-box info" id="geomHelp">Placa plana: usa Lc = V/A_s. Para una pared plana de espesor 2L con ambas caras expuestas, Lc ≈ L.</div>
+      <div class="tag-row" id="geomTags"></div>
+    </div>
+    <div class="card">
+      <div class="row"><div><label>Longitud característica Lc (m)</label><input id="Lc" type="number" value="0.01" min="0" inputmode="decimal"></div><div><label>Tiempo t (s)</label><input id="time" type="number" value="120" min="0" inputmode="decimal"></div></div>
+      <div class="row"><div><label>ρ sólido (kg/m³)</label><input id="rho" type="number" value="7800" min="0"></div><div><label>Cp sólido (J/kg·K)</label><input id="Cp" type="number" value="500" min="0"></div></div>
+      <div class="row"><div><label>k sólido (W/m·K)</label><input id="k" type="number" value="45" min="0"></div><div><label>h convectivo (W/m²·K)</label><input id="h" type="number" value="80" min="0"></div></div>
+      <div class="row"><div><label>Temperatura inicial Ti (°C)</label><input id="Ti" type="number" value="200"></div><div><label>Temperatura fluido T∞ (°C)</label><input id="Tinf" type="number" value="25"></div></div>
+      <button class="btn-calc" onclick="calculate()">Calcular Bi-Fo</button>
+    </div>
+    <div id="calcOut"></div>
+  </div>
+
+  <div id="tab-learn" style="display:none">
+    <div class="card learn">
+      <h3>Qué es conducción transitoria</h3>
+      <p>Hay conducción transitoria cuando la temperatura del sólido cambia con el tiempo. A diferencia del estado estacionario, la energía interna del sólido también importa.</p>
+      <h3>Biot y Fourier</h3>
+      <ul>
+        <li><strong>Bi = hLc/k:</strong> compara resistencia conductiva interna contra resistencia convectiva superficial.</li>
+        <li><strong>Fo = αt/Lc²:</strong> tiempo adimensional; mide cuánto ha avanzado la difusión térmica dentro del sólido.</li>
+      </ul>
+      <h3>Capacitancia concentrada</h3>
+      <p>Si Bi &lt; 0.1, los gradientes internos son pequeños y el sólido puede aproximarse con una temperatura uniforme que cambia exponencialmente.</p>
+      <div class="equation-box">θ/θi = (T - T∞)/(Ti - T∞) = exp(-Bi·Fo)</div>
+      <h3>Errores comunes</h3>
+      <ul>
+        <li>Usar Bi &lt; 0.1 como garantía absoluta sin revisar geometría o propiedades.</li>
+        <li>Usar k del fluido; Bi usa k del sólido.</li>
+        <li>Confundir Lc con espesor total. Para muchas formas Lc = V/A_s.</li>
+        <li>Aplicar el modelo concentrado con Bi grande, donde hay gradientes internos importantes.</li>
+      </ul>
+      <div class="warn-box info">Conexión: usa h desde Convección de calor y revisa Bi/Fo también en Números adimensionales v2.0.</div>
+    </div>
+  </div>
+
+  <div id="tab-explore" style="display:none">
+    <div class="card">
+      <h2 style="margin:0 0 8px;font-size:16px">Exploración rápida</h2>
+      <div class="slider-row"><div class="slider-lbl"><span>Tiempo (s)</span><span id="exTv">120</span></div><input id="exT" type="range" min="0" max="1200" step="10" value="120" oninput="updateExplore()"></div>
+      <div class="slider-row"><div class="slider-lbl"><span>h (W/m²·K)</span><span id="exHv">80</span></div><input id="exH" type="range" min="5" max="500" step="5" value="80" oninput="updateExplore()"></div>
+      <canvas id="chart" width="700" height="260"></canvas>
+      <div id="exText" class="warn-box info"></div>
+    </div>
+  </div>
+
+  <div id="tab-corr" style="display:none">
+    <div class="card corr">
+      <h3>Criterio de Biot</h3>
+      <table class="technical-table">
+        <tr><th>Bi &lt; 0.1</th><td>Modelo de capacitancia concentrada usualmente aceptable.</td></tr>
+        <tr><th>0.1 ≤ Bi ≤ 1</th><td>Gradientes internos pueden importar; usar solución transitoria 1D o cartas de Heisler.</td></tr>
+        <tr><th>Bi &gt; 1</th><td>Resistencia interna dominante; el modelo uniforme no es apropiado.</td></tr>
+      </table>
+      <h3>Fourier</h3>
+      <p>Fo = αt/Lc². Fo pequeño indica tiempos cortos o difusión lenta; Fo grande indica que el sólido avanzó hacia el equilibrio térmico.</p>
+      <h3>Longitud característica</h3>
+      <table class="technical-table">
+        <tr><th>General</th><td>Lc = V/A_s expuesta a convección.</td></tr>
+        <tr><th>Placa plana</th><td>Para espesor 2L con ambas caras expuestas, Lc≈L.</td></tr>
+        <tr><th>Cilindro largo</th><td>Lc≈R/2 si se desprecia transferencia por tapas.</td></tr>
+        <tr><th>Esfera</th><td>Lc=R/3.</td></tr>
+      </table>
+      <h3>Cuándo pasar a un modelo avanzado</h3>
+      <ul><li>Bi ≥ 0.1.</li><li>Temperatura superficial no uniforme.</li><li>Propiedades cambian fuertemente con T.</li><li>Conducción multidimensional o generación interna de calor.</li></ul>
+      <div class="warn-box warn">Este v1 no implementa cartas de Heisler ni soluciones por series. Señala cuándo son necesarias.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+let geom='slab';
+const g=id=>document.getElementById(id);
+const fmt=(v,d=3)=>!isFinite(v)?'—':(Math.abs(v)>=1000||Math.abs(v)<0.001&&v!==0?v.toExponential(3):v.toFixed(d));
+function showTab(name,idx){['calc','learn','explore','corr'].forEach(n=>g('tab-'+n).style.display=n===name?'':'none');g('tabs').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===idx));if(name==='explore')updateExplore()}
+function setGeom(name,idx){geom=name;g('geomSeg').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===idx));const text={slab:'Placa plana: usa Lc = V/A_s. Para una pared plana de espesor 2L con ambas caras expuestas, Lc ≈ L.',cyl:'Cilindro largo: si la convección ocurre por el área lateral, Lc ≈ R/2.',sphere:'Esfera: Lc = V/A_s = R/3.'}[name];g('geomHelp').textContent=text;const tags={slab:['placa','1D','Lc≈L'],cyl:['cilindro','radial','Lc≈R/2'],sphere:['esfera','radial','Lc=R/3']}[name];g('geomTags').innerHTML=tags.map((t,i)=>`<span class="tag ${i===0?'hot':''}">${t}</span>`).join('')}
+function warn(msg,cls='warn'){return `<div class="warn-box ${cls}">${msg}</div>`}
+function card(lbl,val,sub='',full=false){return `<div class="res-card ${full?'full':''}"><div class="val">${val}</div><div class="lbl">${lbl}</div>${sub?`<div class="interp">${sub}</div>`:''}</div>`}
+function read(){return {Lc:+g('Lc').value,t:+g('time').value,rho:+g('rho').value,Cp:+g('Cp').value,k:+g('k').value,h:+g('h').value,Ti:+g('Ti').value,Tinf:+g('Tinf').value}}
+function solve(x){if(!(x.Lc>0&&x.t>=0&&x.rho>0&&x.Cp>0&&x.k>0&&x.h>0))return {error:'Ingresa Lc, t, ρ, Cp, k y h válidos.'};const alpha=x.k/(x.rho*x.Cp);const Bi=x.h*x.Lc/x.k;const Fo=alpha*x.t/(x.Lc*x.Lc);const ratio=Math.exp(-Bi*Fo);const T=x.Tinf+(x.Ti-x.Tinf)*ratio;const frac=1-ratio;return {alpha,Bi,Fo,ratio,T,frac,valid:Bi<0.1}}
+function calculate(){const x=read();const r=solve(x);if(r.error){g('calcOut').innerHTML=warn(r.error,'err');return}let html='<div class="card"><div class="res-grid">';html+=card('Geometría',geom==='slab'?'Placa':geom==='cyl'?'Cilindro':'Esfera','Lc según convención seleccionada',true);html+=card('Bi',fmt(r.Bi,4),r.valid?'Bi < 0.1: lumped aceptable':'Bi ≥ 0.1: revisar gradientes internos');html+=card('Fo',fmt(r.Fo,4),'αt/Lc²');html+=card('α',`${fmt(r.alpha)} m²/s`,'k/(ρCp)');html+=card('θ/θi',fmt(r.ratio,4),'exp(-Bi·Fo)');html+=card('Fracción de cambio',`${fmt(100*r.frac,2)} %`,'1 - θ/θi');html+=card('T(t)',`${fmt(r.T,2)} °C`,'temperatura uniforme estimada',true);html+='</div>';html+=r.valid?warn('Modelo de capacitancia concentrada dentro del criterio Bi < 0.1. Aun así verifica propiedades constantes y convección uniforme.','ok'):warn('Bi excede 0.1: el resultado lumped se muestra como referencia conceptual, no como diseño confiable. Usa Heisler/series/FEM según el caso.','warn');html+='</div>';g('calcOut').innerHTML=html}
+function drawCurve(ctx,w,h,Bi){ctx.clearRect(0,0,w,h);ctx.fillStyle='#fffdf8';ctx.fillRect(0,0,w,h);const pad={l:48,r:16,t:16,b:36};const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;ctx.strokeStyle='#ded6c8';ctx.lineWidth=1;for(let i=0;i<=4;i++){let x=pad.l+pw*i/4,y=pad.t+ph*i/4;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ph);ctx.stroke();ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+pw,y);ctx.stroke()}ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=100;i++){const Fo=2*i/100;const ratio=Math.exp(-Bi*Fo);const x=pad.l+Fo/2*pw;const y=pad.t+(1-ratio)*ph;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.fillStyle='#10263f';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Fo',pad.l+pw/2,h-10);ctx.save();ctx.translate(14,pad.t+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('θ/θi',0,0);ctx.restore()}
+function updateExplore(){const t=+g('exT').value,hv=+g('exH').value;g('exTv').textContent=t;g('exHv').textContent=hv;const x={Lc:0.01,t,rho:7800,Cp:500,k:45,h:hv,Ti:200,Tinf:25};const r=solve(x);g('exText').innerHTML=`Bi=${fmt(r.Bi,4)}, Fo=${fmt(r.Fo,4)}, T=${fmt(r.T,2)} °C. ${r.valid?'Bi pequeño: respuesta casi uniforme.':'Bi alto: aparecerían gradientes internos.'}`;drawCurve(g('chart').getContext('2d'),700,260,Math.max(r.Bi,0.02))}
+setGeom('slab',0);calculate();
+</script>
+</body>
+</html>

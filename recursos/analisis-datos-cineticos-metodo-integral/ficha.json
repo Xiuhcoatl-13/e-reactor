@@ -1,0 +1,19 @@
+{
+  "titulo": "Análisis de datos cinéticos: método integral",
+  "descripcion": "Hoja de Excel que prueba los modelos de orden 0, 1 y 2 sobre datos de concentración contra tiempo, elige el de mejor ajuste y estima la constante de velocidad. Cambia los datos y todo se recalcula.",
+  "materia": "reactores",
+  "tema": "Cinética química",
+  "tambien_en": [{"materia": "numericos", "tema": "Excel para ingeniería"}],
+  "archivo": "metodo_integral.xlsx",
+  "tipo": "excel",
+  "sigla": "XLS",
+  "nivel": "basico",
+  "etiquetas": ["método integral", "orden de reacción", "constante de velocidad", "regresión lineal", "Excel"],
+  "objetivos": [
+    "Linealizar las leyes de velocidad de orden 0, 1 y 2.",
+    "Usar PENDIENTE, INTERSECCION.EJE y COEFICIENTE.R2 para ajustar los datos.",
+    "Decidir el orden de reacción con criterio, no solo con el R²."
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

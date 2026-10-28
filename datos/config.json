@@ -1,0 +1,20 @@
+{
+  "_ayuda": "Configuración general del sitio. Edita los valores entre comillas y luego ejecuta ACTUALIZAR_CATALOGO.bat. Deja una cadena vacía \"\" para ocultar algo.",
+  "nombre": "e-Reactor",
+  "lema": "Ingeniería química clara, interactiva y gratuita para Latinoamérica",
+  "descripcion": "Simulaciones, calculadoras, código en Python y MATLAB, hojas de Excel y animaciones para estudiar Ingeniería Química, Ambiental, de Materiales, Energía y Alimentos.",
+  "autor": "Xiuhcóatl",
+  "url_base": "",
+  "github_repo": "",
+  "github_rama": "main",
+  "contacto_email": "",
+  "app_android_url": "",
+  "licencia": "CC BY-NC-SA 4.0",
+  "licencia_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es",
+  "redes": {
+    "youtube": "",
+    "facebook": "",
+    "instagram": "",
+    "tiktok": ""
+  }
+}

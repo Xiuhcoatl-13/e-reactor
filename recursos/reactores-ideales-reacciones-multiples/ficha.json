@@ -1,0 +1,24 @@
+{
+  "titulo": "Reactores ideales con reacciones múltiples",
+  "descripcion": "Compara reactor por lotes, CSTR y PFR con cinética simplificada y observa cómo cambian la selectividad y el rendimiento.",
+  "materia": "reactores",
+  "tema": "Reactores ideales",
+  "tambien_en": [
+    {
+      "materia": "reactores",
+      "tema": "Reacciones múltiples, selectividad y rendimiento"
+    }
+  ],
+  "archivo": "/modulos/ideal_reactors_multi.html",
+  "tipo": "simulacion",
+  "sigla": "τ",
+  "nivel": "avanzado",
+  "etiquetas": [
+    "CSTR",
+    "PFR",
+    "reactor batch",
+    "selectividad"
+  ],
+  "destacado": true,
+  "fecha": "2026-10-21"
+}

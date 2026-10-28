@@ -1,0 +1,26 @@
+{
+  "titulo": "Propiedades críticas y factor acéntrico",
+  "descripcion": "Consulta Tc, Pc, Vc, Zc, factor acéntrico, densidad y peso molecular de miles de compuestos, con búsqueda en español e inglés.",
+  "materia": "termodinamica",
+  "tema": "Propiedades de sustancias puras",
+  "tambien_en": [
+    {
+      "materia": "termodinamica",
+      "tema": "Ecuaciones de estado"
+    }
+  ],
+  "archivo": "/modulos/critical.html",
+  "tipo": "calculadora",
+  "sigla": "Tc",
+  "nivel": "basico",
+  "etiquetas": [
+    "propiedades críticas",
+    "factor acéntrico",
+    "Tc",
+    "Pc",
+    "ecuaciones de estado"
+  ],
+  "destacado": false,
+  "publicado": false,
+  "fecha": "2026-10-21"
+}

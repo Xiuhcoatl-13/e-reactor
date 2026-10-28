@@ -1,0 +1,20 @@
+{
+  "titulo": "Números adimensionales y mapa de correlaciones",
+  "descripcion": "Calcula 12 números adimensionales (Re, Pr, Nu, Sc, Sh, Bi…), aprende su significado físico y encuentra la correlación adecuada para tu caso.",
+  "materia": "transporte",
+  "tema": "Análisis dimensional y correlaciones",
+  "archivo": "/modulos/dimensionless_numbers.html",
+  "tipo": "calculadora",
+  "sigla": "Π",
+  "nivel": "basico",
+  "etiquetas": [
+    "Reynolds",
+    "Prandtl",
+    "Nusselt",
+    "Schmidt",
+    "Sherwood",
+    "correlaciones"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

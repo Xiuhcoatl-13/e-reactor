@@ -1,0 +1,24 @@
+{
+  "titulo": "Convección de calor: de Nu a h",
+  "descripcion": "Obtén el coeficiente convectivo h, el flux de calor y el área requerida a partir de correlaciones de Nusselt para casos comunes.",
+  "materia": "transporte",
+  "tema": "Transporte de calor",
+  "tambien_en": [
+    {
+      "materia": "operaciones",
+      "tema": "Intercambiadores de calor"
+    }
+  ],
+  "archivo": "/modulos/heat_convection.html",
+  "tipo": "calculadora",
+  "sigla": "h",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "convección",
+    "Nusselt",
+    "coeficiente de transferencia de calor",
+    "Dittus-Boelter"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

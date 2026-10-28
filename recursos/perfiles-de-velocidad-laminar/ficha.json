@@ -1,0 +1,19 @@
+{
+  "titulo": "Perfiles de velocidad en flujo laminar",
+  "descripcion": "Simula los perfiles de velocidad en un tubo circular, una película descendente y flujo de Couette plano, con su deducción por balance de envoltura.",
+  "materia": "transporte",
+  "tema": "Transporte de cantidad de movimiento",
+  "archivo": "/modulos/velocity_profile.html",
+  "tipo": "simulacion",
+  "sigla": "u(r)",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "flujo laminar",
+    "Hagen-Poiseuille",
+    "película descendente",
+    "Couette",
+    "balance de envoltura"
+  ],
+  "destacado": true,
+  "fecha": "2026-10-21"
+}

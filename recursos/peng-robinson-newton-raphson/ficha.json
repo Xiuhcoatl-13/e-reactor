@@ -1,0 +1,19 @@
+{
+  "titulo": "Volumen molar con Peng-Robinson usando Newton-Raphson",
+  "descripcion": "Notebook de Jupyter que resuelve la cúbica de Peng-Robinson para el CO₂ con Newton-Raphson y muestra cómo el valor inicial decide si se obtiene la raíz de vapor o la de líquido.",
+  "materia": "termodinamica",
+  "tema": "Ecuaciones de estado",
+  "tambien_en": [{"materia": "numericos", "tema": "Ecuaciones no lineales"}],
+  "archivo": "peng_robinson.ipynb",
+  "tipo": "notebook",
+  "sigla": "PR",
+  "nivel": "intermedio",
+  "etiquetas": ["Peng-Robinson", "Newton-Raphson", "factor de compresibilidad", "ecuación cúbica", "Jupyter"],
+  "objetivos": [
+    "Calcular los parámetros a, b y α(T) de Peng-Robinson.",
+    "Escribir la ecuación de estado como una cúbica en Z.",
+    "Entender por qué el valor inicial de Newton-Raphson define la raíz encontrada."
+  ],
+  "destacado": true,
+  "fecha": "2026-10-21"
+}

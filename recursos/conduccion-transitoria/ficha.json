@@ -1,0 +1,18 @@
+{
+  "titulo": "Conducción transitoria: números de Biot y Fourier",
+  "descripcion": "Aplica el criterio de Biot, el número de Fourier y el modelo de capacitancia concentrada para predecir la temperatura de sólidos simples en el tiempo.",
+  "materia": "transporte",
+  "tema": "Transporte de calor",
+  "archivo": "/modulos/transient_conduction.html",
+  "tipo": "simulacion",
+  "sigla": "Bi",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "Biot",
+    "Fourier",
+    "capacitancia concentrada",
+    "conducción transitoria"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

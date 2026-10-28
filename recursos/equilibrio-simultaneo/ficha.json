@@ -1,0 +1,17 @@
+{
+  "titulo": "Equilibrio químico con reacciones simultáneas",
+  "descripcion": "Resuelve el equilibrio de varias reacciones acopladas con grados de avance múltiples y matriz estequiométrica.",
+  "materia": "termodinamica",
+  "tema": "Equilibrio químico",
+  "archivo": "/modulos/equilibrium_multi.html",
+  "tipo": "simulacion",
+  "sigla": "ΣK",
+  "nivel": "avanzado",
+  "etiquetas": [
+    "equilibrio simultáneo",
+    "reacciones múltiples",
+    "matriz estequiométrica"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}

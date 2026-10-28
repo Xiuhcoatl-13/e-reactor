@@ -1,0 +1,123 @@
+{
+  "_ayuda": "Materias y temas del sitio. Puedes agregar, quitar o reordenar. 'id' va en minúsculas y sin espacios (se usa en las fichas). Colores disponibles: azul, verde, ambar, pizarra, violeta, rosa, oliva, cafe.",
+  "materias": [
+    {
+      "id": "balances",
+      "nombre": "Balances de materia y energía",
+      "sigla": "Σ",
+      "color": "azul",
+      "descripcion": "Estequiometría, grado de avance y balances con y sin reacción: la base de todo proceso químico.",
+      "temas": [
+        "Estequiometría y grado de avance",
+        "Balances de materia sin reacción",
+        "Balances de materia con reacción",
+        "Balances de energía y termoquímica"
+      ]
+    },
+    {
+      "id": "termodinamica",
+      "nombre": "Termodinámica",
+      "sigla": "ΔG",
+      "color": "ambar",
+      "descripcion": "Propiedades de sustancias puras, ecuaciones de estado, termoquímica y equilibrio de fases y químico.",
+      "temas": [
+        "Propiedades de sustancias puras",
+        "Ecuaciones de estado",
+        "Equilibrio de fases",
+        "Termoquímica",
+        "Equilibrio químico"
+      ]
+    },
+    {
+      "id": "transporte",
+      "nombre": "Fenómenos de transporte",
+      "sigla": "∇",
+      "color": "pizarra",
+      "descripcion": "Transporte de cantidad de movimiento, calor y masa; perfiles, balances de envoltura y correlaciones.",
+      "temas": [
+        "Transporte de cantidad de movimiento",
+        "Transporte de calor",
+        "Transporte de masa",
+        "Análisis dimensional y correlaciones"
+      ]
+    },
+    {
+      "id": "reactores",
+      "nombre": "Cinética y reactores químicos",
+      "sigla": "τ",
+      "color": "verde",
+      "descripcion": "Cinética, reactores ideales, reacciones múltiples, operación no isotérmica y catálisis heterogénea.",
+      "temas": [
+        "Cinética química",
+        "Reactores ideales",
+        "Reacciones múltiples, selectividad y rendimiento",
+        "Reactores no isotérmicos",
+        "Catálisis heterogénea"
+      ]
+    },
+    {
+      "id": "operaciones",
+      "nombre": "Operaciones unitarias",
+      "sigla": "OU",
+      "color": "cafe",
+      "descripcion": "Intercambiadores de calor, destilación, absorción, extracción y secado.",
+      "temas": [
+        "Intercambiadores de calor",
+        "Destilación",
+        "Absorción y desorción",
+        "Extracción",
+        "Secado y humidificación"
+      ]
+    },
+    {
+      "id": "numericos",
+      "nombre": "Métodos numéricos y programación",
+      "sigla": "f(x)",
+      "color": "violeta",
+      "descripcion": "Python, MATLAB y Excel aplicados a problemas reales de ingeniería química.",
+      "temas": [
+        "Python para ingeniería",
+        "MATLAB para ingeniería",
+        "Excel para ingeniería",
+        "Ecuaciones no lineales",
+        "Ecuaciones diferenciales",
+        "Regresión y ajuste de datos"
+      ]
+    },
+    {
+      "id": "simulacion",
+      "nombre": "Simulación de procesos",
+      "sigla": "PFD",
+      "color": "rosa",
+      "descripcion": "Aspen Plus, DWSIM, diagramas de flujo, recirculaciones y convergencia.",
+      "temas": [
+        "Aspen Plus",
+        "DWSIM",
+        "Diagramas de flujo y recirculaciones"
+      ]
+    },
+    {
+      "id": "control",
+      "nombre": "Control de procesos",
+      "sigla": "PID",
+      "color": "pizarra",
+      "descripcion": "Dinámica de procesos, funciones de transferencia y controladores PID.",
+      "temas": [
+        "Dinámica de procesos",
+        "Controladores PID"
+      ]
+    },
+    {
+      "id": "ambiental",
+      "nombre": "Ingeniería ambiental",
+      "sigla": "CO₂",
+      "color": "oliva",
+      "descripcion": "Control de emisiones, contaminación atmosférica y tratamiento de aguas.",
+      "temas": [
+        "Control de emisiones",
+        "Contaminación atmosférica",
+        "Tratamiento de aguas"
+      ]
+    }
+  ]
+}

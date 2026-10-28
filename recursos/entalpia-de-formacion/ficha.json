@@ -1,0 +1,24 @@
+{
+  "titulo": "Entalpía estándar de formación",
+  "descripcion": "Valores de ΔHf° por fase para 4 827 compuestos, con comparación entre sustancias comunes.",
+  "materia": "termodinamica",
+  "tema": "Termoquímica",
+  "tambien_en": [
+    {
+      "materia": "balances",
+      "tema": "Balances de energía y termoquímica"
+    }
+  ],
+  "archivo": "/modulos/enthalpy.html",
+  "tipo": "calculadora",
+  "sigla": "Hf",
+  "nivel": "basico",
+  "etiquetas": [
+    "entalpía de formación",
+    "ΔHf°",
+    "termoquímica"
+  ],
+  "destacado": false,
+  "publicado": false,
+  "fecha": "2026-10-21"
+}

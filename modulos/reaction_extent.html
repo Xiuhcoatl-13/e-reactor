@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- e-reactor-web -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .back-link,.er-embebido .module-hero,.er-embebido .topbar,.er-embebido .topbar+.sub{display:none!important}</style>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Grado de avance de reacción — e-Reactor</title>
+<link rel="stylesheet" href="ereactor-design.css">
+<style>
+:root{
+  --bg:var(--paper-bg);--card:var(--paper-surface);--card2:var(--paper-surface-2);--txt:var(--paper-ink);
+  --muted:var(--paper-muted);--accent:var(--paper-accent);--line:var(--paper-line);
+  --green:var(--paper-accent-2);--red:#b42318;--yellow:#92400e;--orange:#b45309;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,Roboto,Segoe UI,sans-serif;font-size:16px}
+.wrap{max-width:600px;margin:0 auto;padding:16px 14px 44px}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  color:var(--accent);font-size:14px;padding:8px 14px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;font-weight:600}
+h1{font-size:20px;margin:0;line-height:1.2}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 16px}
+.tabs{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin:12px 0 14px}
+.tabs button{flex:1;padding:10px 4px;border:0;background:transparent;color:var(--muted);
+  font-size:12px;font-weight:700}
+.tabs button.on{background:var(--accent);color:#04121f}
+.tab-panel{display:none}.tab-panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
+input,select{width:100%;padding:10px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card2);color:var(--txt);font-size:14px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:72px 1fr 86px 32px;gap:6px;align-items:end;margin-bottom:8px}
+.row button{height:38px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:18px}
+.btn{border:0;border-radius:11px;background:var(--accent);color:#04121f;font-weight:800;
+  padding:11px 12px;margin-top:8px;width:100%}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+  padding:7px 11px;margin:4px 4px 4px 0;font-size:12px;color:var(--txt)}
+.status{border-radius:11px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:10px}
+.ok{background:#10291b;border:1px solid #1f6b3a;color:#b8f7cc}
+.bad{background:#2a1616;border:1px solid #7d2a2a;color:#ffb4b4}
+.warn{background:#2a230f;border:1px solid #735a13;color:#ffe29c}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.metric{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px}
+.metric .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.metric .val{font-size:19px;font-weight:800;margin-top:4px;color:#bfe3ff}
+.metric .val.badval{color:var(--red)}
+.table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.table th{color:var(--muted);font-size:11px;text-align:left;border-bottom:1px solid var(--line);padding:6px}
+.table td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7)}
+.table td.num{text-align:right;font-family:monospace}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px;color:#bfe3ff}
+p,li{font-size:13px;color:var(--muted);line-height:1.6}ul{padding-left:18px;margin:8px 0}
+.mini{font-size:12px;color:var(--muted);line-height:1.6}
+.eq{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  color:#bfe3ff;font-weight:700;margin:8px 0;font-size:14px}
+.preset-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.preset{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  text-align:left;padding:10px;font-size:12px}
+.preset b{display:block;color:#bfe3ff;margin-bottom:2px}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.chart{height:210px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-top:10px;padding:8px}
+.kv{width:100%;border-collapse:collapse;font-size:13px}.kv td{padding:7px 6px;border-bottom:1px solid rgba(44,55,68,.7);vertical-align:top}.kv td:first-child{color:var(--muted);width:42%}
+.foot{color:var(--muted);font-size:11px;text-align:center;margin-top:18px;line-height:1.6}
+
+/* Paper design-system migration */
+body{background:var(--paper-bg);color:var(--paper-ink)}
+.module-shell{max-width:760px}
+.module-hero{margin-bottom:14px}
+.module-tabs{margin-bottom:16px}
+.module-panel{display:none}
+.module-panel.on{display:block}
+.paper-card{margin-bottom:12px}
+label{color:var(--paper-muted);font-weight:700}
+input,select{
+  background:#fffdf8;color:var(--paper-ink);border-color:var(--paper-line)
+}
+input:focus,select:focus{
+  border-color:var(--paper-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)
+}
+.row button{
+  border-color:var(--paper-line);color:var(--paper-muted);background:var(--paper-surface)
+}
+.row button:active,.pill:active,.preset:active{background:#e7e0d4}
+.btn{background:#10263f;color:#f8fafc}
+.pill,.preset,.metric{
+  background:var(--paper-surface-2);border-color:var(--paper-line);color:var(--paper-ink)
+}
+.preset,.metric{box-shadow:0 1px 0 rgba(31,41,51,.03)}
+.preset b,.metric .val{color:#10263f}
+.metric .val.badval{color:#b42318}
+.status{border-radius:12px}
+.ok{background:#e7f5ef;border-color:#b7dbc9;color:#0f5132}
+.bad{background:#fff0ed;border-color:#f0b9b0;color:#9f2a1d}
+.warn{background:var(--paper-soft-amber);border-color:#f3d391;color:#92400e}
+.table th,.table td,.kv td{border-color:var(--paper-line)}
+.table th{color:var(--paper-muted)}
+h3{color:#10263f}
+.mini,p,li{color:var(--paper-muted)}
+.eq{background:var(--paper-soft-blue);border-color:#cbdaf7;color:#10263f}
+.chart{background:#fffdf8;border-color:var(--paper-line)}
+.foot{color:var(--paper-muted)}
+@media (max-width:560px){
+  .module-shell{padding-left:14px;padding-right:14px}
+  .row{grid-template-columns:1fr 1fr 1fr 32px}
+  .grid,.control-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="module-shell">
+  <div class="module-hero">
+    <div class="module-topbar">
+      <a class="back-link" href="../index.html">← Inicio</a>
+      <span class="module-kicker">Equilibrio químico y reactores</span>
+    </div>
+    <h1 class="module-heading">Grado de avance de reacción</h1>
+    <p class="module-subtitle">Explora la coordenada ξ para conectar estequiometría, moles finales, conversión y factibilidad física.</p>
+  </div>
+
+  <div class="module-tabs" id="tabs">
+    <button class="on" data-tab="calc">Calculadora</button>
+    <button data-tab="learn">Aprendizaje</button>
+    <button data-tab="explore">Exploración</button>
+    <button data-tab="data">Datos</button>
+  </div>
+
+  <div id="tab-calc" class="module-panel on">
+    <div class="paper-card">
+      <h2>Calculadora</h2>
+      <div class="mini">Usa ν negativo para reactantes y positivo para productos. Ejemplo: A + B → C se escribe νA=-1, νB=-1, νC=+1.</div>
+      <div id="speciesRows"></div>
+      <button class="pill" id="addSpecies" type="button">+ Agregar especie</button>
+      <button class="pill" id="loadAB" type="button">Cargar A + B → C</button>
+      <label>Grado de avance ξ (mol de reacción)</label>
+      <input id="xiInput" type="number" value="0.5" step="0.01">
+      <label>Reactante para conversión</label>
+      <select id="conversionSpecies"></select>
+      <div id="statusBox"></div>
+    </div>
+
+    <div class="paper-card">
+      <h2>Resultados</h2>
+      <div class="grid" id="metricGrid"></div>
+      <table class="table" id="resultTable"></table>
+    </div>
+  </div>
+
+  <div id="tab-learn" class="module-panel">
+    <div class="paper-card">
+      <h2>Aprendizaje</h2>
+      <p>El grado de avance de reacción ξ mide cuánto ha progresado una reacción escrita con una estequiometría fija. Para una sola reacción independiente, un solo número ξ actualiza todas las especies.</p>
+      <div class="eq">nᵢ = nᵢ,0 + νᵢ ξ</div>
+      <h3>Signo de νᵢ</h3>
+      <p>Reactantes tienen νᵢ negativo porque se consumen. Productos tienen νᵢ positivo porque se forman. Si ξ aumenta, los reactantes bajan y los productos suben.</p>
+      <h3>Conversión</h3>
+      <p>Para un reactante A, X_A = moles consumidos / moles iniciales. Si ν_A &lt; 0, entonces X_A = -ν_A ξ / n_A,0.</p>
+      <h3>Por qué importa</h3>
+      <p>ξ conecta balances molares, composición, conversión, equilibrio y reactores. Más adelante, el equilibrio químico se puede plantear buscando el ξ que minimiza Gibbs o satisface K.</p>
+      <h3>Errores comunes</h3>
+      <ul>
+        <li>Usar coeficientes positivos para reactantes.</li>
+        <li>Olvidar que ξ tiene unidades de mol de reacción.</li>
+        <li>Elegir un ξ que vuelve negativos los moles finales.</li>
+        <li>Confundir conversión de un reactante con avance de reacción.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-explore" class="module-panel">
+    <div class="paper-card">
+      <h2>Exploración</h2>
+      <p>Elige un preset, mueve ξ y observa cómo cambian moles y fracciones molares.</p>
+      <div class="preset-grid" id="presetGrid"></div>
+      <div class="control-grid">
+        <label>ξ<input id="xiSliderNumber" type="number" value="0.5" step="0.01"></label>
+        <label>Escala gráfica<input id="plotPoints" type="number" value="7" min="4" max="11" step="1"></label>
+      </div>
+      <input id="xiSlider" type="range" min="0" max="1" step="0.01" value="0.5">
+      <div id="exploreIndicator"></div>
+      <div class="chart" id="extentChart"></div>
+      <table class="table" id="exploreTable"></table>
+    </div>
+  </div>
+
+  <div id="tab-data" class="module-panel">
+    <div class="paper-card">
+      <h2>Datos / Soporte técnico</h2>
+      <table class="kv" id="supportTable"></table>
+      <div class="mini" style="margin-top:10px">
+        Supuestos: una reacción independiente, sistema cerrado para el conteo estequiométrico, sin cinética ni equilibrio todavía. La factibilidad aquí solo evita moles negativos.
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Módulo offline · Fundamento para equilibrio químico, conversión y reactores</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let species=[];
+let nextId=1;
+const presets=[
+  {title:"A → B",desc:"Una especie se consume y otra se forma.",xi:0.5,sp:[["A",-1,1],["B",1,0]]},
+  {title:"A + B → C",desc:"Dos reactantes compiten por el límite de ξ.",xi:0.5,sp:[["A",-1,1],["B",-1,1.2],["C",1,0]]},
+  {title:"N2 + 3H2 → 2NH3",desc:"Síntesis de amoníaco con reactivo limitante.",xi:0.25,sp:[["N2",-1,1],["H2",-3,2],["NH3",2,0]]},
+  {title:"CH4 + 2O2 → CO2 + 2H2O",desc:"Combustión con cambio de moles totales.",xi:0.4,sp:[["CH4",-1,1],["O2",-2,2.4],["CO2",1,0],["H2O",2,0]]}
+];
+
+function fmt(v,d=3){return isFinite(v)?v.toLocaleString("es-MX",{maximumFractionDigits:d,minimumFractionDigits:d}):"N/D"}
+function readXi(){return parseFloat($("xiInput").value)||0}
+function addSpecies(name="",nu=-1,n0=1){
+  species.push({id:nextId++,name,nu,n0});
+  renderRows(); updateAll();
+}
+function loadPreset(p){
+  species=[]; nextId=1;
+  p.sp.forEach(s=>species.push({id:nextId++,name:s[0],nu:s[1],n0:s[2]}));
+  $("xiInput").value=p.xi;
+  $("xiSliderNumber").value=p.xi;
+  renderRows(); updateAll();
+}
+function renderRows(){
+  $("speciesRows").innerHTML=species.map(s=>`<div class="row">
+    <label>νᵢ<input type="number" step="0.1" value="${s.nu}" data-id="${s.id}" data-field="nu"></label>
+    <label>Especie<input value="${s.name}" data-id="${s.id}" data-field="name"></label>
+    <label>nᵢ,0<input type="number" step="0.01" min="0" value="${s.n0}" data-id="${s.id}" data-field="n0"></label>
+    <button type="button" data-remove="${s.id}">×</button>
+  </div>`).join("");
+  $("speciesRows").querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{
+    const s=species.find(x=>x.id==e.target.dataset.id); if(!s)return;
+    const f=e.target.dataset.field;
+    s[f]=f==="name"?e.target.value:(parseFloat(e.target.value)||0);
+    updateAll();
+  }));
+  $("speciesRows").querySelectorAll("button[data-remove]").forEach(b=>b.addEventListener("click",e=>{
+    species=species.filter(s=>s.id!=e.target.dataset.remove);
+    renderRows(); updateAll();
+  }));
+}
+function reactionText(){
+  const left=species.filter(s=>s.nu<0).map(s=>`${Math.abs(s.nu)!==1?fmt(Math.abs(s.nu),2)+" ":""}${s.name||"?"}`).join(" + ");
+  const right=species.filter(s=>s.nu>0).map(s=>`${Math.abs(s.nu)!==1?fmt(Math.abs(s.nu),2)+" ":""}${s.name||"?"}`).join(" + ");
+  return `${left||"Reactantes"} → ${right||"Productos"}`;
+}
+function compute(xi=readXi()){
+  const rows=species.map(s=>({...s,n:s.n0+s.nu*xi}));
+  const n0=species.reduce((a,s)=>a+s.n0,0);
+  const nt=rows.reduce((a,s)=>a+Math.max(0,s.n),0);
+  const reactants=species.filter(s=>s.nu<0);
+  const upper=reactants.length?Math.min(...reactants.map(s=>s.n0/(-s.nu))):Infinity;
+  const lower=Math.max(0,...species.filter(s=>s.nu>0).map(s=>-s.n0/s.nu));
+  const feasible=rows.every(r=>r.n>=-1e-9) && xi>=lower-1e-9;
+  return {rows,n0,nt,upper,lower,feasible};
+}
+function updateConversionOptions(){
+  const prev=$("conversionSpecies").value;
+  const opts=species.filter(s=>s.nu<0);
+  $("conversionSpecies").innerHTML=opts.map(s=>`<option value="${s.id}">${s.name||"Reactante"} (ν=${s.nu})</option>`).join("");
+  if(opts.some(s=>String(s.id)===prev)) $("conversionSpecies").value=prev;
+}
+function updateAll(){
+  updateConversionOptions();
+  const xi=readXi();
+  const c=compute(xi);
+  const convSp=species.find(s=>s.id===$("conversionSpecies").value) || species.find(s=>s.nu<0);
+  const X=convSp && convSp.n0>0 ? (-convSp.nu*xi/convSp.n0) : null;
+  $("metricGrid").innerHTML=[
+    ["Reacción",reactionText(),""],
+    ["ξ elegido",fmt(xi,3),"mol rxn"],
+    ["ξ máximo físico",isFinite(c.upper)?fmt(c.upper,3):"Sin límite","mol rxn"],
+    ["Conversión",X!==null?fmt(100*X,1)+" %":"N/D",convSp?convSp.name:""]
+  ].map(m=>`<div class="metric"><div class="lbl">${m[0]}</div><div class="val ${m[1].includes("-")?"badval":""}">${m[1]}</div><div class="mini">${m[2]}</div></div>`).join("");
+  $("resultTable").innerHTML=`<thead><tr><th>Especie</th><th class="num">νᵢ</th><th class="num">nᵢ,0</th><th class="num">nᵢ</th><th class="num">yᵢ</th></tr></thead><tbody>${c.rows.map(r=>`<tr>
+    <td>${r.name||"?"}</td><td class="num">${fmt(r.nu,2)}</td><td class="num">${fmt(r.n0,3)}</td>
+    <td class="num" style="color:${r.n<0?"var(--red)":"inherit"}">${fmt(r.n,3)}</td><td class="num">${c.nt>0&&r.n>=0?fmt(r.n/c.nt,3):"N/D"}</td>
+  </tr>`).join("")}</tbody>`;
+  $("statusBox").innerHTML=c.feasible
+    ? `<div class="status ok">Físicamente factible: ningún nᵢ final es negativo. Rango sugerido: ${fmt(c.lower,3)} ≤ ξ ≤ ${isFinite(c.upper)?fmt(c.upper,3):"∞"}.</div>`
+    : `<div class="status bad">ξ no factible: al menos una especie queda con moles negativos. Reduce ξ o revisa la estequiometría.</div>`;
+  syncExplore(xi,c);
+  updateSupport(c,convSp,X);
+}
+function syncExplore(xi,c){
+  if(document.activeElement!==$("xiSliderNumber")) $("xiSliderNumber").value=xi;
+  const max=isFinite(c.upper)&&c.upper>0?c.upper:Math.max(1,xi);
+  $("xiSlider").max=max; $("xiSlider").value=Math.min(Math.max(xi,0),max);
+  $("exploreIndicator").innerHTML=c.feasible
+    ? `<div class="status ok">ξ dentro del rango físico. El primer reactante agotado ocurre en ξ = ${isFinite(c.upper)?fmt(c.upper,3):"∞"}.</div>`
+    : `<div class="status warn">Estás fuera del rango físico. La gráfica marca la zona útil antes del agotamiento.</div>`;
+  drawChart(c.upper);
+  drawExploreTable(c.upper);
+}
+function drawExploreTable(upper){
+  const max=isFinite(upper)&&upper>0?upper:1;
+  const n=Math.min(11,Math.max(4,parseInt($("plotPoints").value,10)||7));
+  const xs=Array.from({length:n},(_,i)=>max*i/(n-1));
+  $("exploreTable").innerHTML=`<thead><tr><th>ξ</th>${species.map(s=>`<th class="num">${s.name}</th>`).join("")}</tr></thead><tbody>${xs.map(x=>`<tr><td>${fmt(x,2)}</td>${compute(x).rows.map(r=>`<td class="num">${fmt(r.n,2)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+function drawChart(upper){
+  const max=isFinite(upper)&&upper>0?upper:1;
+  const pts=40,W=320,H=180,ml=42,mr=10,mt=12,mb=30,gw=W-ml-mr,gh=H-mt-mb;
+  const all=[];
+  species.forEach(s=>{for(let i=0;i<=pts;i++){const x=max*i/pts;all.push(Math.max(0,s.n0+s.nu*x));}});
+  const yMax=Math.max(1,...all)*1.08;
+  const px=x=>ml+x/max*gw, py=y=>mt+gh-y/yMax*gh;
+  const colors=["#1d4ed8","#0f766e","#b45309","#6d28d9","#92400e","#2563eb"];
+  const paths=species.map((s,idx)=>{
+    let d="";
+    for(let i=0;i<=pts;i++){const x=max*i/pts,y=Math.max(0,s.n0+s.nu*x);d+=`${i?"L":"M"}${px(x).toFixed(1)},${py(y).toFixed(1)}`;}
+    return `<path d="${d}" fill="none" stroke="${colors[idx%colors.length]}" stroke-width="2"/><text x="${W-8}" y="${18+idx*13}" fill="${colors[idx%colors.length]}" font-size="9" text-anchor="end">${s.name}</text>`;
+  }).join("");
+  $("extentChart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%;display:block">
+    <line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+gh}" stroke="#d8d0c3"/><line x1="${ml}" y1="${mt+gh}" x2="${W-mr}" y2="${mt+gh}" stroke="#d8d0c3"/>
+    ${paths}
+    <text x="${ml}" y="${H-8}" fill="#667085" font-size="9">ξ=0</text><text x="${W-mr}" y="${H-8}" fill="#667085" font-size="9" text-anchor="end">ξ=${fmt(max,2)}</text>
+    <text x="${ml-6}" y="${mt+4}" fill="#667085" font-size="9" text-anchor="end">${fmt(yMax,1)} mol</text>
+  </svg>`;
+}
+function updateSupport(c,convSp,X){
+  $("supportTable").innerHTML=[
+    ["Reacción",reactionText()],
+    ["Relación base","nᵢ = nᵢ,0 + νᵢ ξ"],
+    ["Especies",species.map(s=>`${s.name}: ν=${s.nu}, n0=${s.n0}`).join("<br>")],
+    ["Rango físico de ξ",`${fmt(c.lower,3)} ≤ ξ ≤ ${isFinite(c.upper)?fmt(c.upper,3):"∞"}`],
+    ["Reactante de conversión",convSp?`${convSp.name}, X=${X!==null?fmt(X,3):"N/D"}`:"No seleccionado"],
+    ["Moles totales",`Inicial: ${fmt(c.n0,3)} mol · Final: ${fmt(c.nt,3)} mol`]
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+}
+$("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-tab]"); if(!b)return;
+  [...$("tabs").children].forEach(x=>x.classList.toggle("on",x===b));
+  ["calc","learn","explore","data"].forEach(t=>$("tab-"+t).classList.toggle("on",t===b.dataset.tab));
+  updateAll();
+});
+$("addSpecies").addEventListener("click",()=>addSpecies("Nueva",0,0));
+$("loadAB").addEventListener("click",()=>loadPreset(presets[1]));
+$("xiInput").addEventListener("input",()=>{updateAll()});
+$("conversionSpecies").addEventListener("change",updateAll);
+$("xiSlider").addEventListener("input",e=>{$("xiInput").value=e.target.value;$("xiSliderNumber").value=e.target.value;updateAll()});
+$("xiSliderNumber").addEventListener("input",e=>{$("xiInput").value=e.target.value;updateAll()});
+$("plotPoints").addEventListener("input",updateAll);
+$("presetGrid").innerHTML=presets.map((p,i)=>`<button class="preset" type="button" data-i="${i}"><b>${p.title}</b><span class="mini">${p.desc}</span></button>`).join("");
+$("presetGrid").addEventListener("click",e=>{const b=e.target.closest("button[data-i]"); if(b) loadPreset(presets[+b.dataset.i]);});
+loadPreset(presets[1]);
+</script>
+</body>
+</html>

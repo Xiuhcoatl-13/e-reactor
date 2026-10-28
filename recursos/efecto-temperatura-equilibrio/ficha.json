@@ -1,0 +1,17 @@
+{
+  "titulo": "Efecto de la temperatura sobre K (van ’t Hoff)",
+  "descripcion": "Explora cómo cambia la constante de equilibrio con la temperatura en reacciones endotérmicas y exotérmicas usando la ecuación de van ’t Hoff.",
+  "materia": "termodinamica",
+  "tema": "Equilibrio químico",
+  "archivo": "/modulos/equilibrium_temperature.html",
+  "tipo": "simulacion",
+  "sigla": "K(T)",
+  "nivel": "intermedio",
+  "etiquetas": [
+    "van 't Hoff",
+    "constante de equilibrio",
+    "Le Châtelier"
+  ],
+  "destacado": false,
+  "fecha": "2026-10-21"
+}
