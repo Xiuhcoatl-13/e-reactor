@@ -1,6 +1,6 @@
 /* Archivo GENERADO por scripts/construir_catalogo.py — no lo edites a mano. */
 window.EREACTOR = {
- "generado": "2026-10-28 12:21",
+ "generado": "2026-10-28 14:28",
  "config": {
   "nombre": "e-Reactor",
   "lema": "Ingeniería química clara, interactiva y gratuita para Latinoamérica",
@@ -206,7 +206,7 @@ window.EREACTOR = {
     }
    ],
    "archivo": "modulos/heat_convection.html",
-   "bytes": 18147,
+   "bytes": 18898,
    "ext": "html",
    "tipo": "calculadora",
    "nivel": "intermedio",
@@ -232,7 +232,7 @@ window.EREACTOR = {
     }
    ],
    "archivo": "modulos/equilibrium_conversion.html",
-   "bytes": 19853,
+   "bytes": 19869,
    "ext": "html",
    "tipo": "simulacion",
    "nivel": "intermedio",
@@ -278,13 +278,47 @@ window.EREACTOR = {
    "fecha": "2026-10-21"
   },
   {
+   "id": "destilacion-mccabe-thiele",
+   "titulo": "Destilación binaria por McCabe-Thiele",
+   "descripcion": "Diseña una columna de destilación binaria: reflujo mínimo, número de etapas, etapa de alimentación y eficiencia de Murphree. Usa tus propios datos x–y de Aspen Plus y compara con el método corto de Fenske-Underwood-Gilliland.",
+   "materia": "operaciones",
+   "tema": "Destilación",
+   "tambien_en": [
+    {
+     "materia": "simulacion",
+     "tema": "Aspen Plus"
+    }
+   ],
+   "archivo": "recursos/destilacion-mccabe-thiele/mccabe_thiele.html",
+   "bytes": 150228,
+   "ext": "html",
+   "tipo": "simulacion",
+   "nivel": "intermedio",
+   "sigla": "MT",
+   "etiquetas": [
+    "McCabe-Thiele",
+    "destilación",
+    "reflujo mínimo",
+    "línea q",
+    "eficiencia de Murphree",
+    "Fenske-Underwood-Gilliland",
+    "Aspen Plus"
+   ],
+   "objetivos": [
+    "Trazar las líneas de operación y la línea q a partir de las especificaciones de la columna.",
+    "Calcular el reflujo mínimo, el número de etapas y la etapa óptima de alimentación.",
+    "Comparar McCabe-Thiele con el método corto y llevar los resultados a Aspen Plus."
+   ],
+   "fecha": "2026-10-28"
+  },
+  {
    "id": "efecto-temperatura-equilibrio",
    "titulo": "Efecto de la temperatura sobre K (van ’t Hoff)",
    "descripcion": "Explora cómo cambia la constante de equilibrio con la temperatura en reacciones endotérmicas y exotérmicas usando la ecuación de van ’t Hoff.",
    "materia": "termodinamica",
    "tema": "Equilibrio químico",
    "archivo": "modulos/equilibrium_temperature.html",
-   "bytes": 16729,
+   "bytes": 16821,
    "ext": "html",
    "tipo": "simulacion",
    "nivel": "intermedio",
@@ -328,7 +362,7 @@ window.EREACTOR = {
     }
    ],
    "archivo": "modulos/reaction_extent.html",
-   "bytes": 19866,
+   "bytes": 19874,
    "ext": "html",
    "tipo": "simulacion",
    "nivel": "basico",
@@ -465,7 +499,7 @@ window.EREACTOR = {
     }
    ],
    "archivo": "modulos/ideal_reactors_multi.html",
-   "bytes": 21738,
+   "bytes": 22879,
    "ext": "html",
    "tipo": "simulacion",
    "nivel": "avanzado",

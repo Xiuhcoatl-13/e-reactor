@@ -1,0 +1,19 @@
+{
+  "titulo": "Destilación binaria por McCabe-Thiele",
+  "descripcion": "Diseña una columna de destilación binaria: reflujo mínimo, número de etapas, etapa de alimentación y eficiencia de Murphree. Usa tus propios datos x–y de Aspen Plus y compara con el método corto de Fenske-Underwood-Gilliland.",
+  "materia": "operaciones",
+  "tema": "Destilación",
+  "tambien_en": [{"materia": "simulacion", "tema": "Aspen Plus"}],
+  "archivo": "mccabe_thiele.html",
+  "tipo": "simulacion",
+  "sigla": "MT",
+  "nivel": "intermedio",
+  "etiquetas": ["McCabe-Thiele", "destilación", "reflujo mínimo", "línea q", "eficiencia de Murphree", "Fenske-Underwood-Gilliland", "Aspen Plus"],
+  "objetivos": [
+    "Trazar las líneas de operación y la línea q a partir de las especificaciones de la columna.",
+    "Calcular el reflujo mínimo, el número de etapas y la etapa óptima de alimentación.",
+    "Comparar McCabe-Thiele con el método corto y llevar los resultados a Aspen Plus."
+  ],
+  "destacado": false,
+  "fecha": "2026-10-28"
+}
