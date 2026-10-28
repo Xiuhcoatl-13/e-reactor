@@ -175,7 +175,7 @@ input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px r
       <h3>Tubo circular interno</h3>
       <table class="technical-table">
         <tr><th>Régimen</th><td>Laminar: Re &lt; 2300. Turbulento: Re &gt; 10000. Transición: evitar diseño directo.</td></tr>
-        <tr><th>Correlaciones</th><td>Nu = 3.66 para laminar plenamente desarrollado con pared a T constante. Nu = 0.023 Re^0.8 Pr^0.4 para Dittus-Boelter en turbulento.</td></tr>
+        <tr><th>Correlaciones</th><td>Nu = 3.66 para laminar plenamente desarrollado con pared a T constante. Nu = 0.023 Re^0.8 Pr^n para Dittus-Boelter en turbulento, con n = 0.4 si el fluido se calienta (Ts &gt; T∞) y n = 0.3 si se enfría.</td></tr>
         <tr><th>Uso</th><td>Estima h interno con Lc = D. Requiere propiedades del fluido.</td></tr>
       </table>
       <h3>Placa plana forzada</h3>
@@ -197,7 +197,12 @@ input:focus,select:focus{border-color:var(--paper-accent);box-shadow:0 0 0 3px r
 
 <script>
 'use strict';
-let curCase='tube';
+let curCase='tube',curFluid='agua';
+// Juegos de propiedades coherentes: agua a 20 °C (casos forzados) y aire a la temperatura de película ≈ 325 K (convección natural)
+const FLUIDS={
+  agua:{rho:998,mu:0.001,Cp:4182,k:0.598,beta:0.000207,nu:0.000001},
+  aire:{rho:1.078,mu:0.00001964,Cp:1008,k:0.0282,beta:0.00308,nu:0.0000184}
+};
 const g=id=>document.getElementById(id);
 const fmt=(v,d=3)=>!isFinite(v)?'—':(Math.abs(v)>=1000||Math.abs(v)<0.001&&v!==0?v.toExponential(3):v.toFixed(d));
 function showTab(name,idx){
@@ -211,10 +216,12 @@ function setCase(name,idx){
   g('velBox').style.display=name==='natural'?'none':'';
   g('natProps').style.display=name==='natural'?'':'none';
   g('lenLabel').textContent=name==='tube'?'Diámetro D (m)':'Longitud característica L (m)';
+  const fluid=name==='natural'?'aire':'agua';
+  if(fluid!==curFluid){Object.entries(FLUIDS[fluid]).forEach(([id,v])=>g(id).value=v);curFluid=fluid;}
   g('caseHelp').textContent={
-    tube:'Flujo interno en tubo circular. Usa D como longitud característica y selecciona la correlación por Re.',
-    plate:'Flujo externo forzado sobre placa plana. Re_L define capa límite laminar o mixta/turbulenta.',
-    natural:'Placa vertical en convección natural. Ra reemplaza a Re porque el movimiento lo genera la flotación.'
+    tube:'Flujo interno en tubo circular con agua a 20 °C. Usa D como longitud característica y selecciona la correlación por Re.',
+    plate:'Flujo externo forzado sobre placa plana con agua a 20 °C. Re_L define capa límite laminar o mixta/turbulenta.',
+    natural:'Placa vertical en convección natural con aire a la temperatura de película (≈ 325 K). Ra reemplaza a Re porque el movimiento lo genera la flotación. Para un gas ideal, β = 1/T de película (en K).'
   }[name];
   const tags={
     tube:['interno','forzada','Re','Pr','Nu'],
@@ -240,7 +247,7 @@ function calcCore(caseName,x){
   if(caseName==='tube'){
     Re=x.rho*x.V*x.L/x.mu;
     if(Re<2300){Nu=3.66;corr='Nu = 3.66';regime='Laminar desarrollado';}
-    else if(Re>=10000){Nu=0.023*Math.pow(Re,0.8)*Math.pow(Pr,0.4);corr='Dittus-Boelter';regime='Turbulento';}
+    else if(Re>=10000){const n=dT>=0?0.4:0.3;Nu=0.023*Math.pow(Re,0.8)*Math.pow(Pr,n);corr=`Dittus-Boelter (n = ${n}: el fluido se ${dT>=0?'calienta':'enfría'})`;regime='Turbulento';}
     else{Nu=NaN;corr='Transición';regime='Transición';warnings.push('Re entre 2300 y 10000: evita usar una sola correlación sin revisión.');}
   }
   if(caseName==='plate'){

@@ -157,9 +157,9 @@ const R=8.314462618e-3; // kJ/mol/K
 const $=id=>document.getElementById(id);
 const presets=[
   {title:"Síntesis de amoníaco",desc:"Exotérmica: K disminuye al subir T.",rxn:"N2 + 3H2 ⇌ 2NH3",K:6.0e5,T:298.15,H:-92.4,src:"Valor representativo educativo"},
-  {title:"Formación de agua",desc:"Muy exotérmica: productos fuertemente favorecidos a baja T.",rxn:"2H2 + O2 ⇌ 2H2O(g)",K:1.0e40,T:298.15,H:-483.6,src:"Estimación conceptual desde ΔH°rxn"},
-  {title:"Reformado seco de metano",desc:"Endotérmica: K aumenta al subir T.",rxn:"CH4 + CO2 ⇌ 2CO + 2H2",K:1.0e-4,T:1000,H:247.0,src:"Caso representativo para exploración"},
-  {title:"Reformado con vapor",desc:"Endotérmica industrial: altas T favorecen productos.",rxn:"CH4 + H2O ⇌ CO + 3H2",K:1.0e-3,T:900,H:206.0,src:"Caso representativo para exploración"}
+  {title:"Formación de agua",desc:"Muy exotérmica: productos fuertemente favorecidos a baja T.",rxn:"2H2 + O2 ⇌ 2H2O(g)",K:1.22e80,T:298.15,H:-483.6,src:"Calculada con ΔG°f del H2O(g) a 298.15 K (2 mol de agua)"},
+  {title:"Reformado seco de metano",desc:"Endotérmica: K aumenta al subir T.",rxn:"CH4 + CO2 ⇌ 2CO + 2H2",K:3.15,T:1000,H:247.3,src:"Estimada con ΔG°f y ΔH°f a 298.15 K y van’t Hoff con ΔH° constante"},
+  {title:"Reformado con vapor",desc:"Endotérmica industrial: altas T favorecen productos.",rxn:"CH4 + H2O ⇌ CO + 3H2",K:0.18,T:900,H:206.2,src:"Estimada con ΔG°f y ΔH°f a 298.15 K y van’t Hoff con ΔH° constante"}
 ];
 let currentSource="Usuario";
 function fmtK(v){

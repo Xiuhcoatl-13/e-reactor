@@ -269,7 +269,7 @@ function updateAll(){
   updateConversionOptions();
   const xi=readXi();
   const c=compute(xi);
-  const convSp=species.find(s=>s.id===$("conversionSpecies").value) || species.find(s=>s.nu<0);
+  const convSp=species.find(s=>String(s.id)===$("conversionSpecies").value) || species.find(s=>s.nu<0);
   const X=convSp && convSp.n0>0 ? (-convSp.nu*xi/convSp.n0) : null;
   $("metricGrid").innerHTML=[
     ["Reacción",reactionText(),""],

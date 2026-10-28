@@ -220,7 +220,7 @@ function updateOptions(){
 }
 function updateAll(){
   updateOptions();
-  const K=parseFloat($("kInput").value), sol=solve(K), convSp=species.find(s=>s.id===$("conversionSpecies").value)||species.find(s=>s.nu<0);
+  const K=parseFloat($("kInput").value), sol=solve(K), convSp=species.find(s=>String(s.id)===$("conversionSpecies").value)||species.find(s=>s.nu<0);
   const c=sol.root!==null?comp(sol.root):null;
   const X=sol.root!==null&&convSp&&convSp.n0>0 ? -convSp.nu*sol.root/convSp.n0 : null;
   $("statusBox").innerHTML=sol.root!==null?`<div class="status ok">${sol.msg} Rango físico: ${fmt(sol.lo,4)} ≤ ξ ≤ ${fmt(sol.hi,4)}.</div>`:`<div class="status bad">${sol.msg}</div>`;
@@ -236,7 +236,7 @@ function updateAll(){
 function exploreRows(){
   let a=parseFloat($("logMin").value),b=parseFloat($("logMax").value),n=parseInt($("steps").value,10);
   if(!isFinite(a))a=-3;if(!isFinite(b))b=3;if(b<a)[a,b]=[b,a];n=Math.min(13,Math.max(4,isFinite(n)?n:9));
-  const convSp=species.find(s=>s.id===$("conversionSpecies").value)||species.find(s=>s.nu<0);
+  const convSp=species.find(s=>String(s.id)===$("conversionSpecies").value)||species.find(s=>s.nu<0);
   return Array.from({length:n},(_,i)=>{const logK=a+(b-a)*i/(n-1),K=Math.pow(10,logK),sol=solve(K),X=sol.root!==null&&convSp&&convSp.n0>0?-convSp.nu*sol.root/convSp.n0:null;return{logK,K,xi:sol.root,X};});
 }
 function updateExplore(){
