@@ -1,13 +1,13 @@
 /* Archivo GENERADO por scripts/construir_catalogo.py — no lo edites a mano. */
 window.EREACTOR = {
- "generado": "2026-10-28 12:12",
+ "generado": "2026-10-28 12:21",
  "config": {
   "nombre": "e-Reactor",
   "lema": "Ingeniería química clara, interactiva y gratuita para Latinoamérica",
   "descripcion": "Simulaciones, calculadoras, código en Python y MATLAB, hojas de Excel y animaciones para estudiar Ingeniería Química, Ambiental, de Materiales, Energía y Alimentos.",
   "autor": "Xiuhcóatl",
-  "url_base": "",
-  "github_repo": "",
+  "url_base": "https://xiuhcoatl-13.github.io/e-reactor",
+  "github_repo": "Xiuhcoatl-13/e-reactor",
   "github_rama": "main",
   "contacto_email": "",
   "app_android_url": "",
