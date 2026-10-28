@@ -1,0 +1,22 @@
+{
+  "titulo": "Destilación multicomponente: método corto FUG",
+  "descripcion": "Diseña una columna multicomponente con Fenske, Underwood, Gilliland y Kirkbride: etapas mínimas, reflujo mínimo, número de etapas y etapa de alimentación. Resuelve sola los pasos que en Excel requieren Solver, y trae el Excel del curso para practicarlos.",
+  "materia": "operaciones",
+  "tema": "Destilación",
+  "tambien_en": [{"materia": "simulacion", "tema": "Aspen Plus"}],
+  "archivo": "fug.html",
+  "tipo": "simulacion",
+  "sigla": "FUG",
+  "nivel": "avanzado",
+  "etiquetas": ["Fenske", "Underwood", "Gilliland", "Kirkbride", "destilación multicomponente", "componentes clave", "DSTWU", "Aspen Plus"],
+  "objetivos": [
+    "Elegir los componentes clave y plantear el balance con reparto limpio de los no clave.",
+    "Calcular las etapas mínimas, el reflujo mínimo, el número de etapas y la etapa de alimentación.",
+    "Comprobar las suposiciones del método y llevar los resultados a DSTWU y RadFrac en Aspen Plus."
+  ],
+  "adjuntos": [
+    {"archivo": "FUG_PetrochemicalEng_revisado.xlsx", "titulo": "Excel del curso: los 12 pasos con Solver"}
+  ],
+  "destacado": false,
+  "fecha": "2026-10-28"
+}

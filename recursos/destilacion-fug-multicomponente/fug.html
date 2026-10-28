@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<!-- e-reactor-web: dentro de la página del recurso se oculta el título propio (la página ya lo muestra); el sitio es solo de modo claro -->
+<script>if(window.self!==window.top)document.documentElement.classList.add('er-embebido');</script>
+<style>.er-embebido .brand{display:none}.er-embebido .top{justify-content:flex-end;padding-block:12px 4px}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FUG Lab</title>
+<meta name="description" content="Herramienta educativa libre: método corto Fenske–Underwood–Gilliland–Kirkbride para columnas de destilación multicomponente.">
+<meta name="author" content="Xiuhcóatl">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}
+/* Misma familia visual que el McCabe–Thiele Lab: datos a la izquierda, resultados y gráficas a la derecha, pestañas abajo */
+:root{
+  --bg:#f2f4f5;--surface:#ffffff;--surface-2:#f7f9fa;--paper:#fcfdfd;
+  --ink:#141a1f;--ink-2:#47525c;--ink-3:#6f7a84;--line:#dce2e6;--line-2:#c6cfd6;
+  --grid-minor:#edf1f3;--grid-major:#d9e1e6;
+  --accent:#1d5cab;--accent-ink:#ffffff;--accent-soft:#e4edf8;
+  --s-eq:#2a78d6;--s-rect:#eb6834;--s-strip:#1baf7a;--s-q:#6250d6;--s-min:#e34948;
+  --ok:#0ca30c;--warn:#fab219;--crit:#d03b3b;--warn-bg:#fff5dc;--crit-bg:#fdeceb;--info-bg:#e8f1fb;
+  --shadow:0 1px 2px rgba(20,26,31,.05),0 4px 16px rgba(20,26,31,.05);
+  --font-display:"IBM Plex Sans Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --r:10px;color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+sub,sup{font-size:.72em;line-height:0}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:18px 14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-family:var(--font-display);font-weight:700;font-size:26px;line-height:1.05;margin:0;letter-spacing:.005em;text-wrap:balance}
+.brand p{margin:2px 0 0;color:var(--ink-2);font-size:13.5px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:6px 11px;cursor:pointer;font-size:13px;color:var(--ink-2);font-weight:500}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg.sm button{padding:4px 9px;font-size:12.5px}
+.seg.full{display:flex}.seg.full button{flex:1}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:1100px){
+  .layout{grid-template-columns:390px minmax(0,1fr);align-items:start}
+  .rail{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;scrollbar-width:thin}
+}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.sec{padding:14px 14px 16px;display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;align-items:baseline;gap:8px}
+.sec-h .num{font-family:var(--font-mono);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 5px;line-height:17px}
+.sec-h h2{font-family:var(--font-display);font-size:16px;font-weight:600;margin:0;letter-spacing:.01em}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>label,.lbl{font-size:12px;color:var(--ink-2);font-weight:500;letter-spacing:.01em}
+.hint{font-size:12px;color:var(--ink-3);line-height:1.4}
+.row{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+input[type=text],input[type=number],select{width:100%;background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:7px 9px;min-width:0}
+input.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+input[aria-invalid="true"]{border-color:var(--crit);background:var(--crit-bg)}
+select{cursor:pointer}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);background:var(--surface);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn svg{width:14px;height:14px;flex:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line-2);background:var(--surface-2);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* componentes */
+.comps{display:flex;flex-direction:column;gap:8px}
+.comp{display:grid;grid-template-columns:10px minmax(0,1fr) 84px 30px;gap:6px 8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 6px 8px 10px;background:var(--surface-2)}
+.comp .dot{width:10px;height:10px;border-radius:50%}
+.comp input{padding:5px 7px;background:var(--surface)}
+.comp .par{grid-column:2 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.comp .par.one{grid-template-columns:minmax(0,84px) minmax(0,1fr);align-items:center}
+.comp .par label{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-3);min-width:0}
+.comp .par label input{flex:1}
+.comp .meta{grid-column:2 / -1;font-size:12px;color:var(--ink-3);display:flex;gap:4px 10px;flex-wrap:wrap}
+.comp .meta b{color:var(--ink-2);font-weight:600}
+.del{border:1px solid transparent;background:transparent;border-radius:6px;width:30px;height:30px;cursor:pointer;color:var(--ink-3);display:grid;place-items:center}
+.del:hover{border-color:var(--crit);color:var(--crit)}
+.del svg{width:14px;height:14px}
+.zsum{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-2)}
+.zsum.bad{color:var(--crit);font-weight:600}
+
+/* avisos */
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:9px 12px;font-size:13px;border:1px solid transparent}
+.alert .ico{flex:none;width:18px;height:18px;margin-top:1px}
+.alert.err{background:var(--crit-bg);border-color:color-mix(in srgb,var(--crit) 35%,transparent)}
+.alert.warn{background:var(--warn-bg);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.alert.info{background:var(--info-bg);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.alert b{font-weight:600}
+
+/* indicadores */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:820px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:11px 13px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .k{font-size:11.5px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.kpi .v{font-family:var(--font-display);font-size:30px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v small{font-size:15px;color:var(--ink-2);font-weight:500;margin-left:4px}
+.kpi .d{font-size:12px;color:var(--ink-3);line-height:1.35}
+
+/* gráficas */
+.plotcard{padding:10px 12px 12px;display:flex;flex-direction:column;gap:10px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.plotbox{width:100%;max-width:780px;margin:0 auto}
+.plotbox svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.lg{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px 3px 8px;font-size:12px;color:var(--ink)}
+.lg .sw{width:22px;height:10px;flex:none}
+.lg small{color:var(--ink-3);font-size:11px}
+.caption{font-size:13px;color:var(--ink-2);text-align:center;max-width:780px;margin:0 auto}
+.caption b{color:var(--ink)}
+
+/* pestañas */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);padding:0 8px;overflow-x:auto;scrollbar-width:thin}
+.tab{border:0;background:transparent;padding:11px 12px 10px;cursor:pointer;font-weight:500;font-size:13.5px;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.panel{padding:16px}
+.panel p{margin:0 0 10px;color:var(--ink-2);max-width:72ch}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.cols2{grid-template-columns:minmax(0,1fr)}}
+.spec{border:1px solid var(--line);border-radius:8px;overflow:hidden;min-width:0}
+.spec .hd{background:var(--surface-2);padding:9px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.spec .hd b{font-family:var(--font-display);font-size:15px;font-weight:600}
+.spec .hd span{font-size:12px;color:var(--ink-3)}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto}
+.kv>div{padding:7px 12px;border-bottom:1px solid var(--line);font-size:13px;min-width:0}
+.kv>div:nth-last-child(-n+2){border-bottom:0}
+.kv .k{color:var(--ink-2)}
+.kv .k small{display:block;color:var(--ink-3);font-size:11.5px}
+.kv .v{text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.copyv{border:1px dashed transparent;background:transparent;border-radius:5px;padding:1px 6px;cursor:copy;font-family:var(--font-mono)}
+.copyv:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:12px;max-width:80ch}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--ink-2);background:var(--surface-2);font-size:12px}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+td.txt{font-family:var(--font-body)}
+td.wrap{white-space:normal;min-width:220px}
+tr.key td{background:var(--accent-soft)}
+.cdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:baseline}
+.okm{color:var(--ok);font-family:var(--font-body)}.badm{color:#9a6400;font-family:var(--font-body)}
+.steps td:nth-child(2){font-family:var(--font-body);white-space:normal;min-width:170px}
+.steps td:nth-child(3){white-space:normal;min-width:200px}
+.steps td:nth-child(4){font-size:12px;color:var(--ink-2);white-space:normal;min-width:200px}
+.theory{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.theory section{border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.theory h4{margin:0 0 6px;font-family:var(--font-display);font-size:15px;font-weight:600}
+.theory p,.theory li{font-size:13px;color:var(--ink-2)}
+.theory ul{margin:0;padding-left:18px}
+.eqn{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:7px 10px;margin:6px 0;overflow-x:auto;white-space:nowrap;color:var(--ink)}
+
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--ink-3);font-size:12.5px}
+footer b{color:var(--ink-2);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+@media (max-width:1099px){
+  .main{display:contents}
+  #alerts{order:1}.kpis{order:2}.plotcard{order:3}.layout>.rail{order:4}.tabcard{order:5}
+  .alerts:empty{display:none}
+}
+@media (max-width:520px){
+  .kpi .v{font-size:25px}
+  .brand h1{font-size:22px}
+  .row.r3{gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.2"/>
+        <rect x="15" y="7" width="10" height="26" rx="3" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+        <path d="M15 12.5h10M15 17h10M15 21.5h10M15 26h10" stroke="var(--ink-3)" stroke-width="1"/>
+        <path d="M6 19.5h9" stroke="var(--s-q)" stroke-width="2"/>
+        <path d="M25 10h8M25 30h8" stroke="var(--s-eq)" stroke-width="2"/>
+      </svg>
+      <div>
+        <h1>FUG Lab</h1>
+        <p data-i18n="tagline">Método corto para columnas de destilación multicomponente</p>
+      </div>
+    </div>
+    <div class="seg" role="group" aria-label="Idioma / Language">
+      <button type="button" id="lang-es" aria-pressed="true">ES</button>
+      <button type="button" id="lang-en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="rail">
+      <section class="card sec" aria-labelledby="h-op">
+        <div class="sec-h"><span class="num">1</span><h2 id="h-op" data-i18n="h.op">Alimentación y operación</h2></div>
+        <div class="field">
+          <label for="preset" data-i18n="lbl.preset">Ejemplo precargado</label>
+          <select id="preset">
+            <option value="clase" data-i18n="preset.clase">Ejercicio de clase: BTX + propanol + p-DEB</option>
+            <option value="alcoholes" data-i18n="preset.alcoholes">Alcoholes y agua a 2 atm</option>
+            <option value="alfa" data-i18n="preset.alfa">Ejercicio de clase con α fijas</option>
+            <option value="custom" data-i18n="preset.custom">Mis datos</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field"><label for="F" data-i18n-html="lbl.F">Alimentación <i>F</i></label><input type="text" class="num" id="F" inputmode="decimal"></div>
+          <div class="field"><label for="Funit" data-i18n="lbl.unit">Unidades</label>
+            <select id="Funit"><option>kmol/h</option><option>mol/s</option><option>kmol/s</option><option>lbmol/h</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="P" data-i18n-html="lbl.P">Presión <i>P</i> (atm)</label><input type="text" class="num" id="P" inputmode="decimal"></div>
+          <div class="field"><label for="RR" data-i18n-html="lbl.RR"><i>R</i>/<i>R</i><sub>min</sub></label><input type="text" class="num" id="RR" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="q" data-i18n-html="lbl.q">Condición térmica de la alimentación <i>q</i></label>
+          <input type="text" class="num" id="q" inputmode="decimal">
+          <div class="chips" id="qChips">
+            <button type="button" class="chip" data-q="1" data-i18n="q.satliq">Líquido saturado · 1</button>
+            <button type="button" class="chip" data-q="0.5" data-i18n="q.half">50 % vapor · 0.5</button>
+            <button type="button" class="chip" data-q="0" data-i18n="q.satvap">Vapor saturado · 0</button>
+          </div>
+          <div class="hint" data-i18n="hint.q">q &gt; 1 subenfriado · 0 &lt; q &lt; 1 mezcla L–V (q = fracción líquida) · q &lt; 0 sobrecalentado</div>
+        </div>
+      </section>
+
+      <section class="card sec" aria-labelledby="h-comp">
+        <div class="sec-h"><span class="num">2</span><h2 id="h-comp" data-i18n="h.comp">Componentes</h2></div>
+        <div class="seg full" role="group" id="modeSeg">
+          <button type="button" id="mAnt" aria-pressed="true" data-i18n="mode.ant">K ideal (Antoine)</button>
+          <button type="button" id="mAlpha" aria-pressed="false" data-i18n="mode.alpha">α constantes</button>
+        </div>
+        <div class="hint" id="modeHint"></div>
+        <div class="comps" id="comps"></div>
+        <div class="inline" style="justify-content:space-between">
+          <select id="addComp" style="flex:1 1 100%"></select>
+          <span class="zsum" id="zsum" aria-live="polite"></span>
+          <button type="button" class="btn" id="btnNorm" data-i18n="btn.norm">Normalizar z</button>
+        </div>
+      </section>
+
+      <section class="card sec" aria-labelledby="h-spec">
+        <div class="sec-h"><span class="num">3</span><h2 id="h-spec" data-i18n="h.spec">Separación deseada</h2></div>
+        <div class="row">
+          <div class="field"><label for="lk" data-i18n="lbl.lk">Clave ligero (LK)</label><select id="lk"></select></div>
+          <div class="field"><label for="hk" data-i18n="lbl.hk">Clave pesado (HK)</label><select id="hk"></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="recLK" data-i18n="lbl.recLK">LK recuperado en el destilado (%)</label><input type="text" class="num" id="recLK" inputmode="decimal"></div>
+          <div class="field"><label for="recHK" data-i18n="lbl.recHK">HK recuperado en los fondos (%)</label><input type="text" class="num" id="recHK" inputmode="decimal"></div>
+        </div>
+        <div class="hint" data-i18n="hint.keys">Los no clave se reparten de forma limpia: los más ligeros que el LK salen todos en el destilado y los más pesados que el HK, todos en los fondos.</div>
+      </section>
+
+      <section class="card sec" aria-labelledby="h-opt">
+        <div class="sec-h"><span class="num">4</span><h2 id="h-opt" data-i18n="h.opt">Opciones del modelo</h2></div>
+        <div class="field">
+          <label for="gill" data-i18n="lbl.gill">Correlación de Gilliland</label>
+          <select id="gill"><option value="eduljee" data-i18n="gill.edu">Eduljee (como en clase)</option><option value="molokanov" data-i18n="gill.mol">Molokanov</option></select>
+        </div>
+        <button type="button" class="btn ghost" id="btnReset" style="align-self:flex-start"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8a5 5 0 1 0 1.5-3.5M3 2.5V5h2.5"/></svg><span data-i18n="btn.reset">Volver al ejercicio de clase</span></button>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div class="alerts" id="alerts" aria-live="polite"></div>
+
+      <div class="kpis">
+        <div class="card kpi"><span class="k" data-i18n="kpi.N">Etapas teóricas</span><span class="v" id="kN">—</span><span class="d" id="kNd"></span></div>
+        <div class="card kpi"><span class="k" data-i18n="kpi.feed">Alimentación</span><span class="v" id="kF">—</span><span class="d" id="kFd"></span></div>
+        <div class="card kpi"><span class="k" data-i18n="kpi.R">Reflujo R</span><span class="v" id="kR">—</span><span class="d" id="kRd"></span></div>
+        <div class="card kpi"><span class="k" data-i18n="kpi.Nmin">Reflujo total</span><span class="v" id="kM">—</span><span class="d" id="kMd"></span></div>
+      </div>
+
+      <section class="card plotcard" aria-label="FUG">
+        <div class="toolbar">
+          <div class="seg sm" role="group" id="viewSeg">
+            <button type="button" data-view="col" aria-pressed="true" data-i18n="view.col">Columna</button>
+            <button type="button" data-view="und" aria-pressed="false" data-i18n="view.und">Underwood</button>
+            <button type="button" data-view="gil" aria-pressed="false" data-i18n="view.gil">Gilliland</button>
+          </div>
+          <div class="seg sm" role="group" id="zoomSeg" hidden>
+            <button type="button" data-zoom="all" aria-pressed="true" data-i18n="z.all">Completa</button>
+            <button type="button" data-zoom="keys" aria-pressed="false" data-i18n="z.keys">Entre los claves</button>
+          </div>
+        </div>
+        <div class="plotbox"><svg id="plot" viewBox="0 0 600 470" role="img" aria-labelledby="plotTitle"><title id="plotTitle">FUG</title></svg></div>
+        <div class="legend" id="legend"></div>
+        <div class="caption" id="caption" aria-live="polite"></div>
+      </section>
+
+      <section class="card tabcard">
+        <div class="tabs" role="tablist" id="tabs">
+          <button type="button" class="tab" role="tab" aria-selected="true" data-tab="steps" id="t-steps" aria-controls="p-steps" data-i18n="tab.steps">Pasos</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="bal" id="t-bal" aria-controls="p-bal" data-i18n="tab.bal">Balance</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="vol" id="t-vol" aria-controls="p-vol" data-i18n="tab.vol">Volatilidades</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="nk" id="t-nk" aria-controls="p-nk" data-i18n="tab.nk">No clave</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="aspen" id="t-aspen" aria-controls="p-aspen" data-i18n="tab.aspen">Aspen Plus</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="theory" id="t-theory" aria-controls="p-theory" data-i18n="tab.theory">Fundamentos</button>
+        </div>
+        <div class="panel" role="tabpanel" id="p-steps" aria-labelledby="t-steps"></div>
+        <div class="panel" role="tabpanel" id="p-bal" aria-labelledby="t-bal" hidden></div>
+        <div class="panel" role="tabpanel" id="p-vol" aria-labelledby="t-vol" hidden></div>
+        <div class="panel" role="tabpanel" id="p-nk" aria-labelledby="t-nk" hidden></div>
+        <div class="panel" role="tabpanel" id="p-aspen" aria-labelledby="t-aspen" hidden></div>
+        <div class="panel" role="tabpanel" id="p-theory" aria-labelledby="t-theory" hidden>
+          <div class="theory" data-lang="es">
+            <section>
+              <h4>Qué hace cada método</h4>
+              <ul>
+                <li><b>Fenske:</b> número mínimo de etapas a reflujo total (R → ∞).</li>
+                <li><b>Underwood:</b> reflujo mínimo R<sub>min</sub>, con un número infinito de etapas.</li>
+                <li><b>Gilliland:</b> relaciona el reflujo real con el número real de etapas.</li>
+                <li><b>Kirkbride:</b> reparte las etapas entre rectificación (N<sub>R</sub>, arriba de la alimentación) y agotamiento (N<sub>S</sub>, abajo).</li>
+              </ul>
+            </section>
+            <section>
+              <h4>Hipótesis</h4>
+              <ul>
+                <li>Volatilidad relativa constante: la media geométrica de α en el domo y en los fondos.</li>
+                <li>Flujo molar constante en cada sección.</li>
+                <li>Claves adyacentes en volatilidad y reparto limpio de los no clave (se comprueba en la pestaña «No clave»).</li>
+                <li>Con Antoine, K = P<sup>sat</sup>/P (ley de Raoult, líquido ideal).</li>
+                <li>Condensador total: la temperatura del domo es el punto de burbuja del destilado.</li>
+              </ul>
+            </section>
+            <section>
+              <h4>Fenske</h4>
+              <div class="eqn">N<sub>min</sub> + 1 = ln S / ln α<sub>LK,HK</sub></div>
+              <div class="eqn">S = (x<sub>LK</sub>/x<sub>HK</sub>)<sub>D</sub> · (x<sub>HK</sub>/x<sub>LK</sub>)<sub>B</sub></div>
+              <p>N<sub>min</sub> + 1 cuenta el rehervidor parcial como etapa; N<sub>min</sub> son los platos a reflujo total.</p>
+            </section>
+            <section>
+              <h4>Underwood</h4>
+              <div class="eqn">Σ α<sub>i</sub>z<sub>i</sub>/(α<sub>i</sub> − θ) = 1 − q</div>
+              <div class="eqn">R<sub>min</sub> + 1 = Σ α<sub>i</sub>x<sub>D,i</sub>/(α<sub>i</sub> − θ)</div>
+              <p>Con claves adyacentes, la raíz útil θ está entre α<sub>HK</sub> = 1 y α<sub>LK</sub>. La gráfica «Underwood» muestra por qué: la función tiene una asíntota en cada α<sub>i</sub>.</p>
+            </section>
+            <section>
+              <h4>Gilliland</h4>
+              <div class="eqn">X = (R − R<sub>min</sub>)/(R + 1) &nbsp;·&nbsp; Y = (N − N<sub>min</sub>)/(N + 1)</div>
+              <div class="eqn">Eduljee: Y = 0.75 (1 − X<sup>0.5668</sup>)</div>
+              <div class="eqn">Molokanov: Y = 1 − exp[(1 + 54.4X)/(11 + 117.2X) · (X − 1)/√X]</div>
+              <p>Como N<sub>min</sub> + 1 incluye el rehervidor, N también lo incluye. Se redondea hacia arriba.</p>
+            </section>
+            <section>
+              <h4>Kirkbride</h4>
+              <div class="eqn">N<sub>R</sub>/N<sub>S</sub> = [(z<sub>HK</sub>/z<sub>LK</sub>)·(x<sub>B,LK</sub>/x<sub>D,HK</sub>)²·(B/D)]<sup>0.206</sup></div>
+              <p>La alimentación entra en la etapa redondeo(N<sub>R</sub>) + 1, contando desde arriba.</p>
+            </section>
+            <section>
+              <h4>Cuidado con la K ideal</h4>
+              <p>Con mezclas no ideales (por ejemplo, el 1-propanol forma azeótropos con el benceno, el tolueno y el agua) un modelo de actividad como NRTL en Aspen Plus da resultados distintos. FUG es una primera estimación: valídala con RadFrac.</p>
+              <p>En la página de este recurso puedes descargar el Excel del curso, que hace los mismos 12 pasos con Solver.</p>
+            </section>
+          </div>
+          <div class="theory" data-lang="en" hidden>
+            <section>
+              <h4>What each method does</h4>
+              <ul>
+                <li><b>Fenske:</b> minimum number of stages at total reflux (R → ∞).</li>
+                <li><b>Underwood:</b> minimum reflux ratio R<sub>min</sub>, with an infinite number of stages.</li>
+                <li><b>Gilliland:</b> links the actual reflux ratio to the actual number of stages.</li>
+                <li><b>Kirkbride:</b> splits the stages between rectifying (N<sub>R</sub>, above the feed) and stripping (N<sub>S</sub>, below).</li>
+              </ul>
+            </section>
+            <section>
+              <h4>Assumptions</h4>
+              <ul>
+                <li>Constant relative volatility: the geometric mean of α at the top and at the bottom.</li>
+                <li>Constant molar overflow in each section.</li>
+                <li>Adjacent keys and a sharp split of the non-keys (checked on the “Non-keys” tab).</li>
+                <li>With Antoine, K = P<sup>sat</sup>/P (Raoult’s law, ideal liquid).</li>
+                <li>Total condenser: the top temperature is the distillate bubble point.</li>
+              </ul>
+            </section>
+            <section>
+              <h4>Fenske</h4>
+              <div class="eqn">N<sub>min</sub> + 1 = ln S / ln α<sub>LK,HK</sub></div>
+              <div class="eqn">S = (x<sub>LK</sub>/x<sub>HK</sub>)<sub>D</sub> · (x<sub>HK</sub>/x<sub>LK</sub>)<sub>B</sub></div>
+              <p>N<sub>min</sub> + 1 counts the partial reboiler as a stage; N<sub>min</sub> is the number of trays at total reflux.</p>
+            </section>
+            <section>
+              <h4>Underwood</h4>
+              <div class="eqn">Σ α<sub>i</sub>z<sub>i</sub>/(α<sub>i</sub> − θ) = 1 − q</div>
+              <div class="eqn">R<sub>min</sub> + 1 = Σ α<sub>i</sub>x<sub>D,i</sub>/(α<sub>i</sub> − θ)</div>
+              <p>With adjacent keys, the useful root θ lies between α<sub>HK</sub> = 1 and α<sub>LK</sub>. The “Underwood” plot shows why: the function has an asymptote at every α<sub>i</sub>.</p>
+            </section>
+            <section>
+              <h4>Gilliland</h4>
+              <div class="eqn">X = (R − R<sub>min</sub>)/(R + 1) &nbsp;·&nbsp; Y = (N − N<sub>min</sub>)/(N + 1)</div>
+              <div class="eqn">Eduljee: Y = 0.75 (1 − X<sup>0.5668</sup>)</div>
+              <div class="eqn">Molokanov: Y = 1 − exp[(1 + 54.4X)/(11 + 117.2X) · (X − 1)/√X]</div>
+              <p>Since N<sub>min</sub> + 1 includes the reboiler, so does N. It is rounded up.</p>
+            </section>
+            <section>
+              <h4>Kirkbride</h4>
+              <div class="eqn">N<sub>R</sub>/N<sub>S</sub> = [(z<sub>HK</sub>/z<sub>LK</sub>)·(x<sub>B,LK</sub>/x<sub>D,HK</sub>)²·(B/D)]<sup>0.206</sup></div>
+              <p>The feed enters on stage round(N<sub>R</sub>) + 1, counted from the top.</p>
+            </section>
+            <section>
+              <h4>Beware of ideal K-values</h4>
+              <p>For non-ideal mixtures (for example, 1-propanol forms azeotropes with benzene, toluene and water) an activity-coefficient model such as NRTL in Aspen Plus gives different results. FUG is a first estimate: validate it with RadFrac.</p>
+              <p>The resource page also offers the course Excel workbook, which follows the same 12 steps with Solver.</p>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span data-i18n-html="foot.by">Desarrollado por <b>Xiuhcóatl</b> · Herramienta educativa libre de Ingeniería Química</span>
+    <span data-i18n="foot.note">Método corto con volatilidad relativa constante. Valida siempre con una simulación rigurosa.</span>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== Motor FUG (funciones puras, sin DOM) ===== */
+const FUG = (function () {
+  'use strict';
+  // Antoine: log10 Psat[mmHg] = A − B/(T[°C] + C)
+  function psat(c, T) { return Math.pow(10, c.A - c.B / (T + c.C)); }
+  function tbAt(c, Pmm) { return c.B / (c.A - Math.log10(Pmm)) - c.C; }
+
+  function bisect(g, lo, hi, it) {
+    let glo = g(lo);
+    for (let k = 0; k < (it || 100); k++) {
+      const m = 0.5 * (lo + hi), gm = g(m);
+      if ((gm > 0) === (glo > 0)) { lo = m; glo = gm; } else hi = m;
+    }
+    return 0.5 * (lo + hi);
+  }
+
+  /* Punto de burbuja: Σ x_i·Psat_i(T)/P = 1 (lo que en el Excel se resuelve con Solver) */
+  function bubble(comps, x, Pmm) {
+    const g = T => { let s = 0; for (let i = 0; i < comps.length; i++) if (x[i] > 0) s += x[i] * psat(comps[i], T); return s / Pmm - 1; };
+    let lo = -90;
+    comps.forEach((c, i) => { if (x[i] > 0) lo = Math.max(lo, -c.C + 1); });
+    const hi = 500;
+    if (!(g(lo) < 0) || !(g(hi) > 0)) return NaN;
+    return bisect(g, lo, hi, 90);
+  }
+
+  const eduljee = X => 0.75 * (1 - Math.pow(X, 0.5668));
+  const molokanov = X => 1 - Math.exp(((1 + 54.4 * X) / (11 + 117.2 * X)) * ((X - 1) / Math.sqrt(X)));
+  function underwood(a, z, th) { let s = 0; for (let i = 0; i < a.length; i++) if (z[i] > 0) s += a[i] * z[i] / (a[i] - th); return s; }
+
+  function solve(inp) {
+    const r = { errors: [], warnings: [], inp };
+    const fail = (key, p) => { r.errors.push({ key, p: p || {} }); return r; };
+    const comps = inp.comps, n = comps.length, ant = inp.mode === 'antoine';
+    if (n < 2) return fail('err.n');
+    if (!(inp.F > 0)) return fail('err.F');
+    if (!(inp.P > 0)) return fail('err.P');
+    if (!isFinite(inp.q)) return fail('err.q');
+    if (!(inp.RR > 1)) return fail('err.RR');
+    let zs = 0;
+    for (const c of comps) { if (!(c.z >= 0)) return fail('err.z', { s: NaN }); zs += c.z; }
+    if (Math.abs(zs - 1) > 1e-3) return fail('err.z', { s: zs });
+    const z = comps.map(c => c.z / zs);
+    for (let i = 0; i < n; i++) {
+      const c = comps[i];
+      if (ant ? !(isFinite(c.A) && c.B > 0 && isFinite(c.C)) : !(c.alpha > 0)) return fail(ant ? 'err.ant' : 'err.alpha', { i });
+    }
+    const lk = inp.lk, hk = inp.hk;
+    if (!(lk >= 0 && lk < n && hk >= 0 && hk < n) || lk === hk) return fail('err.keys');
+    const Pmm = inp.P * 760;
+
+    // Orden de volatilidad: Tb a la presión de operación (Antoine) o α (constantes)
+    const vol = ant ? comps.map(c => -tbAt(c, Pmm)) : comps.map(c => c.alpha);
+    const ord = comps.map((_, i) => i).sort((p, q) => vol[q] - vol[p]);
+    const rank = [];
+    ord.forEach((i, k) => { rank[i] = k; });
+    Object.assign(r, { ord, rank, z, tb: ant ? comps.map(c => tbAt(c, Pmm)) : null });
+    if (rank[lk] > rank[hk]) return fail('err.keysOrder', { lk, hk });
+    const entre = ord.slice(rank[lk] + 1, rank[hk]).filter(i => z[i] > 0);
+    if (entre.length) return fail('err.keysAdj', { lk, hk, i: entre[0] });
+    if (!(z[lk] > 0 && z[hk] > 0)) return fail('err.zKey');
+    const fL = inp.recLK, fH = inp.recHK;
+    if (!(fL > 0 && fL < 1 && fH > 0 && fH < 1)) return fail('err.rec');
+
+    // Balance con reparto limpio de los no clave
+    const f = z.map(v => v * inp.F), d = [], b = [], role = [];
+    for (let i = 0; i < n; i++) {
+      if (i === lk) { d[i] = fL * f[i]; b[i] = f[i] - d[i]; role[i] = 'LK'; }
+      else if (i === hk) { b[i] = fH * f[i]; d[i] = f[i] - b[i]; role[i] = 'HK'; }
+      else if (rank[i] < rank[lk]) { d[i] = f[i]; b[i] = 0; role[i] = 'LNK'; }
+      else { d[i] = 0; b[i] = f[i]; role[i] = 'HNK'; }
+    }
+    const D = d.reduce((s, v) => s + v, 0), B = inp.F - D;
+    const xD = d.map(v => v / D), xB = b.map(v => v / B);
+    Object.assign(r, { f, d, b, D, B, xD, xB, role });
+    const S = (d[lk] / d[hk]) * (b[hk] / b[lk]);
+    r.S = S;
+    if (!(S > 1)) return fail('err.S');
+
+    // Volatilidades relativas respecto al HK, arriba y abajo, y su media geométrica
+    let a, aTop, aBot, TD = NaN, TB = NaN, KD = null, KB = null;
+    if (ant) {
+      TD = bubble(comps, xD, Pmm); if (!isFinite(TD)) return fail('err.bubble', { p: 'D' });
+      TB = bubble(comps, xB, Pmm); if (!isFinite(TB)) return fail('err.bubble', { p: 'B' });
+      KD = comps.map(c => psat(c, TD) / Pmm); KB = comps.map(c => psat(c, TB) / Pmm);
+      aTop = KD.map(k => k / KD[hk]); aBot = KB.map(k => k / KB[hk]);
+      a = aTop.map((v, i) => Math.sqrt(v * aBot[i]));
+    } else {
+      a = comps.map(c => c.alpha / comps[hk].alpha); aTop = a.slice(); aBot = a.slice();
+    }
+    Object.assign(r, { TD, TB, KD, KB, a, aTop, aBot });
+    if (!(a[lk] > 1)) return fail('err.alphaLK');
+
+    // Fenske
+    const Nmin1 = Math.log(S) / Math.log(a[lk]);
+    Object.assign(r, { Nmin1, Nmin: Nmin1 - 1 });
+
+    // Underwood: la raíz útil está entre α_HK y el siguiente polo (α_LK si los claves son adyacentes)
+    let hi = Infinity;
+    for (let i = 0; i < n; i++) if (z[i] > 0 && a[i] > a[hk] + 1e-12) hi = Math.min(hi, a[i]);
+    for (let i = 0; i < n; i++) if (i !== lk && i !== hk && z[i] > 0 && a[i] > a[hk] && a[i] < a[lk]) r.warnings.push({ key: 'warn.alphaOrder', p: { i } });
+    const span = hi - a[hk];
+    const th = bisect(t => underwood(a, z, t) - (1 - inp.q), a[hk] + span * 1e-12, hi - span * 1e-12, 200);
+    r.theta = th;
+    const Rmin = xD.reduce((s, x, i) => s + (x > 0 ? a[i] * x / (a[i] - th) : 0), 0) - 1;
+    r.Rmin = Rmin;
+    if (!(Rmin > 0)) return fail('err.rmin');
+    const R = inp.RR * Rmin;
+    r.R = R;
+
+    // Gilliland (Eduljee o Molokanov); N incluye el rehervidor porque N_min + 1 lo incluye
+    const X = (R - Rmin) / (R + 1), Ye = eduljee(X), Ym = molokanov(X);
+    const Y = inp.gill === 'molokanov' ? Ym : Ye;
+    const N = (Nmin1 + Y) / (1 - Y);
+    Object.assign(r, { X, Y, Ye, Ym, N, Nedu: (Nmin1 + Ye) / (1 - Ye), Nmol: (Nmin1 + Ym) / (1 - Ym), Nceil: Math.ceil(N - 1e-9) });
+
+    // Kirkbride
+    const kr = Math.pow((z[hk] / z[lk]) * Math.pow(xB[lk] / xD[hk], 2) * (B / D), 0.206);
+    const NR = kr / (1 + kr) * N;
+    Object.assign(r, { kr, NR, NS: N - NR, feed: Math.round(NR) + 1 });
+
+    // Comprobación de no clave con la distribución de Fenske: (d/b)_i = (d/b)_HK · α_i^(N_min + 1)
+    const dbHK = d[hk] / b[hk];
+    r.nk = a.map((ai, i) => {
+      const db = dbHK * Math.pow(ai, Nmin1);
+      const wrong = role[i] === 'LNK' ? 1 / (1 + db) : role[i] === 'HNK' ? db / (1 + db) : NaN;
+      return { db, wrong };
+    });
+    r.nk.forEach((o, i) => { if (z[i] > 0 && o.wrong > 1e-3) r.warnings.push({ key: 'warn.nk', p: { i, w: o.wrong } }); });
+    r.ok = true;
+    return r;
+  }
+
+  return { solve, psat, tbAt, underwood, eduljee, molokanov };
+})();
+if (typeof module !== 'undefined') module.exports = FUG;
+
+/* ===== Textos bilingües ===== */
+const I18N = {
+  es: {
+    tagline: 'Método corto para columnas de destilación multicomponente',
+    'h.op': 'Alimentación y operación', 'h.comp': 'Componentes', 'h.spec': 'Separación deseada', 'h.opt': 'Opciones del modelo',
+    'lbl.preset': 'Ejemplo precargado',
+    'preset.clase': 'Ejercicio de clase: BTX + propanol + p-DEB', 'preset.alcoholes': 'Alcoholes y agua a 2 atm', 'preset.alfa': 'Ejercicio de clase con α fijas', 'preset.custom': 'Mis datos',
+    'lbl.F': 'Alimentación <i>F</i>', 'lbl.unit': 'Unidades', 'lbl.P': 'Presión <i>P</i> (atm)', 'lbl.RR': '<i>R</i>/<i>R</i><sub>min</sub>',
+    'lbl.q': 'Condición térmica de la alimentación <i>q</i>',
+    'q.satliq': 'Líquido saturado · 1', 'q.half': '50 % vapor · 0.5', 'q.satvap': 'Vapor saturado · 0',
+    'hint.q': 'q > 1 subenfriado · 0 < q < 1 mezcla L–V (q = fracción líquida) · q < 0 sobrecalentado',
+    'mode.ant': 'K ideal (Antoine)', 'mode.alpha': 'α constantes',
+    'hint.ant': 'log₁₀ P<sup>sat</sup> [mmHg] = A − B/(T [°C] + C) · K = P<sup>sat</sup>/P',
+    'hint.alpha': 'Escribe α respecto a cualquier referencia: se normaliza con el clave pesado.',
+    'ph.name': 'Nombre', 'c.tb': 'T<sub>b</sub> a {P} atm: <b>{t} °C</b>', 'c.role': '{r}', 'c.del': 'Quitar {c}',
+    'add.title': '+ Agregar componente…', 'add.other': 'Otro (escribe sus constantes)', 'new.comp': 'Componente {n}',
+    'btn.norm': 'Normalizar z', 'zsum': 'Σz = {s}',
+    'lbl.lk': 'Clave ligero (LK)', 'lbl.hk': 'Clave pesado (HK)',
+    'lbl.recLK': 'LK recuperado en el destilado (%)', 'lbl.recHK': 'HK recuperado en los fondos (%)',
+    'hint.keys': 'Los no clave se reparten de forma limpia: los más ligeros que el LK salen todos en el destilado y los más pesados que el HK, todos en los fondos.',
+    'lbl.gill': 'Correlación de Gilliland', 'gill.edu': 'Eduljee (como en clase)', 'gill.mol': 'Molokanov',
+    'btn.reset': 'Volver al ejercicio de clase',
+    'kpi.N': 'Etapas teóricas', 'kpi.feed': 'Alimentación', 'kpi.R': 'Reflujo R', 'kpi.Nmin': 'Reflujo total',
+    'kpi.Nsub': '{t} platos + rehervidor · N = {n}', 'kpi.feedSub': 'etapa desde arriba · N<sub>R</sub> = {r} · N<sub>S</sub> = {s}',
+    'kpi.Rsub': 'R<sub>min</sub> = {m} · θ = {th}', 'kpi.NminSub': 'N<sub>min</sub> + 1, con rehervidor · S = {S}',
+    'view.col': 'Columna', 'view.und': 'Underwood', 'view.gil': 'Gilliland', 'z.all': 'Completa', 'z.keys': 'Entre los claves',
+    'role.LNK': 'ligero no clave', 'role.LK': 'clave ligero', 'role.HK': 'clave pesado', 'role.HNK': 'pesado no clave',
+    'role.s.LNK': 'LNK', 'role.s.LK': 'LK', 'role.s.HK': 'HK', 'role.s.HNK': 'HNK',
+    // gráficas
+    'pl.feed': 'F = {F} {u} · q = {q}', 'pl.feedStage': 'etapa {f}', 'pl.D': 'D = {D} {u}', 'pl.B': 'B = {B} {u}',
+    'pl.TD': 'T domo = {t} °C', 'pl.TB': 'T fondos = {t} °C', 'pl.rect': 'Rectificación', 'pl.strip': 'Agotamiento',
+    'pl.stages': '{k} etapas', 'pl.cond': 'condensador', 'pl.reb': 'rehervidor',
+    'pl.theta': 'θ = {th}', 'pl.oneq': '1 − q = {v}', 'pl.thx': 'θ', 'pl.thy': 'Σ αᵢzᵢ/(αᵢ − θ)',
+    'pl.gx': 'X = (R − Rmin)/(R + 1)', 'pl.gy': 'Y = (N − Nmin)/(N + 1)', 'pl.point': 'X = {x} · Y = {y}',
+    'lg.edu': 'Eduljee', 'lg.mol': 'Molokanov', 'lg.point': 'Esta columna', 'lg.und': 'Función de Underwood', 'lg.oneq': '1 − q', 'lg.root': 'Raíz θ', 'lg.pole': 'Asíntotas α<sub>i</sub>',
+    'cap.col': 'Condensador total y rehervidor parcial. La alimentación entra en la etapa <b>{f}</b> contando desde arriba; el rehervidor es la etapa <b>{n}</b>.',
+    'cap.und': 'Primera ecuación de Underwood. La raíz útil está entre α<sub>HK</sub> = 1 y α<sub>LK</sub> = {a}: <b>θ = {th}</b>.',
+    'cap.gil': 'Con R/R<sub>min</sub> = {k}: X = {x} → Y = {y} → <b>N = {n}</b> etapas con rehervidor ({corr}).',
+    // avisos
+    'err.n': '<b>Se necesitan al menos dos componentes.</b>',
+    'err.F': '<b>F debe ser positivo.</b>', 'err.P': '<b>La presión debe ser positiva.</b>', 'err.q': '<b>Escribe un valor numérico para q.</b>',
+    'err.RR': '<b>R/R<sub>min</sub> debe ser mayor que 1.</b> Con R = R<sub>min</sub> harían falta infinitas etapas.',
+    'err.z': '<b>Las fracciones z deben ser ≥ 0 y sumar 1</b> (ahora suman {s}). Usa «Normalizar z».',
+    'err.ant': '<b>Faltan las constantes de Antoine de {c}.</b>', 'err.alpha': '<b>Escribe una α positiva para {c}.</b>',
+    'err.keys': '<b>Elige dos componentes clave distintos.</b>',
+    'err.keysOrder': '<b>El clave ligero debe ser más volátil que el pesado.</b> Con estos datos, {hk} es más volátil que {lk}: intercámbialos.',
+    'err.keysAdj': '<b>Los claves deben ser adyacentes en volatilidad.</b> {c} queda entre {lk} y {hk}; elige claves vecinos.',
+    'err.zKey': '<b>Los dos claves deben estar en la alimentación</b> (z > 0).',
+    'err.rec': '<b>Las recuperaciones deben estar entre 0 y 100 %</b> (sin llegar a los extremos).',
+    'err.S': '<b>Con esas recuperaciones no hay separación entre los claves</b> (factor de separación ≤ 1). Aumenta alguna de las dos.',
+    'err.bubble': '<b>No se encontró el punto de burbuja {p}.</b> Revisa las constantes de Antoine y la presión.', 'bub.D': 'del destilado', 'bub.B': 'de los fondos',
+    'err.alphaLK': '<b>α<sub>LK,HK</sub> ≤ 1:</b> con estos datos el clave ligero no es más volátil que el pesado.',
+    'err.rmin': '<b>R<sub>min</sub> ≤ 0.</b> Revisa q y las composiciones.',
+    'warn.nk': '<b>Reparto limpio dudoso:</b> según Fenske, {c} manda {w} de lo alimentado al producto contrario. El balance supone 0 %.',
+    'warn.alphaOrder': '<b>Al promediar α, {c} queda entre los claves.</b> Revisa la elección del LK y el HK.',
+    'info.ideal': 'K ideal (ley de Raoult). En esta mezcla hay azeótropos y un modelo de actividad dará otros números; úsalo como primera estimación.',
+    // pasos
+    'st.n': 'Paso', 'st.what': 'Qué se calcula', 'st.res': 'Resultado', 'st.f': 'Fórmula',
+    'st.intro': 'Los mismos pasos del Excel del curso. Aquí los dos pasos con Solver (temperaturas y θ) se resuelven solos.',
+    's1': 'Datos del problema', 's2': 'Claves y recuperaciones', 's3': 'Balance de materia (reparto limpio)', 's45': 'Puntos de burbuja del destilado y de los fondos',
+    's6': 'Volatilidades relativas (media geométrica)', 's7': 'Fenske: etapas mínimas', 's89': 'Underwood: raíz θ', 's10': 'Underwood: R<sub>min</sub> y R',
+    's11': 'Gilliland: número de etapas', 's12': 'Kirkbride: etapa de alimentación',
+    'r1': 'P = {P} atm · F = {F} {u} · q = {q} · R/R<sub>min</sub> = {k}', 'r2': 'LK: {lk}, {rl} % al destilado · HK: {hk}, {rh} % a los fondos',
+    'r3': 'D = {D} · B = {B} {u}', 'r45': 'T<sub>D</sub> = {td} °C · T<sub>B</sub> = {tb} °C', 'r45na': 'No aplica con α constantes',
+    'r6': 'α<sub>LK,HK</sub> = {a}', 'r7': 'S = {S} · N<sub>min</sub> + 1 = {n1} ({n} platos a reflujo total)', 'r89': 'θ = {th}, entre 1 y {a}',
+    'r10': 'R<sub>min</sub> = {rm} · R = {R}', 'r11': 'X = {x} · Y = {y} · N = {n} → <b>{nc}</b> etapas', 'r12': 'N<sub>R</sub> = {nr} · N<sub>S</sub> = {ns} → alimentación en la etapa <b>{f}</b>',
+    // balance
+    'b.comp': 'Componente', 'b.role': 'Rol', 'b.note': 'Ordenados por volatilidad. Flujos en {u}.',
+    'v.tb': 'T<sub>b</sub> a P (°C)', 'v.KD': 'K domo', 'v.KB': 'K fondos', 'v.aD': 'α domo', 'v.aB': 'α fondos', 'v.a': 'α promedio',
+    'v.note': 'α<sub>i</sub> = K<sub>i</sub>/K<sub>HK</sub> en el domo (T<sub>D</sub> = {td} °C) y en los fondos (T<sub>B</sub> = {tb} °C); el promedio es la media geométrica. Fenske usa α<sub>LK,HK</sub>; las dos ecuaciones de Underwood usan todas.',
+    'v.noteAlpha': 'Con α constantes no hay temperaturas ni valores de K: se usan las α que escribiste, normalizadas con el clave pesado.',
+    'nk.db': '(d/b) de Fenske', 'nk.wrong': 'Al producto contrario', 'nk.state': 'Estado', 'nk.ok': '✓ reparto limpio', 'nk.bad': '⚠ se reparte', 'nk.key': 'clave',
+    'nk.note': 'Distribución de Fenske: (d/b)<sub>i</sub> = (d/b)<sub>HK</sub> · α<sub>i</sub><sup>N<sub>min</sub>+1</sup>. Si un no clave manda más de 0.1 % al producto contrario, el reparto limpio del balance es solo una aproximación.',
+    // Aspen
+    'asp.intro': 'Valores listos para capturar en Aspen Plus. Haz clic en cualquier valor para copiarlo.', 'asp.copyAll': 'Copiar resumen',
+    'asp.dstwu': 'DSTWU', 'asp.dstwuSub': 'método corto', 'asp.radfrac': 'RadFrac', 'asp.radfracSub': 'método riguroso',
+    'asp.reflux': 'Reflux ratio', 'asp.refluxS': 'negativo = múltiplo de R<sub>min</sub>; DSTWU calcula su propio R<sub>min</sub>',
+    'asp.lk': 'Light key · Recov', 'asp.hk': 'Heavy key · Recov', 'asp.recS': 'fracción de {c} alimentado que sale en el destilado',
+    'asp.press': 'Pressure', 'asp.pressS': 'condensador y rehervidor', 'asp.cond': 'Condenser',
+    'asp.nst': 'Number of stages', 'asp.nstS': '{n} etapas de FUG + condensador total', 'asp.D': 'Distillate rate (Mole)', 'asp.RR': 'Reflux ratio (Mole)',
+    'asp.feed': 'Feed stage', 'asp.feedS': 'etapa {f} de FUG + 1 (RadFrac cuenta el condensador como etapa 1)',
+    'asp.note': 'DSTWU usa el método termodinámico de tu simulación (por ejemplo NRTL), así que sus números pueden diferir de estos, que suponen K ideal.',
+    'asp.unavailable': 'Corrige los avisos de arriba para obtener los resultados.',
+    'toast.copied': 'Copiado: {v}', 'toast.copyFail': 'No se pudo copiar; selecciona el texto manualmente.',
+    'foot.by': 'Desarrollado por <b>Xiuhcóatl</b> · Herramienta educativa libre de Ingeniería Química',
+    'foot.note': 'Método corto con volatilidad relativa constante. Valida siempre con una simulación rigurosa.'
+  },
+  en: {
+    tagline: 'Shortcut method for multicomponent distillation columns',
+    'h.op': 'Feed and operation', 'h.comp': 'Components', 'h.spec': 'Desired separation', 'h.opt': 'Model options',
+    'lbl.preset': 'Preloaded example',
+    'preset.clase': 'Course exercise: BTX + propanol + p-DEB', 'preset.alcoholes': 'Alcohols and water at 2 atm', 'preset.alfa': 'Course exercise with fixed α', 'preset.custom': 'My data',
+    'lbl.F': 'Feed <i>F</i>', 'lbl.unit': 'Units', 'lbl.P': 'Pressure <i>P</i> (atm)', 'lbl.RR': '<i>R</i>/<i>R</i><sub>min</sub>',
+    'lbl.q': 'Feed thermal condition <i>q</i>',
+    'q.satliq': 'Saturated liquid · 1', 'q.half': '50 % vapor · 0.5', 'q.satvap': 'Saturated vapor · 0',
+    'hint.q': 'q > 1 subcooled · 0 < q < 1 V–L mixture (q = liquid fraction) · q < 0 superheated',
+    'mode.ant': 'Ideal K (Antoine)', 'mode.alpha': 'Constant α',
+    'hint.ant': 'log₁₀ P<sup>sat</sup> [mmHg] = A − B/(T [°C] + C) · K = P<sup>sat</sup>/P',
+    'hint.alpha': 'Enter α relative to any reference: it is normalized with the heavy key.',
+    'ph.name': 'Name', 'c.tb': 'T<sub>b</sub> at {P} atm: <b>{t} °C</b>', 'c.role': '{r}', 'c.del': 'Remove {c}',
+    'add.title': '+ Add a component…', 'add.other': 'Other (type its constants)', 'new.comp': 'Component {n}',
+    'btn.norm': 'Normalize z', 'zsum': 'Σz = {s}',
+    'lbl.lk': 'Light key (LK)', 'lbl.hk': 'Heavy key (HK)',
+    'lbl.recLK': 'LK recovered in the distillate (%)', 'lbl.recHK': 'HK recovered in the bottoms (%)',
+    'hint.keys': 'Non-keys split sharply: those lighter than the LK all leave in the distillate and those heavier than the HK all leave in the bottoms.',
+    'lbl.gill': 'Gilliland correlation', 'gill.edu': 'Eduljee (as in class)', 'gill.mol': 'Molokanov',
+    'btn.reset': 'Back to the course exercise',
+    'kpi.N': 'Theoretical stages', 'kpi.feed': 'Feed', 'kpi.R': 'Reflux R', 'kpi.Nmin': 'Total reflux',
+    'kpi.Nsub': '{t} trays + reboiler · N = {n}', 'kpi.feedSub': 'stage from the top · N<sub>R</sub> = {r} · N<sub>S</sub> = {s}',
+    'kpi.Rsub': 'R<sub>min</sub> = {m} · θ = {th}', 'kpi.NminSub': 'N<sub>min</sub> + 1, incl. reboiler · S = {S}',
+    'view.col': 'Column', 'view.und': 'Underwood', 'view.gil': 'Gilliland', 'z.all': 'Full', 'z.keys': 'Between the keys',
+    'role.LNK': 'light non-key', 'role.LK': 'light key', 'role.HK': 'heavy key', 'role.HNK': 'heavy non-key',
+    'role.s.LNK': 'LNK', 'role.s.LK': 'LK', 'role.s.HK': 'HK', 'role.s.HNK': 'HNK',
+    'pl.feed': 'F = {F} {u} · q = {q}', 'pl.feedStage': 'stage {f}', 'pl.D': 'D = {D} {u}', 'pl.B': 'B = {B} {u}',
+    'pl.TD': 'T top = {t} °C', 'pl.TB': 'T bottom = {t} °C', 'pl.rect': 'Rectifying', 'pl.strip': 'Stripping',
+    'pl.stages': '{k} stages', 'pl.cond': 'condenser', 'pl.reb': 'reboiler',
+    'pl.theta': 'θ = {th}', 'pl.oneq': '1 − q = {v}', 'pl.thx': 'θ', 'pl.thy': 'Σ αᵢzᵢ/(αᵢ − θ)',
+    'pl.gx': 'X = (R − Rmin)/(R + 1)', 'pl.gy': 'Y = (N − Nmin)/(N + 1)', 'pl.point': 'X = {x} · Y = {y}',
+    'lg.edu': 'Eduljee', 'lg.mol': 'Molokanov', 'lg.point': 'This column', 'lg.und': 'Underwood function', 'lg.oneq': '1 − q', 'lg.root': 'Root θ', 'lg.pole': 'Asymptotes α<sub>i</sub>',
+    'cap.col': 'Total condenser and partial reboiler. The feed enters on stage <b>{f}</b> counted from the top; the reboiler is stage <b>{n}</b>.',
+    'cap.und': 'First Underwood equation. The useful root lies between α<sub>HK</sub> = 1 and α<sub>LK</sub> = {a}: <b>θ = {th}</b>.',
+    'cap.gil': 'With R/R<sub>min</sub> = {k}: X = {x} → Y = {y} → <b>N = {n}</b> stages incl. reboiler ({corr}).',
+    'err.n': '<b>At least two components are needed.</b>',
+    'err.F': '<b>F must be positive.</b>', 'err.P': '<b>Pressure must be positive.</b>', 'err.q': '<b>Enter a numeric value for q.</b>',
+    'err.RR': '<b>R/R<sub>min</sub> must be greater than 1.</b> At R = R<sub>min</sub> an infinite number of stages is needed.',
+    'err.z': '<b>Mole fractions z must be ≥ 0 and add up to 1</b> (now {s}). Use “Normalize z”.',
+    'err.ant': '<b>Antoine constants are missing for {c}.</b>', 'err.alpha': '<b>Enter a positive α for {c}.</b>',
+    'err.keys': '<b>Choose two different key components.</b>',
+    'err.keysOrder': '<b>The light key must be more volatile than the heavy key.</b> With these data, {hk} is more volatile than {lk}: swap them.',
+    'err.keysAdj': '<b>The keys must be adjacent in volatility.</b> {c} lies between {lk} and {hk}; choose neighboring keys.',
+    'err.zKey': '<b>Both keys must be present in the feed</b> (z > 0).',
+    'err.rec': '<b>Recoveries must lie between 0 and 100 %</b> (excluding the ends).',
+    'err.S': '<b>These recoveries give no separation between the keys</b> (separation factor ≤ 1). Increase one of them.',
+    'err.bubble': '<b>The {p} bubble point was not found.</b> Check the Antoine constants and the pressure.', 'bub.D': 'distillate', 'bub.B': 'bottoms',
+    'err.alphaLK': '<b>α<sub>LK,HK</sub> ≤ 1:</b> with these data the light key is not more volatile than the heavy key.',
+    'err.rmin': '<b>R<sub>min</sub> ≤ 0.</b> Check q and the compositions.',
+    'warn.nk': '<b>Sharp split is questionable:</b> by Fenske, {c} sends {w} of its feed to the other product. The balance assumes 0 %.',
+    'warn.alphaOrder': '<b>After averaging α, {c} falls between the keys.</b> Check the LK and HK choice.',
+    'info.ideal': 'Ideal K (Raoult’s law). This mixture has azeotropes and an activity model will give other numbers; use it as a first estimate.',
+    'st.n': 'Step', 'st.what': 'What is computed', 'st.res': 'Result', 'st.f': 'Formula',
+    'st.intro': 'The same steps as the course workbook. Here the two Solver steps (temperatures and θ) are solved automatically.',
+    's1': 'Problem data', 's2': 'Keys and recoveries', 's3': 'Material balance (sharp split)', 's45': 'Distillate and bottoms bubble points',
+    's6': 'Relative volatilities (geometric mean)', 's7': 'Fenske: minimum stages', 's89': 'Underwood: root θ', 's10': 'Underwood: R<sub>min</sub> and R',
+    's11': 'Gilliland: number of stages', 's12': 'Kirkbride: feed stage',
+    'r1': 'P = {P} atm · F = {F} {u} · q = {q} · R/R<sub>min</sub> = {k}', 'r2': 'LK: {lk}, {rl} % to the distillate · HK: {hk}, {rh} % to the bottoms',
+    'r3': 'D = {D} · B = {B} {u}', 'r45': 'T<sub>D</sub> = {td} °C · T<sub>B</sub> = {tb} °C', 'r45na': 'Not applicable with constant α',
+    'r6': 'α<sub>LK,HK</sub> = {a}', 'r7': 'S = {S} · N<sub>min</sub> + 1 = {n1} ({n} trays at total reflux)', 'r89': 'θ = {th}, between 1 and {a}',
+    'r10': 'R<sub>min</sub> = {rm} · R = {R}', 'r11': 'X = {x} · Y = {y} · N = {n} → <b>{nc}</b> stages', 'r12': 'N<sub>R</sub> = {nr} · N<sub>S</sub> = {ns} → feed on stage <b>{f}</b>',
+    'b.comp': 'Component', 'b.role': 'Role', 'b.note': 'Sorted by volatility. Flows in {u}.',
+    'v.tb': 'T<sub>b</sub> at P (°C)', 'v.KD': 'K top', 'v.KB': 'K bottom', 'v.aD': 'α top', 'v.aB': 'α bottom', 'v.a': 'average α',
+    'v.note': 'α<sub>i</sub> = K<sub>i</sub>/K<sub>HK</sub> at the top (T<sub>D</sub> = {td} °C) and at the bottom (T<sub>B</sub> = {tb} °C); the average is the geometric mean. Fenske uses α<sub>LK,HK</sub>; both Underwood equations use them all.',
+    'v.noteAlpha': 'With constant α there are no temperatures or K-values: the α you entered are used, normalized with the heavy key.',
+    'nk.db': 'Fenske (d/b)', 'nk.wrong': 'To the other product', 'nk.state': 'Status', 'nk.ok': '✓ sharp split', 'nk.bad': '⚠ distributes', 'nk.key': 'key',
+    'nk.note': 'Fenske distribution: (d/b)<sub>i</sub> = (d/b)<sub>HK</sub> · α<sub>i</sub><sup>N<sub>min</sub>+1</sup>. If a non-key sends more than 0.1 % to the other product, the sharp-split balance is only an approximation.',
+    'asp.intro': 'Values ready to enter in Aspen Plus. Click any value to copy it.', 'asp.copyAll': 'Copy summary',
+    'asp.dstwu': 'DSTWU', 'asp.dstwuSub': 'shortcut', 'asp.radfrac': 'RadFrac', 'asp.radfracSub': 'rigorous',
+    'asp.reflux': 'Reflux ratio', 'asp.refluxS': 'negative = multiple of R<sub>min</sub>; DSTWU computes its own R<sub>min</sub>',
+    'asp.lk': 'Light key · Recov', 'asp.hk': 'Heavy key · Recov', 'asp.recS': 'fraction of fed {c} leaving in the distillate',
+    'asp.press': 'Pressure', 'asp.pressS': 'condenser and reboiler', 'asp.cond': 'Condenser',
+    'asp.nst': 'Number of stages', 'asp.nstS': '{n} FUG stages + total condenser', 'asp.D': 'Distillate rate (Mole)', 'asp.RR': 'Reflux ratio (Mole)',
+    'asp.feed': 'Feed stage', 'asp.feedS': 'FUG stage {f} + 1 (RadFrac counts the condenser as stage 1)',
+    'asp.note': 'DSTWU uses your simulation’s property method (for example NRTL), so its numbers may differ from these, which assume ideal K-values.',
+    'asp.unavailable': 'Fix the warnings above to get the results.',
+    'toast.copied': 'Copied: {v}', 'toast.copyFail': 'Could not copy; select the text manually.',
+    'foot.by': 'Developed by <b>Xiuhcóatl</b> · Free Chemical Engineering teaching tool',
+    'foot.note': 'Shortcut method with constant relative volatility. Always check against a rigorous simulation.'
+  }
+};
+
+/* ===== FUG Lab · interfaz ===== */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const STORE = 'fuglab.v1';
+  const COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#6250d6', '#e34948', '#b07d10', '#0e8f9a', '#8a5a44', '#6f7a84'];
+
+  /* Constantes de Antoine de las hojas del curso (mmHg, °C) */
+  const LIB = {
+    benzene: { es: 'Benceno', en: 'Benzene', A: 7.06437, B: 1296.93, C: 229.916 },
+    propanol: { es: '1-Propanol', en: '1-Propanol', A: 7.77374, B: 1518.16, C: 213.076 },
+    toluene: { es: 'Tolueno', en: 'Toluene', A: 7.1362, B: 1457.29, C: 231.827 },
+    ethylbenzene: { es: 'Etilbenceno', en: 'Ethylbenzene', A: 7.1561, B: 1559.55, C: 228.582 },
+    pdeb: { es: 'p-Dietilbenceno', en: 'p-Diethylbenzene', A: 7.21059, B: 1743.19, C: 218.815 },
+    methanol: { es: 'Metanol', en: 'Methanol', A: 8.09126, B: 1582.91, C: 239.096 },
+    ethanol: { es: 'Etanol', en: 'Ethanol', A: 8.13484, B: 1662.48, C: 238.131 },
+    water: { es: 'Agua', en: 'Water', A: 8.05573, B: 1723.6425, C: 233.08 },
+    butanol: { es: '1-Butanol', en: '1-Butanol', A: 7.62121, B: 1543.89, C: 208.029 }
+  };
+  const libComp = (key, z, alpha) => ({ key, name: '', z: String(z), A: String(LIB[key].A), B: String(LIB[key].B), C: String(LIB[key].C), alpha: alpha != null ? String(alpha) : '' });
+
+  const PRESETS = {
+    clase: () => ({ mode: 'antoine', P: '1', F: '100', q: '1.5', RR: '1.3', recLK: '99.8', recHK: '99.8', lk: 2, hk: 3,
+      comps: [libComp('benzene', 0.2, 4.8003), libComp('propanol', 0.08, 3.3882), libComp('toluene', 0.12, 2.0645), libComp('ethylbenzene', 0.35, 1), libComp('pdeb', 0.25, 0.2381)] }),
+    alcoholes: () => ({ mode: 'antoine', P: '2', F: '136', q: '0.8', RR: '1.3', recLK: '85', recHK: '85', lk: 2, hk: 3,
+      comps: [libComp('methanol', 0.1), libComp('ethanol', 0.15), libComp('propanol', 0.5), libComp('water', 0.2), libComp('butanol', 0.05)] }),
+    alfa: () => Object.assign(PRESETS.clase(), { mode: 'alpha' })
+  };
+
+  /* ---------- estado ---------- */
+  let S = null, lang = 'es', res = null, zoom = 'all';
+  function freshState(p) {
+    const base = (PRESETS[p] || PRESETS.clase)();
+    return Object.assign({ lang: S ? S.lang : 'es', preset: p, Funit: 'kmol/h', gill: 'eduljee', view: S ? S.view : 'col', tab: S ? S.tab : 'steps' }, base);
+  }
+
+  /* ---------- i18n ---------- */
+  function t(k, p) {
+    let s = (I18N[lang] && I18N[lang][k]) != null ? I18N[lang][k] : (I18N.es[k] != null ? I18N.es[k] : k);
+    if (p) s = s.replace(/\{(\w+)\}/g, (m, n) => (p[n] != null ? p[n] : m));
+    return s;
+  }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const cname = c => (c.key && LIB[c.key] ? LIB[c.key][lang] : c.name) || '?';
+  const nm = i => esc(cname(S.comps[i]));
+  const col = i => COLORS[i % COLORS.length];
+
+  function applyStatic() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll('[data-lang]').forEach(el => { el.hidden = el.dataset.lang !== lang; });
+    $('lang-es').setAttribute('aria-pressed', lang === 'es');
+    $('lang-en').setAttribute('aria-pressed', lang === 'en');
+  }
+
+  /* ---------- números ---------- */
+  const num = s => { const v = parseFloat(String(s).trim().replace(',', '.')); return isFinite(v) ? v : NaN; };
+  const fx = (v, d) => (isFinite(v) ? Number(v).toFixed(d) : '—');
+  const fR = v => (!isFinite(v) ? '∞' : Math.abs(v) >= 100 ? fx(v, 1) : Math.abs(v) >= 10 ? fx(v, 2) : fx(v, 3));
+  const fFlow = v => (Math.abs(v) >= 1000 ? fx(v, 1) : fx(v, 3));
+  const trim = s => String(s).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  function sci(v, d) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    const a = Math.abs(v);
+    if (a >= 1e-3 && a < 1e4) return trim(fx(v, d == null ? 4 : d));
+    const e = Math.floor(Math.log10(a)), m = v / Math.pow(10, e);
+    return `${fx(m, d == null ? 2 : Math.min(d, 3))}×10${String(e).split('').map(c => SUP[c]).join('')}`;
+  }
+  const pct = v => (!isFinite(v) ? '—' : v < 1e-4 ? sci(100 * v, 1) + ' %' : trim(fx(100 * v, 3)) + ' %');
+
+  /* ---------- guardado ---------- */
+  let saveT = null;
+  function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* sin almacenamiento */ } }, 300); }
+  function load() {
+    try { const o = JSON.parse(localStorage.getItem(STORE) || 'null'); if (o && Array.isArray(o.comps) && o.comps.length) return o; } catch (e) { /* ignorar */ }
+    return null;
+  }
+
+  /* ---------- cálculo ---------- */
+  function readInputs() {
+    const comps = S.comps.map(c => ({ z: num(c.z), A: num(c.A), B: num(c.B), C: num(c.C), alpha: num(c.alpha) }));
+    return { mode: S.mode, comps, P: num(S.P), F: num(S.F), q: num(S.q), RR: num(S.RR), lk: S.lk, hk: S.hk, recLK: num(S.recLK) / 100, recHK: num(S.recHK) / 100, gill: S.gill };
+  }
+  function markInvalid(inp) {
+    const bad = { F: !(inp.F > 0), P: !(inp.P > 0), q: !isFinite(inp.q), RR: !(inp.RR > 1), recLK: !(inp.recLK > 0 && inp.recLK < 1), recHK: !(inp.recHK > 0 && inp.recHK < 1) };
+    Object.keys(bad).forEach(k => $(k).setAttribute('aria-invalid', bad[k] ? 'true' : 'false'));
+  }
+  function compute() {
+    const inp = readInputs();
+    markInvalid(inp);
+    res = FUG.solve(inp);
+    renderAll();
+    save();
+  }
+  let pend = 0;
+  function schedule() { clearTimeout(pend); pend = setTimeout(compute, 30); }
+
+  /* ---------- componentes ---------- */
+  const DEL = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
+  function renderComps() {
+    const ant = S.mode === 'antoine';
+    $('mAnt').setAttribute('aria-pressed', ant); $('mAlpha').setAttribute('aria-pressed', !ant);
+    $('modeHint').innerHTML = t(ant ? 'hint.ant' : 'hint.alpha');
+    $('comps').innerHTML = S.comps.map((c, i) => {
+      const par = ant
+        ? `<div class="par">${['A', 'B', 'C'].map(k => `<label>${k}<input type="text" class="num" inputmode="decimal" data-i="${i}" data-k="${k}" value="${esc(c[k])}" aria-label="${k} · ${nm(i)}"></label>`).join('')}</div>`
+        : `<div class="par one"><label>α<input type="text" class="num" inputmode="decimal" data-i="${i}" data-k="alpha" value="${esc(c.alpha)}" aria-label="α · ${nm(i)}"></label></div>`;
+      return `<div class="comp">
+        <span class="dot" style="background:${col(i)}"></span>
+        <input type="text" data-i="${i}" data-k="name" value="${nm(i)}" placeholder="${t('ph.name')}" aria-label="${t('ph.name')} ${i + 1}" autocomplete="off">
+        <input type="text" class="num" inputmode="decimal" data-i="${i}" data-k="z" value="${esc(c.z)}" aria-label="z · ${nm(i)}" title="z">
+        <button type="button" class="del" data-del="${i}" aria-label="${esc(t('c.del', { c: cname(c) }))}" title="${esc(t('c.del', { c: cname(c) }))}">${DEL}</button>
+        ${par}
+        <div class="meta" id="meta${i}"></div>
+      </div>`;
+    }).join('');
+    $('addComp').innerHTML = `<option value="">${t('add.title')}</option>` +
+      Object.keys(LIB).map(k => `<option value="${k}">${LIB[k][lang]}</option>`).join('') + `<option value="other">${t('add.other')}</option>`;
+    renderKeys();
+  }
+  function renderKeys() {
+    const opts = S.comps.map((c, i) => `<option value="${i}">${nm(i)}</option>`).join('');
+    $('lk').innerHTML = opts; $('hk').innerHTML = opts;
+    $('lk').value = String(S.lk); $('hk').value = String(S.hk);
+  }
+  function renderMeta() {
+    const P = num(S.P), ant = S.mode === 'antoine';
+    let zs = 0;
+    S.comps.forEach((c, i) => {
+      zs += num(c.z) || 0;
+      const el = $('meta' + i); if (!el) return;
+      const parts = [];
+      if (ant) {
+        const A = num(c.A), B = num(c.B), C = num(c.C);
+        if (isFinite(A) && B > 0 && isFinite(C) && P > 0) parts.push(t('c.tb', { P: trim(fx(P, 3)), t: fx(FUG.tbAt({ A, B, C }, P * 760), 1) }));
+      }
+      if (res && res.role && res.role[i]) parts.push(t('role.' + res.role[i]));
+      else if (i === S.lk) parts.push(t('role.LK'));
+      else if (i === S.hk) parts.push(t('role.HK'));
+      el.innerHTML = parts.map(p => `<span>${p}</span>`).join('');
+    });
+    const zel = $('zsum');
+    zel.textContent = t('zsum', { s: fx(zs, 4) });
+    zel.classList.toggle('bad', Math.abs(zs - 1) > 1e-3);
+  }
+
+  /* ---------- avisos ---------- */
+  const ICON = {
+    err: '<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="var(--crit)"/><path d="M6.5 6.5l7 7M13.5 6.5l-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>',
+    warn: '<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5l9 16H1z" fill="var(--warn)"/><path d="M10 7v5" stroke="#3a2a00" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.8" r="1.2" fill="#3a2a00"/></svg>',
+    info: '<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="var(--accent)"/><path d="M10 9v5" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="6" r="1.2" fill="#fff"/></svg>'
+  };
+  function msg(e) {
+    const p = Object.assign({}, e.p);
+    if (p.i != null) p.c = nm(p.i);
+    if (p.lk != null) p.lk = nm(p.lk);
+    if (p.hk != null) p.hk = nm(p.hk);
+    if (p.s != null) p.s = fx(p.s, 4);
+    if (p.w != null) p.w = pct(p.w);
+    if (p.p != null) p.p = t('bub.' + p.p);
+    return t(e.key, p);
+  }
+  function renderAlerts() {
+    const A = [];
+    if (res) {
+      res.errors.forEach(e => A.push(['err', msg(e)]));
+      res.warnings.forEach(e => A.push(['warn', msg(e)]));
+      if (res.ok && S.preset === 'alcoholes' && S.mode === 'antoine') A.push(['info', t('info.ideal')]);
+    }
+    $('alerts').innerHTML = A.map(([lv, h]) => `<div class="alert ${lv}">${ICON[lv]}<div>${h}</div></div>`).join('');
+  }
+
+  /* ---------- indicadores ---------- */
+  function renderKPIs() {
+    const set = (id, v, d) => { $(id).innerHTML = v; $(id + 'd').innerHTML = d || ''; };
+    if (res && res.ok) {
+      set('kN', String(res.Nceil), t('kpi.Nsub', { t: res.Nceil - 1, n: fx(res.N, 2) }));
+      set('kF', `${res.feed}<small>/ ${res.Nceil}</small>`, t('kpi.feedSub', { r: fx(res.NR, 1), s: fx(res.NS, 1) }));
+      set('kR', fR(res.R), t('kpi.Rsub', { m: fR(res.Rmin), th: fx(res.theta, 4) }));
+      set('kM', fx(res.Nmin1, 2), t('kpi.NminSub', { S: sci(res.S, 2) }));
+    } else ['kN', 'kF', 'kR', 'kM'].forEach(id => set(id, '—', ''));
+  }
+
+  /* ---------- gráficas ---------- */
+  const FONT = 'IBM Plex Sans, system-ui, -apple-system, Segoe UI, sans-serif', MONO = 'IBM Plex Mono, ui-monospace, Consolas, monospace';
+  const C = { ink: '#141a1f', ink2: '#47525c', ink3: '#6f7a84', line: '#dce2e6', line2: '#c6cfd6', paper: '#fcfdfd', surf2: '#f7f9fa', gMin: '#edf1f3', gMaj: '#d9e1e6', q: '#6250d6', rect: '#eb6834', strip: '#1baf7a', eq: '#2a78d6', accent: '#1d5cab' };
+  // En celular la gráfica se dibuja a la mitad de su tamaño: FS agranda los textos para que sigan legibles
+  let FS = 1;
+  const fz = s => (s * FS).toFixed(1);
+  const txt = (x, y, s, a) => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="${FONT}" font-size="${fz(12)}" fill="${C.ink2}" ${a || ''}>${s}</text>`;
+  const sub = s => s.replace(/_([A-Za-z]+)/g, '<tspan font-size="9" dy="3">$1</tspan><tspan dy="-3">​</tspan>');
+
+  function stackBar(x, y, w, h, fr) {
+    let o = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${C.surf2}" stroke="${C.line2}"/>`;
+    let cx = x;
+    res.ord.forEach(i => { const ww = w * fr[i]; if (ww > 0.2) { o += `<rect x="${cx.toFixed(2)}" y="${y}" width="${ww.toFixed(2)}" height="${h}" fill="${col(i)}"><title>${nm(i)}: ${fx(fr[i], 4)}</title></rect>`; cx += ww; } });
+    return o;
+  }
+
+  function plotColumn() {
+    // K: versión compacta (celular), más angosta y con las etiquetas en varias líneas
+    const K = FS > 1, inp = res.inp, u = esc(S.Funit);
+    const W = K ? 400 : 600, top = 74, bot = 396, cx = K ? 150 : 250, cw = K ? 60 : 92;
+    const cc = cx + cw + (K ? 20 : 30), px = cx + cw + (K ? 46 : 80), fx0 = K ? 8 : 22, bw = K ? 130 : 170;
+    const yD = 20 + 6 * FS, yB = 436, lh = 15 * FS, H = Math.round(yB + lh + 21);
+    const Nt = Math.max(1, res.Nceil - 1), step = (bot - top) / Nt;
+    const trayY = k => top + (k - 0.5) * step;
+    const f = Math.min(res.feed, Nt), fy = trayY(f);
+    const o = [];
+    o.push(`<rect x="${cx}" y="${top - 10}" width="${cw}" height="${bot - top + 20}" rx="${K ? 12 : 16}" fill="${C.surf2}" stroke="${C.ink3}" stroke-width="1.4"/>`);
+    const every = Nt > 110 ? Math.ceil(Nt / 110) : 1;
+    let trays = '';
+    for (let k = 1; k <= Nt; k += every) if (k !== f) trays += `M${cx + 7},${trayY(k).toFixed(1)}H${cx + cw - 7}`;
+    o.push(`<path d="${trays}" stroke="${C.line2}" stroke-width="1" fill="none"/>`);
+    o.push(`<path d="M${cx + 4},${fy.toFixed(1)}H${cx + cw - 4}" stroke="${C.q}" stroke-width="2.4"/>`);
+    // condensador y destilado; rehervidor y fondos
+    [[30, top - 10], [442, bot + 10]].forEach(([y, y0]) => {
+      o.push(`<path d="M${cx + cw / 2},${y0}V${y}H${cc}" stroke="${C.ink3}" stroke-width="1.4" fill="none"/>`);
+      o.push(`<circle cx="${cc}" cy="${y}" r="${K ? 9 : 11}" fill="${C.paper}" stroke="${C.ink3}" stroke-width="1.4"/>`);
+      o.push(`<path d="M${cc + (K ? 9 : 11)},${y}H${px - 7}" stroke="${C.eq}" stroke-width="2" marker-end="url(#ar)"/>`);
+    });
+    o.push(txt(cc, 14, t('pl.cond'), `text-anchor="middle" fill="${C.ink3}"`));
+    o.push(txt(cx - 10, 446, t('pl.reb'), `text-anchor="end" fill="${C.ink3}"`));
+    o.push(txt(px, yD, t('pl.D', { D: fFlow(res.D), u }), `fill="${C.ink}" font-weight="500"`));
+    if (isFinite(res.TD)) o.push(txt(px, yD + lh, t('pl.TD', { t: fx(res.TD, 1) })));
+    o.push(stackBar(px, yD + lh + 6, bw, 9, res.xD));
+    o.push(txt(px, yB, t('pl.B', { B: fFlow(res.B), u }), `fill="${C.ink}" font-weight="500"`));
+    if (isFinite(res.TB)) o.push(txt(px, yB + lh, t('pl.TB', { t: fx(res.TB, 1) })));
+    o.push(stackBar(px, yB + lh + 6, bw, 9, res.xB));
+    // alimentación
+    o.push(`<path d="M${fx0},${fy.toFixed(1)}H${cx - 4}" stroke="${C.q}" stroke-width="2" marker-end="url(#arq)"/>`);
+    const feedTxt = t('pl.feed', { F: trim(fx(inp.F, 3)), u, q: trim(fx(inp.q, 3)) });
+    (K ? feedTxt.split(' · ').reverse() : [feedTxt]).forEach((s, k) => o.push(txt(fx0, fy - 28 - k * lh, s, `fill="${C.ink}" font-weight="500"`)));
+    o.push(stackBar(fx0, fy - 22, K ? cx - fx0 - 14 : 200, 10, res.z));
+    o.push(txt(fx0, fy + 6 + 12 * FS, t('pl.feedStage', { f: res.feed }), `fill="${C.q}" font-weight="600"`));
+    // secciones (Kirkbride)
+    const bx = cx + cw + (K ? 10 : 14), tx = bx + (K ? 12 : 14), yR0 = top - 4, yR1 = fy - 6, yS0 = fy + 6, yS1 = bot + 4;
+    const brace = (y0, y1, c) => `<path d="M${bx},${y0.toFixed(1)}h6V${y1.toFixed(1)}h-6" stroke="${c}" stroke-width="1.6" fill="none"/>`;
+    const section = (y0, y1, c, name, v, k) => {
+      if (y1 - y0 <= 8) return;
+      o.push(brace(y0, y1, c));
+      const lines = K ? [name, v, t('pl.stages', { k })] : [name, `${v} → ${t('pl.stages', { k })}`];
+      const ym = (y0 + y1) / 2 - (lines.length - 2) * lh / 2;
+      lines.forEach((s, j) => o.push(txt(tx, ym - 2 + j * lh, sub(s), j ? '' : `fill="${C.ink}" font-weight="600"`)));
+    };
+    section(yR0, yR1, C.rect, t('pl.rect'), `N_R = ${fx(res.NR, 1)}`, res.feed - 1);
+    section(yS0, yS1, C.strip, t('pl.strip'), `N_S = ${fx(res.NS, 1)}`, res.Nceil - res.feed + 1);
+    // números de etapa
+    const lab = (k, s) => o.push(`<text x="${cx - 8}" y="${(trayY(k) + 4).toFixed(1)}" font-family="${MONO}" font-size="${fz(11)}" fill="${C.ink2}" text-anchor="end">${s}</text>`);
+    lab(1, '1');
+    if (Nt > 1) lab(Nt, String(Nt));
+    const defs = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="${C.eq}"/></marker><marker id="arq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="${C.q}"/></marker></defs>`;
+    return { W, H, body: defs + o.join('') };
+  }
+
+  function axes(o, PL, PT, PW, PH, xt, yt, sx, sy, xl, yl, dec) {
+    o.push(`<rect x="${PL}" y="${PT}" width="${PW}" height="${PH}" fill="${C.paper}"/>`);
+    let g = '';
+    xt.forEach(v => { g += `M${sx(v).toFixed(1)},${PT}V${PT + PH}`; });
+    yt.forEach(v => { g += `M${PL},${sy(v).toFixed(1)}H${PL + PW}`; });
+    o.push(`<path d="${g}" stroke="${C.gMaj}" fill="none"/>`);
+    xt.forEach(v => o.push(`<text x="${sx(v).toFixed(1)}" y="${(PT + PH + 4 + 12 * FS).toFixed(1)}" font-family="${MONO}" font-size="${fz(11)}" fill="${C.ink2}" text-anchor="middle">${dec.x(v)}</text>`));
+    yt.forEach(v => o.push(`<text x="${PL - 7}" y="${(sy(v) + 4 * FS).toFixed(1)}" font-family="${MONO}" font-size="${fz(11)}" fill="${C.ink2}" text-anchor="end">${dec.y(v)}</text>`));
+    o.push(`<text x="${PL + PW / 2}" y="${(PT + PH + 12 + 26 * FS).toFixed(1)}" font-family="${FONT}" font-size="${fz(12.5)}" fill="${C.ink2}" text-anchor="middle">${xl}</text>`);
+    const ty = 6 + 9 * FS;
+    o.push(`<text x="${ty}" y="${PT + PH / 2}" font-family="${FONT}" font-size="${fz(12.5)}" fill="${C.ink2}" text-anchor="middle" transform="rotate(-90 ${ty} ${PT + PH / 2})">${yl}</text>`);
+  }
+  function niceTicks(a, b, n) {
+    const raw = (b - a) / (n || 5), p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    const st = (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p, out = [];
+    for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + 1e-9; v += st) out.push(+v.toFixed(10));
+    return { ticks: out, step: st };
+  }
+  const decFor = st => v => (st >= 1 ? fx(v, 0) : st >= 0.1 ? fx(v, 1) : st >= 0.01 ? fx(v, 2) : fx(v, 3));
+
+  function plotUnderwood() {
+    const K = FS > 1, W = K ? 400 : 600, PL = K ? 54 : 58, PT = 16, PW = W - PL - (K ? 12 : 18), PH = K ? 300 : 360, H = Math.round(PT + PH + 18 + 30 * FS), inp = res.inp, a = res.a, z = res.z;
+    const poles = a.map((v, i) => ({ v, i })).filter(p => z[p.i] > 0).sort((p, q) => p.v - q.v);
+    const lk = inp.lk, hk = inp.hk, w = a[lk] - a[hk];
+    let x0, x1;
+    if (zoom === 'keys') { x0 = a[hk] - 0.25 * w; x1 = a[lk] + 0.25 * w; }
+    else { const amax = poles[poles.length - 1].v; x0 = 0; x1 = amax * 1.18 + 0.1; }
+    const c = 1 - inp.q, yr = zoom === 'keys' ? 3 : 5, y0 = c - yr, y1 = c + yr;
+    const sx = x => PL + (x - x0) / (x1 - x0) * PW, sy = y => PT + (1 - (y - y0) / (y1 - y0)) * PH;
+    const o = [`<defs><clipPath id="uc"><rect x="${PL}" y="${PT}" width="${PW}" height="${PH}"/></clipPath></defs>`];
+    const xt = niceTicks(x0, x1, 6), yt = niceTicks(y0, y1, 6);
+    axes(o, PL, PT, PW, PH, xt.ticks, yt.ticks, sx, sy, t('pl.thx'), t('pl.thy'), { x: decFor(xt.step), y: decFor(yt.step) });
+    o.push(`<g clip-path="url(#uc)">`);
+    o.push(`<rect x="${sx(a[hk]).toFixed(1)}" y="${PT}" width="${(sx(a[lk]) - sx(a[hk])).toFixed(1)}" height="${PH}" fill="${C.accent}" fill-opacity=".06"/>`);
+    poles.forEach(p => { if (p.v > x0 && p.v < x1) o.push(`<path d="M${sx(p.v).toFixed(1)},${PT}V${PT + PH}" stroke="${col(p.i)}" stroke-width="1.2" stroke-dasharray="4 4"/>`); });
+    o.push(`<path d="M${PL},${sy(c).toFixed(1)}H${PL + PW}" stroke="${C.q}" stroke-width="1.8"/>`);
+    const edges = [x0].concat(poles.map(p => p.v).filter(v => v > x0 && v < x1)).concat([x1]);
+    const lim = (y1 - y0) * 3;
+    for (let k = 0; k < edges.length - 1; k++) {
+      const e0 = edges[k], e1 = edges[k + 1], gap = (e1 - e0) * 1e-3, pts = [];
+      for (let j = 0; j <= 240; j++) {
+        const x = e0 + gap + (e1 - e0 - 2 * gap) * j / 240;
+        const y = Math.max(y0 - lim, Math.min(y1 + lim, FUG.underwood(a, z, x)));
+        pts.push(sx(x).toFixed(1) + ',' + sy(y).toFixed(1));
+      }
+      o.push(`<path d="M${pts.join('L')}" stroke="${C.ink}" stroke-width="2" fill="none"/>`);
+    }
+    o.push(`<circle cx="${sx(res.theta).toFixed(1)}" cy="${sy(c).toFixed(1)}" r="6" fill="${C.paper}" stroke="${C.rect}" stroke-width="2.4"/>`);
+    o.push('</g>');
+    poles.forEach(p => { if (p.v > x0 && p.v < x1) o.push(`<text x="${(sx(p.v) + 4).toFixed(1)}" y="${(PT + 4 + 9 * FS).toFixed(1)}" font-family="${FONT}" font-size="${fz(11)}" fill="${col(p.i)}" font-weight="600">${t('role.s.' + res.role[p.i])}</text>`); });
+    // θ abajo a la derecha de la raíz (ahí la rama HK–LK ya pasó por encima de la línea); 1 − q en el extremo derecho
+    const tx = Math.min(PL + PW - 6, sx(res.theta) + 10);
+    o.push(txt(tx, sy(c) + 20, t('pl.theta', { th: fx(res.theta, 4) }), `fill="${C.ink}" font-weight="600" ${tx > PL + PW - 90 ? 'text-anchor="end"' : ''}`));
+    o.push(txt(PL + PW - 6, sy(c) - 8, t('pl.oneq', { v: trim(fx(c, 3)) }), `fill="${C.q}" text-anchor="end"`));
+    return { W, H, body: o.join('') };
+  }
+
+  function plotGilliland() {
+    const K = FS > 1, W = K ? 400 : 600, PL = K ? 54 : 58, PT = 16, PW = W - PL - (K ? 12 : 18), PH = K ? 300 : 360, H = Math.round(PT + PH + 18 + 30 * FS);
+    const lx0 = -2, lx1 = 0, sx = X => PL + (Math.log10(X) - lx0) / (lx1 - lx0) * PW, sy = Y => PT + (1 - Y) * PH;
+    const o = [];
+    const xt = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1], yt = [0, 0.2, 0.4, 0.6, 0.8, 1];
+    axes(o, PL, PT, PW, PH, xt, yt, sx, sy, t('pl.gx'), t('pl.gy'), { x: v => String(v), y: v => fx(v, 1) });
+    const curve = (fn, color, dash) => {
+      const pts = [];
+      for (let j = 0; j <= 200; j++) { const X = Math.pow(10, lx0 + (lx1 - lx0) * j / 200); pts.push(sx(X).toFixed(1) + ',' + sy(Math.max(0, Math.min(1, fn(X)))).toFixed(1)); }
+      return `<path d="M${pts.join('L')}" stroke="${color}" stroke-width="2.2" fill="none" ${dash ? `stroke-dasharray="${dash}"` : ''}/>`;
+    };
+    o.push(curve(FUG.eduljee, C.rect, ''));
+    o.push(curve(FUG.molokanov, C.strip, '6 4'));
+    const X = Math.max(0.01, Math.min(1, res.X)), Y = res.Y;
+    o.push(`<path d="M${sx(X).toFixed(1)},${PT + PH}V${sy(Y).toFixed(1)}H${PL}" stroke="${C.ink3}" stroke-width="1" stroke-dasharray="3 3" fill="none"/>`);
+    o.push(`<circle cx="${sx(X).toFixed(1)}" cy="${sy(Y).toFixed(1)}" r="6" fill="${C.paper}" stroke="${C.ink}" stroke-width="2.4"/>`);
+    const right = sx(X) > PL + PW - 160 * FS;
+    o.push(txt(sx(X) + (right ? -10 : 10), sy(Y) - 10, t('pl.point', { x: fx(res.X, 3), y: fx(Y, 3) }), `fill="${C.ink}" font-weight="600" ${right ? 'text-anchor="end"' : ''}`));
+    return { W, H, body: o.join('') };
+  }
+
+  const compact = () => ($('plot').parentElement.clientWidth || 800) < 560;
+  function renderPlot() {
+    const svg = $('plot');
+    FS = compact() ? 1.25 : 1;
+    document.querySelectorAll('#viewSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === S.view));
+    $('zoomSeg').hidden = S.view !== 'und';
+    document.querySelectorAll('#zoomSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.zoom === zoom));
+    if (!res || !res.ok) {
+      svg.setAttribute('viewBox', '0 0 600 120');
+      svg.innerHTML = `<title id="plotTitle">FUG</title><text x="300" y="64" font-family="${FONT}" font-size="14" fill="${C.ink3}" text-anchor="middle">${esc(t('asp.unavailable'))}</text>`;
+      $('legend').innerHTML = ''; $('caption').innerHTML = '';
+      return;
+    }
+    const b = S.view === 'und' ? plotUnderwood() : S.view === 'gil' ? plotGilliland() : plotColumn();
+    svg.setAttribute('viewBox', `0 0 ${b.W} ${b.H}`);
+    svg.innerHTML = `<title id="plotTitle">FUG · ${esc(t('view.' + S.view))}</title>` + b.body;
+    renderLegend(); renderCaption();
+  }
+
+  function renderLegend() {
+    const sw = (c, kind, dash) => kind === 'dot'
+      ? `<svg class="sw" viewBox="0 0 22 10" aria-hidden="true"><circle cx="11" cy="5" r="4" fill="${c}"/></svg>`
+      : kind === 'ring' ? `<svg class="sw" viewBox="0 0 22 10" aria-hidden="true"><circle cx="11" cy="5" r="3.6" fill="#fff" stroke="${c}" stroke-width="2"/></svg>`
+        : `<svg class="sw" viewBox="0 0 22 10" aria-hidden="true"><path d="M1 5H21" stroke="${c}" stroke-width="2.2" ${dash ? `stroke-dasharray="${dash}"` : ''}/></svg>`;
+    let items;
+    if (S.view === 'col') items = res.ord.map(i => `<span class="lg">${sw(col(i), 'dot')}${nm(i)} <small>${t('role.s.' + res.role[i])}</small></span>`);
+    else if (S.view === 'und') items = [`<span class="lg">${sw(C.ink)}${t('lg.und')}</span>`, `<span class="lg">${sw(C.q)}${t('lg.oneq')}</span>`, `<span class="lg">${sw(C.rect, 'ring')}${t('lg.root')}</span>`, `<span class="lg">${sw(C.ink3, '', '4 4')}${t('lg.pole')}</span>`];
+    else items = [`<span class="lg">${sw(C.rect)}${t('lg.edu')}</span>`, `<span class="lg">${sw(C.strip, '', '6 4')}${t('lg.mol')}</span>`, `<span class="lg">${sw(C.ink, 'ring')}${t('lg.point')}</span>`];
+    $('legend').innerHTML = items.join('');
+  }
+
+  function renderCaption() {
+    const r = res, inp = r.inp;
+    let h;
+    if (S.view === 'col') h = t('cap.col', { f: r.feed, n: r.Nceil });
+    else if (S.view === 'und') h = t('cap.und', { a: fx(r.a[inp.lk], 4), th: fx(r.theta, 4) });
+    else h = t('cap.gil', { k: trim(fx(inp.RR, 3)), x: fx(r.X, 4), y: fx(r.Y, 4), n: fx(r.N, 2), corr: t(inp.gill === 'molokanov' ? 'lg.mol' : 'lg.edu') });
+    $('caption').innerHTML = h;
+  }
+
+  /* ---------- pestañas ---------- */
+  function unavailable(id) { $(id).innerHTML = `<p>${t('asp.unavailable')}</p>`; }
+  const dotName = i => `<span class="cdot" style="background:${col(i)}"></span>${nm(i)}`;
+
+  function renderSteps() {
+    if (!res || !res.ok) return unavailable('p-steps');
+    const r = res, inp = r.inp, u = esc(S.Funit), lk = inp.lk;
+    const ant = inp.mode === 'antoine';
+    const rows = [
+      ['1', 's1', t('r1', { P: trim(fx(inp.P, 4)), F: trim(fx(inp.F, 4)), u, q: trim(fx(inp.q, 4)), k: trim(fx(inp.RR, 4)) }), 'Σ z<sub>i</sub> = 1'],
+      ['2', 's2', t('r2', { lk: nm(lk), hk: nm(inp.hk), rl: trim(fx(100 * inp.recLK, 4)), rh: trim(fx(100 * inp.recHK, 4)) }), 'd<sub>LK</sub> = r<sub>LK</sub>F<sub>LK</sub> · b<sub>HK</sub> = r<sub>HK</sub>F<sub>HK</sub>'],
+      ['3', 's3', t('r3', { D: fFlow(r.D), B: fFlow(r.B), u }), 'D = Σ d<sub>i</sub> · B = F − D'],
+      ['4–5', 's45', ant ? t('r45', { td: fx(r.TD, 2), tb: fx(r.TB, 2) }) : t('r45na'), 'Σ x<sub>i</sub>P<sub>i</sub><sup>sat</sup>(T)/P = 1'],
+      ['6', 's6', t('r6', { a: fx(r.a[lk], 4) }), 'α<sub>i</sub> = √(α<sub>i,D</sub> · α<sub>i,B</sub>)'],
+      ['7', 's7', t('r7', { S: sci(r.S, 3), n1: fx(r.Nmin1, 2), n: fx(r.Nmin, 2) }), 'N<sub>min</sub> + 1 = ln S / ln α<sub>LK,HK</sub>'],
+      ['8–9', 's89', t('r89', { th: fx(r.theta, 4), a: fx(r.a[lk], 4) }), 'Σ α<sub>i</sub>z<sub>i</sub>/(α<sub>i</sub> − θ) = 1 − q'],
+      ['10', 's10', t('r10', { rm: fx(r.Rmin, 4), R: fx(r.R, 4) }), 'R<sub>min</sub> + 1 = Σ α<sub>i</sub>x<sub>D,i</sub>/(α<sub>i</sub> − θ)'],
+      ['11', 's11', t('r11', { x: fx(r.X, 4), y: fx(r.Y, 4), n: fx(r.N, 2), nc: r.Nceil }), inp.gill === 'molokanov' ? 'Molokanov · N = (N<sub>min</sub>+1 + Y)/(1 − Y)' : 'Y = 0.75(1 − X<sup>0.5668</sup>) · N = (N<sub>min</sub>+1 + Y)/(1 − Y)'],
+      ['12', 's12', t('r12', { nr: fx(r.NR, 2), ns: fx(r.NS, 2), f: r.feed }), 'N<sub>R</sub>/N<sub>S</sub> = ' + fx(r.kr, 4) + (lang === 'en' ? ' · stage = round(N<sub>R</sub>) + 1' : ' · etapa = redondeo(N<sub>R</sub>) + 1')]
+    ];
+    $('p-steps').innerHTML = `<p>${t('st.intro')}</p><div class="tblwrap"><table class="steps"><thead><tr><th>${t('st.n')}</th><th>${t('st.what')}</th><th>${t('st.res')}</th><th>${t('st.f')}</th></tr></thead><tbody>` +
+      rows.map(([n, k, v, f]) => `<tr><td>${n}</td><td>${t(k)}</td><td>${v}</td><td>${f}</td></tr>`).join('') + '</tbody></table></div>';
+  }
+
+  function renderBal() {
+    if (!res || !res.ok) return unavailable('p-bal');
+    const r = res, u = esc(S.Funit);
+    const body = r.ord.map(i => `<tr class="${r.role[i] === 'LK' || r.role[i] === 'HK' ? 'key' : ''}"><td class="txt">${dotName(i)}</td><td class="txt">${t('role.' + r.role[i])}</td><td>${fx(r.z[i], 4)}</td><td>${fFlow(r.f[i])}</td><td>${fFlow(r.d[i])}</td><td>${fFlow(r.b[i])}</td><td>${fx(r.xD[i], 4)}</td><td>${fx(r.xB[i], 4)}</td></tr>`).join('');
+    const tot = `<tr><td class="txt"><b>Total</b></td><td></td><td>${fx(r.z.reduce((s, v) => s + v, 0), 4)}</td><td>${fFlow(r.inp.F)}</td><td>${fFlow(r.D)}</td><td>${fFlow(r.B)}</td><td>1.0000</td><td>1.0000</td></tr>`;
+    $('p-bal').innerHTML = `<p>${t('b.note', { u })}</p><div class="tblwrap"><table><thead><tr><th>${t('b.comp')}</th><th>${t('b.role')}</th><th>z</th><th>F</th><th>D</th><th>B</th><th>x<sub>D</sub></th><th>x<sub>B</sub></th></tr></thead><tbody>${body}${tot}</tbody></table></div>`;
+  }
+
+  function renderVol() {
+    if (!res || !res.ok) return unavailable('p-vol');
+    const r = res, ant = r.inp.mode === 'antoine';
+    const head = ant ? `<th>${t('b.comp')}</th><th>${t('v.tb')}</th><th>${t('v.KD')}</th><th>${t('v.KB')}</th><th>${t('v.aD')}</th><th>${t('v.aB')}</th><th>${t('v.a')}</th>` : `<th>${t('b.comp')}</th><th>${t('v.a')}</th>`;
+    const body = r.ord.map(i => `<tr class="${r.role[i] === 'LK' || r.role[i] === 'HK' ? 'key' : ''}"><td class="txt">${dotName(i)}</td>` +
+      (ant ? `<td>${fx(r.tb[i], 1)}</td><td>${fx(r.KD[i], 4)}</td><td>${fx(r.KB[i], 4)}</td><td>${fx(r.aTop[i], 3)}</td><td>${fx(r.aBot[i], 3)}</td>` : '') + `<td><b>${fx(r.a[i], 4)}</b></td></tr>`).join('');
+    $('p-vol').innerHTML = `<div class="tblwrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div><div class="note">${ant ? t('v.note', { td: fx(r.TD, 2), tb: fx(r.TB, 2) }) : t('v.noteAlpha')}</div>`;
+  }
+
+  function renderNK() {
+    if (!res || !res.ok) return unavailable('p-nk');
+    const r = res;
+    const body = r.ord.map(i => {
+      const o = r.nk[i], key = r.role[i] === 'LK' || r.role[i] === 'HK';
+      const state = key ? `<span style="font-family:var(--font-body);color:var(--ink-3)">${t('nk.key')}</span>` : o.wrong > 1e-3 ? `<span class="badm">${t('nk.bad')}</span>` : `<span class="okm">${t('nk.ok')}</span>`;
+      return `<tr class="${key ? 'key' : ''}"><td class="txt">${dotName(i)}</td><td class="txt">${t('role.' + r.role[i])}</td><td>${sci(o.db, 2)}</td><td>${key ? '—' : pct(o.wrong)}</td><td>${state}</td></tr>`;
+    }).join('');
+    $('p-nk').innerHTML = `<div class="tblwrap"><table><thead><tr><th>${t('b.comp')}</th><th>${t('b.role')}</th><th>${t('nk.db')}</th><th>${t('nk.wrong')}</th><th>${t('nk.state')}</th></tr></thead><tbody>${body}</tbody></table></div><div class="note">${t('nk.note')}</div>`;
+  }
+
+  const cv = v => `<button type="button" class="copyv" data-copy="${esc(v)}">${esc(v)}</button>`;
+  const kvRow = (k, s, v) => `<div class="k">${k}${s ? `<small>${s}</small>` : ''}</div><div class="v">${v}</div>`;
+  function aspenSummary() {
+    const r = res, inp = r.inp, u = S.Funit;
+    return [
+      `FUG Lab · ${r.ord.map(i => cname(S.comps[i])).join(' / ')}`,
+      `F = ${trim(fx(inp.F, 4))} ${u}, P = ${trim(fx(inp.P, 4))} atm, q = ${trim(fx(inp.q, 4))}`,
+      '',
+      'DSTWU',
+      `  Reflux ratio: -${trim(fx(inp.RR, 4))}  (R = ${fx(r.R, 4)}, Rmin = ${fx(r.Rmin, 4)})`,
+      `  Light key ${cname(S.comps[inp.lk])}: Recov = ${trim(fx(inp.recLK, 6))}`,
+      `  Heavy key ${cname(S.comps[inp.hk])}: Recov = ${trim(fx(1 - inp.recHK, 6))}`,
+      `  Pressure: ${trim(fx(inp.P, 4))} atm (condenser and reboiler) · Total condenser`,
+      '',
+      'RadFrac',
+      `  Number of stages: ${r.Nceil + 1}`,
+      `  Feed stage: ${r.feed + 1}`,
+      `  Distillate rate: ${fFlow(r.D)} ${u}`,
+      `  Reflux ratio (Mole): ${fx(r.R, 4)}`
+    ].join('\n');
+  }
+  function renderAspen() {
+    if (!res || !res.ok) return unavailable('p-aspen');
+    const r = res, inp = r.inp, u = esc(S.Funit);
+    const dstwu = [
+      kvRow(t('asp.reflux'), t('asp.refluxS'), cv('-' + trim(fx(inp.RR, 4)))),
+      kvRow(`${t('asp.lk')} · <b>${nm(inp.lk)}</b>`, t('asp.recS', { c: nm(inp.lk) }), cv(trim(fx(inp.recLK, 6)))),
+      kvRow(`${t('asp.hk')} · <b>${nm(inp.hk)}</b>`, t('asp.recS', { c: nm(inp.hk) }), cv(trim(fx(1 - inp.recHK, 6)))),
+      kvRow(t('asp.press'), t('asp.pressS'), cv(trim(fx(inp.P, 4)) + ' atm')),
+      kvRow(t('asp.cond'), '', '<span style="font-family:var(--font-body)">Total condenser</span>')
+    ].join('');
+    const rad = [
+      kvRow(t('asp.nst'), t('asp.nstS', { n: r.Nceil }), cv(String(r.Nceil + 1))),
+      kvRow(t('asp.feed'), t('asp.feedS', { f: r.feed }), cv(String(r.feed + 1))),
+      kvRow(t('asp.D'), u, cv(fFlow(r.D))),
+      kvRow(t('asp.RR'), '', cv(fx(r.R, 4))),
+      kvRow(t('asp.cond'), '', '<span style="font-family:var(--font-body)">Total · Kettle</span>')
+    ].join('');
+    $('p-aspen').innerHTML = `<div class="inline" style="justify-content:space-between;margin-bottom:12px"><p style="margin:0">${t('asp.intro')}</p>
+      <button type="button" class="btn" data-act="copyAll"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5"/><path d="M3 10.5V3.8C3 3.4 3.4 3 3.8 3h6.7"/></svg>${t('asp.copyAll')}</button></div>
+      <div class="cols2"><div class="spec"><div class="hd"><b>${t('asp.dstwu')}</b><span>${t('asp.dstwuSub')}</span></div><div class="kv">${dstwu}</div></div>
+      <div class="spec"><div class="hd"><b>${t('asp.radfrac')}</b><span>${t('asp.radfracSub')}</span></div><div class="kv">${rad}</div></div></div>
+      <div class="note">${t('asp.note')}</div>`;
+  }
+
+  function renderAll() {
+    renderMeta(); renderAlerts(); renderKPIs(); renderPlot();
+    renderSteps(); renderBal(); renderVol(); renderNK(); renderAspen();
+  }
+
+  /* ---------- portapapeles ---------- */
+  let toastT = null;
+  function toast(m) { const el = $('toast'); el.textContent = m; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2200); }
+  function copyText(txt, label) {
+    const done = () => toast(t('toast.copied', { v: label || txt }));
+    const fallback = () => {
+      try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); ok ? done() : toast(t('toast.copyFail')); }
+      catch (e) { toast(t('toast.copyFail')); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
+  }
+
+  /* ---------- entradas ---------- */
+  const FIELDS = ['F', 'Funit', 'P', 'RR', 'q', 'recLK', 'recHK', 'gill'];
+  function syncInputs() {
+    FIELDS.forEach(id => { if (document.activeElement !== $(id)) $(id).value = S[id]; });
+    $('preset').value = S.preset;
+    document.querySelectorAll('#qChips .chip').forEach(c => c.setAttribute('aria-pressed', String(num(c.dataset.q) === num(S.q))));
+  }
+  function custom() { if (S.preset !== 'custom') { S.preset = 'custom'; $('preset').value = 'custom'; } }
+  function setTab(name) {
+    S.tab = name;
+    document.querySelectorAll('.tab').forEach(b => { const on = b.dataset.tab === name; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+    document.querySelectorAll('[role=tabpanel]').forEach(p => { p.hidden = p.id !== 'p-' + name; });
+    save();
+  }
+  function setLang(l) { lang = l; S.lang = l; applyStatic(); renderComps(); syncInputs(); compute(); }
+  function loadPreset(p) { const keep = S.lang; S = freshState(p); S.lang = keep; zoom = 'all'; renderComps(); syncInputs(); compute(); }
+
+  function bind() {
+    $('lang-es').addEventListener('click', () => setLang('es'));
+    $('lang-en').addEventListener('click', () => setLang('en'));
+    FIELDS.forEach(id => {
+      const el = $(id);
+      el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => {
+        S[id] = el.value;
+        if (id !== 'Funit' && id !== 'gill') custom();
+        if (id === 'q') document.querySelectorAll('#qChips .chip').forEach(c => c.setAttribute('aria-pressed', String(num(c.dataset.q) === num(S.q))));
+        schedule();
+      });
+    });
+    $('preset').addEventListener('change', () => { const p = $('preset').value; if (p === 'custom') { S.preset = 'custom'; return; } loadPreset(p); });
+    $('btnReset').addEventListener('click', () => loadPreset('clase'));
+    $('qChips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; S.q = c.dataset.q; custom(); syncInputs(); schedule(); });
+    $('mAnt').addEventListener('click', () => { if (S.mode === 'antoine') return; S.mode = 'antoine'; custom(); renderComps(); schedule(); });
+    $('mAlpha').addEventListener('click', () => { if (S.mode === 'alpha') return; S.mode = 'alpha'; custom(); renderComps(); schedule(); });
+    $('comps').addEventListener('input', e => {
+      const el = e.target, i = +el.dataset.i, k = el.dataset.k;
+      if (!S.comps[i] || !k) return;
+      if (k === 'name') { S.comps[i].key = null; S.comps[i].name = el.value; renderKeys(); }
+      else S.comps[i][k] = el.value;
+      custom(); schedule();
+    });
+    $('comps').addEventListener('click', e => {
+      const b = e.target.closest('[data-del]'); if (!b) return;
+      const i = +b.dataset.del;
+      S.comps.splice(i, 1);
+      const fix = v => (v === i ? -1 : v > i ? v - 1 : v);
+      S.lk = fix(S.lk); S.hk = fix(S.hk);
+      if (S.lk < 0) S.lk = Math.max(0, Math.min(S.comps.length - 2, S.hk - 1));
+      if (S.hk < 0 || S.hk === S.lk) S.hk = Math.min(S.comps.length - 1, S.lk + 1);
+      custom(); renderComps(); schedule();
+    });
+    $('addComp').addEventListener('change', () => {
+      const k = $('addComp').value; if (!k) return;
+      S.comps.push(k === 'other' ? { key: null, name: t('new.comp', { n: S.comps.length + 1 }), z: '0', A: '', B: '', C: '', alpha: '' } : libComp(k, 0));
+      custom(); renderComps(); schedule();
+    });
+    $('btnNorm').addEventListener('click', () => {
+      const s = S.comps.reduce((a, c) => a + (num(c.z) > 0 ? num(c.z) : 0), 0);
+      if (!(s > 0)) return;
+      S.comps.forEach(c => { c.z = trim(fx((num(c.z) > 0 ? num(c.z) : 0) / s, 6)); });
+      custom(); renderComps(); schedule();
+    });
+    $('lk').addEventListener('change', () => { S.lk = +$('lk').value; custom(); schedule(); });
+    $('hk').addEventListener('change', () => { S.hk = +$('hk').value; custom(); schedule(); });
+    $('viewSeg').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (!b) return; S.view = b.dataset.view; renderPlot(); save(); });
+    $('zoomSeg').addEventListener('click', e => { const b = e.target.closest('[data-zoom]'); if (!b) return; zoom = b.dataset.zoom; renderPlot(); });
+    $('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) setTab(b.dataset.tab); });
+    $('tabs').addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const tabs = [...document.querySelectorAll('.tab')], i = tabs.findIndex(x => x.getAttribute('aria-selected') === 'true');
+      const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      setTab(tabs[j].dataset.tab); tabs[j].focus();
+    });
+    let lastCompact = null;
+    window.addEventListener('resize', () => { const c = compact(); if (c !== lastCompact) { lastCompact = c; renderPlot(); } });
+    document.addEventListener('click', e => {
+      const act = e.target.closest('[data-act]');
+      if (act && act.dataset.act === 'copyAll' && res && res.ok) { copyText(aspenSummary(), 'Aspen'); return; }
+      const c = e.target.closest('.copyv'); if (c) copyText(c.dataset.copy);
+    });
+  }
+
+  function boot() {
+    S = freshState('clase');
+    const saved = load();
+    if (saved) S = Object.assign(S, saved);
+    lang = S.lang === 'en' ? 'en' : 'es';
+    applyStatic(); renderComps(); syncInputs(); bind(); setTab(S.tab || 'steps');
+    compute();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+</body>
+</html>

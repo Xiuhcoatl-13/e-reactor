@@ -1,6 +1,6 @@
 /* Archivo GENERADO por scripts/construir_catalogo.py — no lo edites a mano. */
 window.EREACTOR = {
- "generado": "2026-10-28 14:28",
+ "generado": "2026-10-28 14:48",
  "config": {
   "nombre": "e-Reactor",
   "lema": "Ingeniería química clara, interactiva y gratuita para Latinoamérica",
@@ -276,6 +276,49 @@ window.EREACTOR = {
    ],
    "destacado": true,
    "fecha": "2026-10-21"
+  },
+  {
+   "id": "destilacion-fug-multicomponente",
+   "titulo": "Destilación multicomponente: método corto FUG",
+   "descripcion": "Diseña una columna multicomponente con Fenske, Underwood, Gilliland y Kirkbride: etapas mínimas, reflujo mínimo, número de etapas y etapa de alimentación. Resuelve sola los pasos que en Excel requieren Solver, y trae el Excel del curso para practicarlos.",
+   "materia": "operaciones",
+   "tema": "Destilación",
+   "tambien_en": [
+    {
+     "materia": "simulacion",
+     "tema": "Aspen Plus"
+    }
+   ],
+   "archivo": "recursos/destilacion-fug-multicomponente/fug.html",
+   "bytes": 95682,
+   "ext": "html",
+   "tipo": "simulacion",
+   "adjuntos": [
+    {
+     "nombre": "FUG_PetrochemicalEng_revisado.xlsx",
+     "ruta": "recursos/destilacion-fug-multicomponente/FUG_PetrochemicalEng_revisado.xlsx",
+     "bytes": 46093,
+     "titulo": "Excel del curso: los 12 pasos con Solver"
+    }
+   ],
+   "nivel": "avanzado",
+   "sigla": "FUG",
+   "etiquetas": [
+    "Fenske",
+    "Underwood",
+    "Gilliland",
+    "Kirkbride",
+    "destilación multicomponente",
+    "componentes clave",
+    "DSTWU",
+    "Aspen Plus"
+   ],
+   "objetivos": [
+    "Elegir los componentes clave y plantear el balance con reparto limpio de los no clave.",
+    "Calcular las etapas mínimas, el reflujo mínimo, el número de etapas y la etapa de alimentación.",
+    "Comprobar las suposiciones del método y llevar los resultados a DSTWU y RadFrac en Aspen Plus."
+   ],
+   "fecha": "2026-10-28"
   },
   {
    "id": "destilacion-mccabe-thiele",
